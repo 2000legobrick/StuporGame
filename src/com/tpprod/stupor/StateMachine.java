@@ -34,6 +34,7 @@ public class StateMachine extends Canvas implements Runnable{
 	
 	@Override
 	public void run() {
+		//hi this is change yeas
 		int fps = 0, tick = 0;
 		double timer = System.currentTimeMillis();
 		
