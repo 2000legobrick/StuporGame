@@ -38,17 +38,8 @@ public class Render {
 		}
 	}
 	
-	public void Movement(Graphics g) {
-		g.setColor(Color.RED);
-		if (tempPos > 500) {
-			flip = true;
-		} else if (tempPos < 100) {
-			flip = false;
-		}
-		if (!flip)
-			tempPos++;
-		else
-			tempPos--;
-		g.fillRect(tempPos, 200, 10, 10);
+	public void Movement(Graphics g, Player player) {
+		g.setColor(player.playerColor);
+		g.fillRect(player.currentX, player.currentY, 10, 10);
 	}
 }

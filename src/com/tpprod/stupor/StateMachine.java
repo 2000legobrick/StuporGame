@@ -13,12 +13,13 @@ import javax.swing.JFrame;
 
 public class StateMachine extends Canvas implements Runnable{
 	
-	private static final long serialVesionUID = 1L;
+	private static final long serialVersionUID = 1L;
 	public static final int WIDTH = 640, HEIGHT = 480;
 	public static final String NAME = "Stupor";
 	
 	private boolean running = false;
 	private Render render = new Render();
+	private Player player = new Player();
 	
 	public StateMachine () {
 		
@@ -58,7 +59,8 @@ public class StateMachine extends Canvas implements Runnable{
 			previous = current;
 			while (unprocessed >= 1) {
 				//Updates game objects
-				
+				player.currentX = 100;
+				player.currentY = 300;
 				tick ++;
 				tick();
 				canRender = true;
@@ -97,7 +99,7 @@ public class StateMachine extends Canvas implements Runnable{
 		g.fillRect(0, 0, getWidth(), getHeight());
 		render.RenderBackground(g, getWidth(), getHeight());
 		render.RenderForeground(g, getWidth(), getHeight());
-		render.Movement(g);
+		render.Movement(g, player);
 		//Done with rendering
 		g.dispose();
 		bs.show();
