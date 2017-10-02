@@ -4,7 +4,10 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
+import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 
 import javax.swing.JFrame;
 
@@ -34,7 +37,12 @@ public class StateMachine extends Canvas implements Runnable{
 	
 	@Override
 	public void run() {
-		//hi this is change yeas
+		try {
+			render.InitializeWorld();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
 		int fps = 0, tick = 0;
 		double timer = System.currentTimeMillis();
 		
@@ -50,6 +58,7 @@ public class StateMachine extends Canvas implements Runnable{
 			previous = current;
 			while (unprocessed >= 1) {
 				//Updates game objects
+				
 				tick ++;
 				tick();
 				canRender = true;
