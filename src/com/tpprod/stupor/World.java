@@ -13,22 +13,18 @@ public class World
     	BufferedReader bR = new BufferedReader(new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "\\Content\\WorldFile"));
         String lineString;
         String[] line;
-        int accX;
-        int accY = 0;
+        int acc = 0;
         try {
             while ((lineString = bR.readLine()) != null) {
                 line = lineString.split(" ");
-                
-                accX = 0;
 
                 worldGrid.add(new ArrayList<Integer>());
                 
                 for (String item : line) {
-                    worldGrid.get(accY).add(Integer.parseInt(item));
-                    accX++;
+                    worldGrid.get(acc).add(Integer.parseInt(item));
                 }
                 
-                accY++;
+                acc++;
             }
         } catch (Exception e) {
             System.err.println("Error thrown: " + e);

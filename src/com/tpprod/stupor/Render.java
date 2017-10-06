@@ -24,7 +24,7 @@ public class Render {
 		g.fillRect(0, 0, width, (height / 3) * 2);
 	} 
 	
-	public void RenderForeground(Graphics g, int width, int height) {
+	public void RenderForeground(Graphics g, int width, int height, int tileSize) {
 		g.setColor(Color.GREEN);
 		for (int row = 0; row < world.worldGrid.size(); row++) {
 			for (int col = 0; col < world.worldGrid.get(0).size(); col++) {
@@ -33,7 +33,7 @@ public class Render {
 				} else if (world.worldGrid.get(row).get(col) == 0) {
 					g.setColor(Color.CYAN);
 				}
-				g.fillRect(col * 10, row * 10, 10, 10);
+				g.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
 			}
 		}
 	}

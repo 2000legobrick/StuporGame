@@ -4,22 +4,34 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.io.FileNotFoundException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
-public class StateMachine extends Canvas implements Runnable{
-	
+import javafx.scene.input.KeyCode;
+
+public class StateMachine extends Canvas implements Runnable, KeyListener{
+
+    
+	// Static variables
 	private static final long serialVersionUID = 1L;
 	public static final int WIDTH = 640, HEIGHT = 480;
 	public static final String NAME = "Stupor";
-	
+
+    public ArrayList<Integer> currentKeys = new ArrayList<Integer>(); 
+    
 	private boolean running = false;
+    private boolean keyPressed;
+    private int tileSize = 70;
+    private int  tickPerSec = 60;
 	private Render render = new Render();
 	private Player player = new Player();
+	private Physics physics = new Physics();
 	
 	public StateMachine () {
 		
@@ -29,10 +41,12 @@ public class StateMachine extends Canvas implements Runnable{
 		if (!running) {
 			running = true;
 			new Thread(this).start();
+			new Thread(physics).start();
 		} 
 	}
 	
 	public void stop () {
+		physics.stop();
 		running = false;
 	}
 	
@@ -44,10 +58,12 @@ public class StateMachine extends Canvas implements Runnable{
 			e1.printStackTrace();
 		}
 		
+		addKeyListener(this);
+		
 		int fps = 0, tick = 0;
 		double timer = System.currentTimeMillis();
 		
-		double nsPerTick = 1000000000.0d / 60;
+		double nsPerTick = 1000000000.0d / tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
 		
@@ -59,8 +75,17 @@ public class StateMachine extends Canvas implements Runnable{
 			previous = current;
 			while (unprocessed >= 1) {
 				//Updates game objects
-				player.currentX = 100;
-				player.currentY = 300;
+				for (int kC: currentKeys) {
+		        	if (kC == 87) { // W Key
+		        		player.playerMove(1, 5, render.world, tileSize);
+		        	} else if (kC == 65) { // A Key
+		        		player.playerMove(3, 5, render.world, tileSize);
+		        	} else if (kC == 83) { // S Key
+		        		player.playerMove(2, 5, render.world, tileSize);
+		        	} else if (kC == 68) { // D Key
+		        		player.playerMove(4, 5, render.world, tileSize);
+		        	}
+		        }
 				tick ++;
 				tick();
 				canRender = true;
@@ -98,7 +123,7 @@ public class StateMachine extends Canvas implements Runnable{
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		render.RenderBackground(g, getWidth(), getHeight());
-		render.RenderForeground(g, getWidth(), getHeight());
+		render.RenderForeground(g, getWidth(), getHeight(), tileSize);
 		render.Movement(g, player);
 		//Done with rendering
 		g.dispose();
@@ -128,4 +153,25 @@ public class StateMachine extends Canvas implements Runnable{
 		
 		game.start();
 	}
+	
+	public void keyTyped(KeyEvent e) {
+    }
+    
+    public void keyReleased(KeyEvent e) {
+        currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
+    }
+    
+    public void keyPressed(KeyEvent e) {
+    	keyPressed = false;
+        for (int item : currentKeys) {
+            if (e.getKeyCode() == item) {
+                keyPressed = true;
+            }
+        }
+        if (!keyPressed) {
+            currentKeys.add(e.getKeyCode());
+        }
+        
+        System.out.println(currentKeys);
+    }
 }
