@@ -28,10 +28,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 	private boolean running = false;
     private boolean keyPressed;
     private int tileSize = 70;
-    private int  tickPerSec = 60;
+    private int  tickPerSec = 90;
 	private Render render = new Render();
-	private Player player = new Player();
-	private Physics physics = new Physics();
+	private Physics physics = new Physics(tileSize);
 	
 	public StateMachine () {
 		
@@ -41,12 +40,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 		if (!running) {
 			running = true;
 			new Thread(this).start();
-			new Thread(physics).start();
 		} 
 	}
 	
 	public void stop () {
-		physics.stop();
 		running = false;
 	}
 	
@@ -54,6 +51,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 	public void run() {
 		try {
 			render.InitializeWorld();
+			physics.world = render.world;
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -75,17 +73,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 			previous = current;
 			while (unprocessed >= 1) {
 				//Updates game objects
+				physics.Gravity();
 				for (int kC: currentKeys) {
-		        	if (kC == 87) { // W Key
-		        		player.playerMove(1, 5, render.world, tileSize);
+					if (kC == 87) { // W Key
+		        		physics.mobMove(physics.mobs.get(0), 1, physics.mobs.get(0).speed);
 		        	} else if (kC == 65) { // A Key
-		        		player.playerMove(3, 5, render.world, tileSize);
+		        		physics.mobMove(physics.mobs.get(0), 3, physics.mobs.get(0).speed);
 		        	} else if (kC == 83) { // S Key
-		        		player.playerMove(2, 5, render.world, tileSize);
+		        		physics.mobMove(physics.mobs.get(0), 2, physics.mobs.get(0).speed);
 		        	} else if (kC == 68) { // D Key
-		        		player.playerMove(4, 5, render.world, tileSize);
+		        		physics.mobMove(physics.mobs.get(0), 4, physics.mobs.get(0).speed);
 		        	}
 		        }
+				physics.Movement();
 				tick ++;
 				tick();
 				canRender = true;
@@ -123,8 +123,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		render.RenderBackground(g, getWidth(), getHeight());
-		render.RenderForeground(g, getWidth(), getHeight(), tileSize);
-		render.Movement(g, player);
+		render.RenderForeground(g, getWidth(), getHeight(), tileSize, physics.mobs);
 		//Done with rendering
 		g.dispose();
 		bs.show();
@@ -171,7 +170,5 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
         if (!keyPressed) {
             currentKeys.add(e.getKeyCode());
         }
-        
-        System.out.println(currentKeys);
     }
 }
