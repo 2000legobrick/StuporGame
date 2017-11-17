@@ -16,10 +16,18 @@ public class Mob {
 	public int timeJump = 0;
 	public int maxVelocity = 5;
 	public int maxJump = 2;
+	public int dampening = 1;
 	
 	public Mob (int posX, int posY) {
 		currentX = posX;
 		currentY = posY;
+	}
+	
+	public void Jump () {
+		if (jump == 1) {
+			timeJump = 30;
+			jump = 2;
+		}
 	}
 
 }

@@ -11,25 +11,17 @@ public class Physics {
     
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
     
-    private int GRAVITY = 1;
+    private int GRAVITY = -1;
     private int tileSize = 70;
 	
 	public void Gravity() { 
-		
 		for (Mob entity: mobs) {
-			if (entity.jump == 0) {
+			if (entity.jump != 1) {
 				if (Intersection(entity, 2, GRAVITY, world, tileSize) == 2) {
-					entity.accelerationY = GRAVITY;
+					entity.accelerationY = - GRAVITY;
 				}
-			}
-			if (entity.jump == 2 && entity.timeJump <= 0) {
-				entity.timeJump = 30;
-				entity.jump = 2;
-			} else if (entity.timeJump >= 0) {
-				if (Intersection(entity, 1, entity.timeJump / entity.maxJump, world, tileSize) == 1) {
-					entity.accelerationY = - entity.timeJump / entity.maxJump;
-				}
-				entity.timeJump--;
+			} else {
+				entity.accelerationY = GRAVITY;
 			}
 		}
 	}
@@ -37,30 +29,59 @@ public class Physics {
 	public void Movement() {
 		for (Mob entity: mobs) {
 			
-			entity.velocityX = entity.accelerationX;
-			entity.velocityY = entity.accelerationY;
-			
-			if (Math.abs(entity.velocityX) >= entity.maxVelocity) {
-				entity.velocityX = entity.maxVelocity;
+			if (entity.velocityX > 0) {
+				entity.velocityX -= entity.dampening;
+				if (entity.velocityX < 0) {
+					entity.velocityX = 0;
+				}
+			} else if (entity.velocityX < 0) {
+				entity.velocityX += entity.dampening;
+				if (entity.velocityX > 0) {
+					entity.velocityX = 0;
+				}
 			}
 			
-			if (Math.abs(entity.velocityY) >= entity.maxVelocity) {
-				entity.velocityY = entity.maxVelocity;
+			if (entity.velocityY > 0) {
+				entity.velocityY -= entity.dampening;
+				if (entity.velocityY < 0) {
+					entity.velocityY = 0;
+				}
+			} else if (entity.velocityY < 0) {
+				entity.velocityY += entity.dampening;
+				if (entity.velocityY > 0) {
+					entity.velocityY = 0;
+				}
+			}
+
+			entity.velocityX += entity.accelerationX;
+			entity.velocityY += entity.accelerationY;
+
+			entity.currentX += entity.velocityX;
+			entity.currentY += entity.velocityY;
+
+			if (entity.accelerationX > 0) {
+				entity.accelerationX -= entity.dampening;
+				if (entity.accelerationX < 0) {
+					entity.accelerationX = 0;
+				}
+			} else if (entity.accelerationX < 0) {
+				entity.accelerationX += entity.dampening;
+				if (entity.accelerationX > 0) {
+					entity.accelerationX = 0;
+				}
 			}
 			
-			if (entity.velocityX > 0) 
-				if (Intersection(entity, 1, entity.velocityX, world, tileSize) == 1) 
-					entity.currentX += entity.velocityX;
-			else 
-				if (Intersection(entity, 2, entity.velocityX, world, tileSize) == 2) 
-					entity.currentX += entity.velocityX;
-			
-			if (entity.velocityY > 0) 
-				if (Intersection(entity, 3, entity.velocityY, world, tileSize) == 3) 
-					entity.currentY += entity.velocityY;
-			else 
-				if (Intersection(entity, 4, entity.velocityY, world, tileSize) == 4) 
-					entity.currentY += entity.velocityY;
+			if (entity.accelerationY > 0) {
+				entity.accelerationY -= entity.dampening;
+				if (entity.accelerationY < 0) {
+					entity.accelerationY = 0;
+				}
+			} else if (entity.accelerationY < 0) {
+				entity.accelerationY += entity.dampening;
+				if (entity.accelerationY > 0) {
+					entity.accelerationY = 0;
+				}
+			}
 		}
 	}
 	
@@ -99,18 +120,18 @@ public class Physics {
 		// 2: South
 		// 3: West
 		// 4: East
-		
+
 		if (Intersection(entity, direction, magnitude, world, tileSize) == 1) {
-			entity.accelerationY = - magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 2) {
-			entity.accelerationY = magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 3) {
-			entity.accelerationX = - magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 4) {
-			entity.accelerationX = magnitude;
+			entity.Jump();
 		}
+		
+		if (Intersection(entity, direction, magnitude, world, tileSize) == 3) {
+			entity.velocityX = - magnitude;
+		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 4) {
+			entity.velocityX = magnitude;
+		} 
 	}
-	
+
     public int Intersection(Mob entity, int direction, int magnitude, World world, int tileSize) {
 		// 1: North
 		// 2: South
@@ -132,8 +153,7 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					entity.timeJump = 0;
-					entity.jump = 1;
+					entity.jump = 0;
 					return 0;
 				}
 			} else if (direction == 2) {
@@ -141,8 +161,7 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					entity.timeJump = 0;
-					entity.jump = 1;
+					entity.jump = 0;
 					return 0;
 				} 
 			} else if (direction == 3) {
@@ -150,7 +169,7 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationX = 0;
 					entity.velocityX = 0;
-					entity.jump = 1;
+					entity.jump = 0;
 					return 0;
 				} 
 			} else if (direction == 4) {
@@ -158,14 +177,14 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationX = 0;
 					entity.velocityX = 0;
-					entity.jump = 1;
+					entity.jump = 0;
 					return 0;
 				} 
 			}
 		}
 		return direction;
 	}
-	
+
 	public Physics (int tempTileSize) {
 		tileSize = tempTileSize;
 		mobs.add(new Mob(300,200));
