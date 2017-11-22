@@ -19,18 +19,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 
     
 	// Static variables
-	private static final long serialVersionUID = 1L;
-	public static final int WIDTH = 640, HEIGHT = 480;
+	public static final int WIDTH = 1000, HEIGHT = 1000;
 	public static final String NAME = "Stupor";
+	private static final long serialVersionUID = 1L;
 
+    public static int tileSize = 100;
+    
     public ArrayList<Integer> currentKeys = new ArrayList<Integer>(); 
     
 	private boolean running = false;
     private boolean keyPressed;
-    private int tileSize = 70;
-    private int  tickPerSec = 90;
+    private int  tickPerSec = 75;
 	private Render render = new Render();
-	private Physics physics = new Physics(tileSize);
+	private Physics physics = new Physics();
+	
 	
 	public StateMachine () {
 		
@@ -73,18 +75,31 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 			previous = current;
 			while (unprocessed >= 1) {
 				//Updates game objects
+				//System.out.println(currentKeys);
 				physics.Gravity();
-				for (int kC: currentKeys) {
-					if (kC == 87) { // W Key
-		        		physics.mobMove(physics.mobs.get(0), 1, physics.mobs.get(0).speed);
-		        	} else if (kC == 65) { // A Key
-		        		physics.mobMove(physics.mobs.get(0), 3, physics.mobs.get(0).speed);
-		        	} else if (kC == 83) { // S Key
-		        		physics.mobMove(physics.mobs.get(0), 2, physics.mobs.get(0).speed);
-		        	} else if (kC == 68) { // D Key
-		        		physics.mobMove(physics.mobs.get(0), 4, physics.mobs.get(0).speed);
-		        	}
+				
+				if (currentKeys.indexOf(17) != -1) { // Ctrl key
+					physics.WallSlide(physics.mobs.get(0), true);
+				} else {
+					physics.WallSlide(physics.mobs.get(0), false);
+				}
+				
+				if (currentKeys.indexOf(87) != -1) { // W Key
+					physics.mobs.get(0).Jump();
+		        } else if (currentKeys.indexOf(65) != -1) { // A Key
+		        	physics.mobMove(physics.mobs.get(0), 3, physics.mobs.get(0).speed);
+		        } else if (currentKeys.indexOf(83) != -1) { // S Key
+		        	physics.mobMove(physics.mobs.get(0), 2, physics.mobs.get(0).speed);
+		        } else if (currentKeys.indexOf(68) != -1) { // D Key
+		        	physics.mobMove(physics.mobs.get(0), 4, physics.mobs.get(0).speed);
 		        }
+
+				if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
+					for (Mob entity : physics.mobs) {
+						physics.Dampening(entity);
+					}
+				}
+				
 				physics.Movement();
 				tick ++;
 				tick();

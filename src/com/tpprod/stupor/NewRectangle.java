@@ -8,9 +8,18 @@ public class NewRectangle {
 	public Color color;
 	public Rectangle rect;
 	
-	public NewRectangle (int tempType, Color tempColor, Rectangle tempRectangle) {
+	public NewRectangle (int tempType, Rectangle tempRectangle) {
 		type = tempType;
-		color = tempColor;
 		rect = tempRectangle;
+		
+		if (type == 0) {
+			color = Color.CYAN;
+		}else if (type == 1) {
+			color = Color.GREEN;
+		} else if (type == 2) {
+			color = Color.CYAN;
+		} else if (type == 3) {
+			color = Color.RED;
+		}
 	}
 }

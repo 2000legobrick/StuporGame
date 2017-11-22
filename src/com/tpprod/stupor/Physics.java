@@ -11,44 +11,50 @@ public class Physics {
     
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
     
-    private int GRAVITY = -1;
-    private int tileSize = 70;
+    private int GRAVITY = 2;
 	
 	public void Gravity() { 
 		for (Mob entity: mobs) {
-			if (entity.jump != 1) {
-				if (Intersection(entity, 2, GRAVITY, world, tileSize) == 2) {
-					entity.accelerationY = - GRAVITY;
-				}
+			if (entity.wallSlide) {
+				entity.accelerationY = GRAVITY/2;
 			} else {
 				entity.accelerationY = GRAVITY;
 			}
 		}
 	}
 	
+	public void WallSlide (Mob entity, boolean sliding) {
+	}
+	
 	public void Movement() {
+		// 1: North
+		// 2: South
+		// 3: West
+		// 4: East
+		
 		for (Mob entity: mobs) {
+			entity.velocityY += entity.accelerationY;
+			entity.velocityX += entity.accelerationX;
+
 			
-			if (entity.velocityX > 0) {
-				entity.velocityX -= entity.dampening;
-				if (entity.velocityX < 0) {
-					entity.velocityX = 0;
+			if (entity.velocityY < 0) {
+				if (Intersection(entity, 1, Math.abs(entity.velocityY), world) == 1) {
+					entity.currentY += entity.velocityY;
+				} else {
+					MoveToWall(entity, 1);
 				}
-			} else if (entity.velocityX < 0) {
-				entity.velocityX += entity.dampening;
-				if (entity.velocityX > 0) {
-					entity.velocityX = 0;
+			} else {
+				if (entity.velocityY > entity.maxVelocity) {
+					entity.velocityY = entity.maxVelocity;
 				}
-			}
-			
-			if (entity.velocityY > 0) {
+				
+				if (Intersection(entity, 2, Math.abs(entity.velocityY), world) == 2) {
+					entity.currentY += entity.velocityY;
+				} else {
+					MoveToWall(entity, 2);
+				}
 				entity.velocityY -= entity.dampening;
-				if (entity.velocityY < 0) {
-					entity.velocityY = 0;
-				}
-			} else if (entity.velocityY < 0) {
-				entity.velocityY += entity.dampening;
-				if (entity.velocityY > 0) {
+				if (entity.velocityY <= 0) {
 					entity.velocityY = 0;
 				}
 			}
@@ -71,80 +77,92 @@ public class Physics {
 				}
 			}
 			
-			if (entity.accelerationY > 0) {
-				entity.accelerationY -= entity.dampening;
-				if (entity.accelerationY < 0) {
-					entity.accelerationY = 0;
+			if (entity.velocityX < 0) {
+				if (Intersection(entity, 3, Math.abs(entity.velocityX), world) == 3) {
+					entity.currentX += entity.velocityX;
+				} else {
+					MoveToWall(entity, 3);
 				}
-			} else if (entity.accelerationY < 0) {
-				entity.accelerationY += entity.dampening;
-				if (entity.accelerationY > 0) {
-					entity.accelerationY = 0;
+			} else {
+				if (Intersection(entity, 4, Math.abs(entity.velocityX), world) == 4) {
+					entity.currentX += entity.velocityX;
+				} else {
+					MoveToWall(entity, 4);
 				}
 			}
 		}
 	}
 	
-	public void dedicatedMobMove(Mob entity,int direction, int magnitude) {
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
+	public void mobMove(Mob entity,int direction, int magnitude) {
 		
-		/*
-		// Archaic Version
 		
-		if (Intersection(entity, direction, magnitude, world, tileSize) == 1) {
-			entity.accelerationY = - magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 2) {
-			entity.accelerationY = magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 3) {
-			entity.accelerationX = - magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 4) {
-			entity.accelerationX = magnitude;
+		if (direction == 1) {
+			entity.velocityY = - magnitude;
+		} else if (direction == 2) {
+			entity.velocityY = magnitude;
+		} else if (direction == 3) {
+			entity.velocityX = - magnitude;
+		} else if (direction == 4) {
+			entity.velocityX = magnitude;
 		}
 		
-		entity.velocityX = entity.accelerationX;
-		entity.velocityY = entity.accelerationY;
-		
-		entity.currentX += entity.velocityX;
-		entity.currentY += entity.velocityY;
-
-		entity.accelerationX = 0;
-		entity.accelerationY = 0;
-		*/
 	}
 	
-	public void mobMove(Mob entity,int direction, int magnitude) {
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
-
-		if (Intersection(entity, direction, magnitude, world, tileSize) == 1) {
-			entity.Jump();
+	public void MoveToWall(Mob entity, int direction) {
+		if (direction == 1) {
+			while (Intersection(entity, direction, 1, world) == 1) {
+				entity.currentY -= 1;
+			}
+		} else if (direction == 2) {
+			while (Intersection(entity, direction, 1, world) == 2) {
+				entity.currentY += 1;
+			}
+		} else if (direction == 3) {
+			while (Intersection(entity, direction, 1, world) == 3) {
+				entity.currentX -= 1;
+			}
+		} else if (direction == 4) {
+			while (Intersection(entity, direction, 1, world) == 4) {
+				entity.currentX += 1;
+			}
 		}
-		
-		if (Intersection(entity, direction, magnitude, world, tileSize) == 3) {
-			entity.velocityX = - magnitude;
-		} else if (Intersection(entity, direction, magnitude, world, tileSize) == 4) {
-			entity.velocityX = magnitude;
-		} 
+	}
+	
+	public void Dampening(Mob entity) {
+		if (entity.velocityX < 0) {
+			entity.velocityX += entity.dampening;
+			if (entity.velocityX > 0) {
+				entity.velocityX = 0;
+			}
+		} else if (entity.velocityX > 0) {
+			entity.velocityX -= entity.dampening;
+			if (entity.velocityX < 0) {
+				entity.velocityX = 0;
+			}
+		}
 	}
 
-    public int Intersection(Mob entity, int direction, int magnitude, World world, int tileSize) {
+    public int Intersection(Mob entity, int direction, int magnitude, World world) {
 		// 1: North
 		// 2: South
 		// 3: West
 		// 4: East
     	
+    	int tileSize = StateMachine.tileSize;
+    	int fogOfWar = Render.fogOfWar;
+    	Mob player = mobs.get(0);
+    	
 		DisplayedObjects = new ArrayList<NewRectangle>();
-		for (int row = 0; row < world.worldGrid.size(); row++) {
-			for (int col = 0; col < world.worldGrid.get(0).size(); col++) {
-				if (world.worldGrid.get(row).get(col) == 1) {
-					DisplayedObjects.add(new NewRectangle(1, Color.GREEN, new Rectangle(col*tileSize, row*tileSize, tileSize, tileSize)));
-				}
+		for (int y = (int)(player.currentY / tileSize)-fogOfWar; y <= (int)(player.currentY / tileSize)+fogOfWar; y++) {
+			for (int x = (int)(player.currentX / tileSize)-fogOfWar; x <= (int)(player.currentX / tileSize)+fogOfWar; x++) {
+				try {
+					DisplayedObjects.add(world.worldGrid.get(y).get(x));
+				} catch (Exception e) {}
 			}
+		}
+		
+		for (Mob thing: mobs) {
+			DisplayedObjects.add(new NewRectangle(3, new Rectangle(thing.currentX, thing.currentY, thing.width, thing.height)));
 		}
 		
 		for (NewRectangle rect: DisplayedObjects) {
@@ -153,7 +171,18 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					entity.jump = 0;
+					/*
+					if (entity.velocityX < 0) {
+						entity.velocityX += entity.dampening;
+						if (entity.velocityX >= 0) {
+							entity.velocityX = 0;
+						}
+					} else {
+						entity.velocityX -= entity.dampening;
+						if (entity.velocityX <= 0) {
+							entity.velocityX = 0;
+						}
+					}*/
 					return 0;
 				}
 			} else if (direction == 2) {
@@ -162,6 +191,18 @@ public class Physics {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
 					entity.jump = 0;
+					/*
+					if (entity.velocityX < 0) {
+						entity.velocityX += entity.dampening;
+						if (entity.velocityX >= 0) {
+							entity.velocityX = 0;
+						}
+					} else {
+						entity.velocityX -= entity.dampening;
+						if (entity.velocityX <= 0) {
+							entity.velocityX = 0;
+						}
+					}*/
 					return 0;
 				} 
 			} else if (direction == 3) {
@@ -169,7 +210,6 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationX = 0;
 					entity.velocityX = 0;
-					entity.jump = 0;
 					return 0;
 				} 
 			} else if (direction == 4) {
@@ -177,7 +217,6 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationX = 0;
 					entity.velocityX = 0;
-					entity.jump = 0;
 					return 0;
 				} 
 			}
@@ -185,8 +224,8 @@ public class Physics {
 		return direction;
 	}
 
-	public Physics (int tempTileSize) {
-		tileSize = tempTileSize;
-		mobs.add(new Mob(300,200));
+	public Physics () {
+		mobs.add(new Mob(100, 100, Color.BLACK, 25));
+		mobs.add(new Mob(150, 100));
 	}
 }
