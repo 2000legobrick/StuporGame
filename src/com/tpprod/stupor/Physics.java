@@ -6,9 +6,11 @@ import java.util.ArrayList;
 
 public class Physics {
 	
+	public Mob player = null;
 	public World world;
     public ArrayList<Mob> mobs = new ArrayList<Mob>(); 
     
+    private int physicsFogOfWar = 3;
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
     
     private int GRAVITY = 2;
@@ -58,12 +60,6 @@ public class Physics {
 					entity.velocityY = 0;
 				}
 			}
-
-			entity.velocityX += entity.accelerationX;
-			entity.velocityY += entity.accelerationY;
-
-			entity.currentX += entity.velocityX;
-			entity.currentY += entity.velocityY;
 
 			if (entity.accelerationX > 0) {
 				entity.accelerationX -= entity.dampening;
@@ -148,21 +144,15 @@ public class Physics {
 		// 3: West
 		// 4: East
     	
-    	int tileSize = StateMachine.tileSize;
-    	int fogOfWar = Render.fogOfWar;
-    	Mob player = mobs.get(0);
-    	
 		DisplayedObjects = new ArrayList<NewRectangle>();
-		for (int y = (int)(player.currentY / tileSize)-fogOfWar; y <= (int)(player.currentY / tileSize)+fogOfWar; y++) {
-			for (int x = (int)(player.currentX / tileSize)-fogOfWar; x <= (int)(player.currentX / tileSize)+fogOfWar; x++) {
+		for (int y = (int)(entity.currentY / StateMachine.tileSize)-physicsFogOfWar; y <= (int)(entity.currentY / StateMachine.tileSize)+physicsFogOfWar; y++) {
+			for (int x = (int)(entity.currentX / StateMachine.tileSize)-physicsFogOfWar; x <= (int)(entity.currentX / StateMachine.tileSize)+physicsFogOfWar; x++) {
 				try {
-					DisplayedObjects.add(world.worldGrid.get(y).get(x));
+					if (world.worldGrid.get(y).get(x).type == 1) {
+						DisplayedObjects.add(world.worldGrid.get(y).get(x));
+					}
 				} catch (Exception e) {}
 			}
-		}
-		
-		for (Mob thing: mobs) {
-			DisplayedObjects.add(new NewRectangle(3, new Rectangle(thing.currentX, thing.currentY, thing.width, thing.height)));
 		}
 		
 		for (NewRectangle rect: DisplayedObjects) {
@@ -171,18 +161,6 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					/*
-					if (entity.velocityX < 0) {
-						entity.velocityX += entity.dampening;
-						if (entity.velocityX >= 0) {
-							entity.velocityX = 0;
-						}
-					} else {
-						entity.velocityX -= entity.dampening;
-						if (entity.velocityX <= 0) {
-							entity.velocityX = 0;
-						}
-					}*/
 					return 0;
 				}
 			} else if (direction == 2) {
@@ -191,18 +169,6 @@ public class Physics {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
 					entity.jump = 0;
-					/*
-					if (entity.velocityX < 0) {
-						entity.velocityX += entity.dampening;
-						if (entity.velocityX >= 0) {
-							entity.velocityX = 0;
-						}
-					} else {
-						entity.velocityX -= entity.dampening;
-						if (entity.velocityX <= 0) {
-							entity.velocityX = 0;
-						}
-					}*/
 					return 0;
 				} 
 			} else if (direction == 3) {
@@ -225,7 +191,9 @@ public class Physics {
 	}
 
 	public Physics () {
-		mobs.add(new Mob(100, 100, Color.BLACK, 25));
+		mobs.add(new Mob(115, 125, Color.BLACK, 25));
 		mobs.add(new Mob(150, 100));
+		mobs.add(new Mob(500, 100));
+		player = mobs.get(0);
 	}
 }

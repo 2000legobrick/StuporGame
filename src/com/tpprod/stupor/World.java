@@ -35,11 +35,6 @@ public class World
                 }
                 accY++;
             }
-            for (ArrayList<NewRectangle> item: worldGrid) {
-            	for (NewRectangle thing : item) {
-            		System.out.println(thing.rect.x + " " + thing.rect.y);
-            	}
-            }
         } catch (Exception e) {
             System.err.println("Error thrown: " + e);
         }

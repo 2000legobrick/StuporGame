@@ -10,7 +10,7 @@ public class Render {
 	
 	public World world = new World();
 	
-	public static int fogOfWar = 3;
+	public static int fogOfWar = 12;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
@@ -60,14 +60,20 @@ public class Render {
 			}
 		}
 		
-		for (Mob entity: entities) {
-			DisplayedMobs.add(new NewRectangle(3, new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+		for (Mob entity: entities) { 
+			if (entity.currentX + tileSize > player.currentX - tileSize*fogOfWar && entity.currentX < player.currentX + tileSize*fogOfWar) {
+				if (entity.currentY + tileSize > player.currentY - tileSize*fogOfWar && entity.currentY < player.currentY + tileSize*fogOfWar) {
+					DisplayedMobs.add(new NewRectangle(entity.playerColor, new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+				}
+			}
 		}
 		
 		
 		for (NewRectangle rect: DisplayedObjects) {
-			g.setColor(rect.color);
-			g.fillRect(rect.rect.x - DisplayedMobs.get(0).rect.x + width / 2, rect.rect.y - DisplayedMobs.get(0).rect.y + height/2, rect.rect.width, rect.rect.height);
+			try {
+				g.setColor(rect.color);
+				g.fillRect(rect.rect.x - DisplayedMobs.get(0).rect.x + width / 2, rect.rect.y - DisplayedMobs.get(0).rect.y + height/2, rect.rect.width, rect.rect.height);
+			} catch (Exception e) {}
 		}
 		
 		for (NewRectangle rect: DisplayedMobs) {

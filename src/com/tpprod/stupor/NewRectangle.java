@@ -8,6 +8,12 @@ public class NewRectangle {
 	public Color color;
 	public Rectangle rect;
 	
+	public NewRectangle(Color tempColor, Rectangle tempRectangle) {
+		type = 3;
+		rect = tempRectangle;
+		color = tempColor;
+	}
+	
 	public NewRectangle (int tempType, Rectangle tempRectangle) {
 		type = tempType;
 		rect = tempRectangle;
