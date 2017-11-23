@@ -21,9 +21,9 @@ public class NewRectangle {
 		if (type == 0) {
 			color = Color.CYAN;
 		}else if (type == 1) {
-			color = Color.GREEN;
+			color = new Color(51, 63, 72);
 		} else if (type == 2) {
-			color = Color.CYAN;
+			color = new Color(255, 255, 255);
 		} else if (type == 3) {
 			color = Color.RED;
 		}

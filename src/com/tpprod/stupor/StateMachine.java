@@ -11,6 +11,17 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 
+/*
+ * The StateMachine Class does all the heavy lifting, controlling all the logic for each state of the game.
+ * 
+ * 	Possible States:
+ * 		GameState      - Actual game is ran in this state
+ * 		MenuState      - The main menu is displayed (typically at start of game)
+ * 		PauseState     - The game does not update but instead stops updating until state is changed
+ * 		InventoryState - Displays the current inventory, game functions are suspended here like PuaseState 
+ * 		DeadState      - Informs the player on their death and resets state to the MenuState 
+ */
+
 public class StateMachine extends Canvas implements Runnable, KeyListener{
 
     
@@ -25,7 +36,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
     
 	private boolean running = false;
     private boolean keyPressed;
-    private int  tickPerSec = 75; // Limits the amount of ticks per second, serves to limit the all powerful ticks
+    private int  tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	private Render render = new Render();
 	private Physics physics = new Physics();
 
@@ -112,9 +123,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 				
 				
 				if (currentKeys.indexOf(17) != -1) { // Ctrl key
-					physics.WallSlide(physics.player, true);
+					// player does wallSlide
 				} else {
-					physics.WallSlide(physics.player, false);
+					// player stops wallSlide
+				} 
+				
+				if (currentKeys.indexOf(27) != -1) { // Escape Key
+					stop();
 				}
 				
 				if (currentKeys.indexOf(87) != -1) { // W Key
@@ -124,7 +139,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 		        	physics.mobMove(physics.player, 3, physics.player.speed);
 		        } 
 				if (currentKeys.indexOf(83) != -1) { // S Key
-		        	physics.mobMove(physics.player, 2, physics.player.speed);
+					// Add ground pound function
 		        } 
 				if (currentKeys.indexOf(68) != -1) { // D Key
 		        	physics.mobMove(physics.player, 4, physics.player.speed);
@@ -184,7 +199,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 		Graphics g = bs.getDrawGraphics();
 		//Calling the Rendeer class here
 		render.RenderBackground(g, getWidth(), getHeight());
-		render.RenderForeground(g, getWidth(), getHeight(), tileSize, physics.mobs);
+		render.RenderForeground(g, getWidth(), getHeight(), tileSize, physics.mobs, physics.player);
 		//Done with rendering, Moving to situating the canvas and displaying it
 		g.dispose();
 		bs.show();
@@ -197,7 +212,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 	}
 	
 	public static void main(String[] args) {
-		
 		/*
 		 * The main method is used to create the frames and canvases that are displayed
 		 * 		and printed to respectively.
