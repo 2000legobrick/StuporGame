@@ -16,6 +16,7 @@ public class Render {
 	public World world = new World();
 	
 	public static int fogOfWar = 12;
+	public int currentWorld;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
@@ -74,7 +75,7 @@ public class Render {
 		//  which is located at the center of the screen
 		for (NewRectangle rect: DisplayedObjects) {
 			try {
-				g.setColor(rect.color);
+				g.setColor(GetColorArray(currentWorld)[rect.type]);
 				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 			} catch (Exception e) {}
 		}
@@ -83,5 +84,22 @@ public class Render {
 			g.setColor(rect.color);
 			g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 		}
+	}
+	
+	public Color[] GetColorArray(int selection) {
+		if (selection == 1) {
+			return ColorSchemes.World1;
+		} else {
+			return ColorSchemes.World2;
+		}
+	}
+	
+	public void ChangeWorld(int newWorld) {
+		/*
+		 * This is used to change the current world that
+		 * 	is being rendered.
+		 */
+		
+		currentWorld = newWorld;
 	}
 }

@@ -92,6 +92,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 			e1.printStackTrace();
 			stop();
 		}
+
+		// This resets the current world to the first world
+		render.ChangeWorld(1);
 		
 		// Required so that the programs keeps tracks KeyEvents
 		addKeyListener(this);
@@ -129,7 +132,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener{
 				} 
 				
 				if (currentKeys.indexOf(27) != -1) { // Escape Key
-					stop();
+					if (render.currentWorld == 1) {
+						render.ChangeWorld(2);
+					} else if (render.currentWorld == 2) {
+						render.ChangeWorld(1);
+					}
 				}
 				
 				if (currentKeys.indexOf(87) != -1) { // W Key
