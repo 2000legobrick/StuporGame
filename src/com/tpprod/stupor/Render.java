@@ -3,7 +3,7 @@ package com.tpprod.stupor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /*
@@ -16,11 +16,14 @@ public class Render {
 	public World world = new World();
 	
 	public static int fogOfWar = 12;
+	
 	public int currentWorld;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
-	private Mob player;
+	
+	
+	//private Mob player;
 	
 	
 	public Render() {
@@ -30,11 +33,38 @@ public class Render {
 	}
 	
 	
-	public void InitializeWorld() throws FileNotFoundException {
+	public void InitializeWorld() throws IOException {
 		/*
 		 * The InitializeWorld method gets the most current version of the world to reference.
+		 * 
 		 */
 		world.Initialize();
+	}
+	
+	
+	public void RenderState(Graphics g, int width, int height, int state){
+		
+		// renders a state based on what state is passed through the constructor
+		
+		switch(state) {
+			case StateMachine.GameState:
+				RenderBackground(g, width, height);
+				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, Physics.player);
+				break;
+			case StateMachine.MenuState:
+				RenderMenu(g, width,height);
+				break;
+			case StateMachine.PauseState:
+				
+				break;
+			case StateMachine.InventoryState:
+				
+				break;
+			case StateMachine.DeadState:
+				
+				break;
+		}
+		
 	}
 	
 	public void RenderBackground(Graphics g, int width, int height) {
@@ -43,6 +73,16 @@ public class Render {
 		 */
 		g.setColor(Color.BLUE);
 		g.fillRect(0, 0, width, height);
+	} 
+	
+	public void RenderMenu(Graphics g, int width, int height) {
+		/*
+		 * The method RenderMenud renders out the menu for the game.
+		 */
+		g.setColor(Color.BLUE);
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.RED);
+		g.drawString("testing awesome", 500, 500);
 	} 
 	
 	public void RenderForeground(Graphics g, int width, int height, int tileSize, ArrayList<Mob> entities, Mob player) {

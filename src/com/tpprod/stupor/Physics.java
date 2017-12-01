@@ -10,15 +10,18 @@ import java.util.ArrayList;
 
 public class Physics {
 	
-	public Mob player = null;
+	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
+	public static Mob player = null;
+	
 	public World world;
-    public ArrayList<Mob> mobs = new ArrayList<Mob>(); 
+     
     
     private int physicsFogOfWar = 1;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
     
     private int GRAVITY = 2;
 	
+
 	public void Gravity() { 
 		/*
 		 * The Gravity method applies a vertical acceleration to the south that depends on is the mobs is wall sliding.

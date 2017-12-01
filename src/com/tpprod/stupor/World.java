@@ -1,6 +1,5 @@
 package com.tpprod.stupor;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.*;
 import java.nio.file.Paths;
@@ -20,7 +19,7 @@ public class World
     public World() {
     }
     
-    public void Initialize () throws FileNotFoundException {
+    public void Initialize () throws FileNotFoundException, IOException {
         /*
          * The Initialize method reads a file and separates the numbers within the file into an
          * 	ArrayList of NewRectangles each with a type of that number in the file.
@@ -48,5 +47,6 @@ public class World
         } catch (Exception e) {
             System.err.println("Error thrown: " + e);
         }
+        bR.close();
     }
 }
