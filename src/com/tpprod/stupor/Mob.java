@@ -23,6 +23,8 @@ public class Mob {
 	public int dampening = 1;
 	public boolean wallSlide;
 	
+	private Inventory inventory = new Inventory();
+	
 	public Mob (int posX, int posY, Color tempCol, int tempSize) {
 		/*
 		 * This is a constructor where the position, color, and size can be set.
@@ -32,6 +34,7 @@ public class Mob {
 		playerColor = tempCol;
 		height = tempSize;
 		width = tempSize;
+		
 	}
 	
 	public Mob (int posX, int posY) {
@@ -51,6 +54,13 @@ public class Mob {
 			velocityY = -maxJump;
 			jump = 1;
 		}
+	}
+	
+	public void addItem(Item item) {
+		inventory.addItem(item);
+	}
+	public void removeItem(Item item) {
+		inventory.removeItem(item);
 	}
 
 }
