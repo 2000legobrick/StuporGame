@@ -10,9 +10,10 @@ import java.util.ArrayList;
 
 public class Physics {
 	
+	public Mob player = null;
+	public int playerStartingX = 115;
+	public int playerStartingY = 300;
 	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
-	public static Mob player = null;
-	
 	public World world;
      
     
@@ -255,7 +256,17 @@ public class Physics {
 		 * Currently we are using this to create enemy mobs, and the player entity.
 		 * 	We also set the player entity to the first index of the mobs ArrayList
 		 */
-		mobs.add(new Mob(115, 125, new Color(191, 87, 0), 25));
+		
+		try {	
+			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			playerStartingX = data.playerCurrentX;
+			playerStartingY = data.playerCurrentY;
+		} catch (Exception e) {
+			System.out.println("Couldn't load save data: " + e.getMessage());
+		}
+		
+		
+		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 25));
 		mobs.add(new Mob(150, 100));
 		mobs.add(new Mob(500, 100));
 		player = mobs.get(0);

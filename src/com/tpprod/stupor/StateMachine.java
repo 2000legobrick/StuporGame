@@ -47,33 +47,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 	private boolean keyPressed;
 	private int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	private Render render = new Render();
-	private Physics physics = new Physics();
+	public JFrame frame = new JFrame();
+	public boolean closeGame = false;
+	
+	public Physics physics = new Physics();
 
 	public StateMachine() {
 		/*
 		 * This is the StateMachine constructor, intentionally left empty.
 		 */
 	}
-
-	public void start() {
-		/*
-		 * The start method is called upon launching the app and starts the thread that
-		 * the game runs on.
-		 */
-		if (!running) {
-			running = true;
-			new Thread(this).start();
-		}
-	}
-
-	public void stop() {
-		/*
-		 * The stop method ends the program by causing the run method's while loop to
-		 * finish and finally reach the end of the run method
-		 */
-		running = false;
-	}
-
+	
+	
+	
 	@Override
 	public void run() {
 		/*
@@ -166,22 +152,34 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 						if (currentKeys.indexOf(68) != -1) { // D Key
 							physics.mobMove(Physics.player, 4, Physics.player.speed);
 						}
-						
-		
-						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
-							for (Mob entity : Physics.mobs) {
-								physics.Dampening(entity);
-							}
-						}
-						physics.Movement();
-						
-						break;
-					case MenuState:
-						// controls for menu state goes here
-						break;
-					// other cases go here
 					}
-					
+				if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
+					SaveData data = new SaveData();
+					data.playerCurrentX = physics.player.currentX;
+					data.playerCurrentY = physics.player.currentY;
+					try {
+						ResourceManager.Save(data, "SaveData");
+					} catch (Exception e) {
+						System.out.println("Couldn't save: " + e.getMessage());
+					}
+				}
+				if (currentKeys.indexOf(88) != -1) { // X key and Load Data
+					try {	
+						SaveData data = (SaveData) ResourceManager.Load("SaveData");
+						physics.player.currentX = data.playerCurrentX;
+						physics.player.currentY = data.playerCurrentY;
+					} catch (Exception e) {
+						System.out.println("Couldn't load save data: " + e.getMessage());
+					}
+				}
+
+				if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
+					for (Mob entity : physics.mobs) {
+						physics.Dampening(entity);
+					}
+				}
+				physics.Movement();
+				
 				// Beautiful ticks are ticking!!!
 				tick++;
 				tick();
@@ -254,30 +252,54 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 		// print to later.
 
 		StateMachine game = new StateMachine();
+		
+		game.start();
+	
+	}
+	
+	public void start() {
+		/*
+		 * The start method is called upon launching the app and starts the thread that
+		 * 	the game runs on.
+		 */
+		
 		Dimension dimension = new Dimension(WIDTH, HEIGHT);
-		game.setMaximumSize(dimension);
-		game.setMinimumSize(dimension);
-		game.setPreferredSize(dimension);
-		game.setSize(dimension);
+		this.setMaximumSize(dimension);
+		this.setMinimumSize(dimension);
+		this.setPreferredSize(dimension);
+		this.setSize(dimension);
+		
+			
+		// The second chunk adds the canvas to a JFrame in order to display everything onto 
+		// 	a frame that is more versatile than a canvas in terms of dimensioning and 
+		//  positioning. 
 
-		// The second chunk adds the canvas to a JFrame in order to display everything
-		// onto
-		// a frame that is more versatile than a canvas in terms of dimensioning and
-		// positioning.
-
-		JFrame frame = new JFrame();
 		frame.setUndecorated(true);
 		frame.setTitle(NAME);
-		frame.add(game);
+		frame.add(this);
 		frame.pack();
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-
-		game.start();
+		
+		if (!running) {
+			
+			running = true;
+			new Thread(this).start();
+		} 
 	}
-
+	
+	public void stop () {
+		/*
+		 * The stop method ends the program by causing the run method's while loop
+		 *  to finish and finally reach the end of the run method
+		 */
+		running = false;
+		frame.setVisible(false);
+		frame.dispose();
+	}
+	
 	public void keyTyped(KeyEvent e) {
 		/*
 		 * The method keyTyped is required by the KeyListener class and is an event that
