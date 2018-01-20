@@ -18,6 +18,8 @@ public class Render {
 	public static int fogOfWar = 12;
 	
 	public int currentWorld;
+	public int currentMenuPos = 0;
+	public int currentMouseX, currentMouseY;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
@@ -42,14 +44,14 @@ public class Render {
 	}
 	
 	
-	public void RenderState(Graphics g, int width, int height, int state){
+	public void RenderState(Graphics g, int width, int height, int state, Mob player){
 		
 		// renders a state based on what state is passed through the constructor
 		
 		switch(state) {
 			case StateMachine.GameState:
 				RenderBackground(g, width, height);
-				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, Physics.player);
+				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
 				break;
 			case StateMachine.MenuState:
 				RenderMenu(g, width,height);
@@ -83,6 +85,40 @@ public class Render {
 		g.fillRect(0, 0, width, height);
 		g.setColor(Color.RED);
 		g.drawString("testing awesome", 500, 500);
+		
+		if (currentMouseX > 90 && currentMouseX < 210) {
+			if (currentMouseY > 90 && currentMouseY < 160) {
+				currentMenuPos = 0;
+			} else if (currentMouseY > 190 && currentMouseY < 260) {
+				currentMenuPos = 1;
+			} else if (currentMouseY > 290 && currentMouseY < 360) {
+				currentMenuPos = 2;
+			}
+		}
+			
+		if (currentMenuPos == 0) {
+			g.setColor(Color.RED);
+			g.drawString("Game", 100, 100);
+		} else {
+			g.setColor(Color.GREEN);
+			g.drawString("Game", 100, 100);
+		}
+		
+		if (currentMenuPos == 1) {
+			g.setColor(Color.RED);
+			g.drawString("Settings", 100, 200);
+		} else {
+			g.setColor(Color.GREEN);
+			g.drawString("Settings", 100, 200);
+		}
+		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 300);
+		} else {
+			g.setColor(Color.GREEN);
+			g.drawString("Exit", 100, 300);
+		}
 	} 
 	
 	public void RenderForeground(Graphics g, int width, int height, int tileSize, ArrayList<Mob> entities, Mob player) {
@@ -109,20 +145,35 @@ public class Render {
 					DisplayedMobs.add(new NewRectangle(entity.playerColor, new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
 				}
 			}
+			if (entity.projectileList[0] != null) {
+				if (entity.projectileList[0].shown) {
+					g.setColor(Color.RED);
+					g.fillRect(entity.projectileList[0].currentX - player.currentX - player.width/2 + width / 2, entity.projectileList[0].currentY - player.currentY - player.height/2 + height/2, entity.projectileList[0].size, entity.projectileList[0].size);
+				}
+			}
+			if (entity.projectileList[1] != null) {
+				if (entity.projectileList[1].shown) {
+					g.setColor(Color.RED);
+					g.fillRect(entity.projectileList[1].currentX - player.currentX - player.width/2 + width / 2, entity.projectileList[1].currentY - player.currentY - player.height/2 + height/2, entity.projectileList[1].size, entity.projectileList[1].size);
+				}
+			}
 		}
 		
 		// Iterates through all objects that are on screen and displays them based off the players current position
 		//  which is located at the center of the screen
 		for (NewRectangle rect: DisplayedObjects) {
 			try {
-				g.setColor(GetColorArray(currentWorld)[rect.type]);
-				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+				if (rect.type != 0) {
+					g.setColor(GetColorArray(currentWorld)[rect.type]);
+					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+				}
 			} catch (Exception e) {}
 		}
 		
 		for (NewRectangle rect: DisplayedMobs) {
 			g.setColor(rect.color);
 			g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+			
 		}
 	}
 	

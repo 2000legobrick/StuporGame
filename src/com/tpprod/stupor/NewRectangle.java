@@ -33,7 +33,7 @@ public class NewRectangle {
 		rect = tempRectangle;
 		
 		if (type == 0) { 		// This is a CYAN empty tile
-			color = Color.CYAN;
+			color = null;
 		} else if (type == 1) { // This is a wall tile
 			color = new Color(51, 63, 72);
 		} else if (type == 2) { // This is a WHITE empty tile

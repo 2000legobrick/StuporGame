@@ -4,12 +4,16 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.image.BufferStrategy;
 import java.awt.Toolkit;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.JFrame;
+import javax.swing.event.MouseInputListener;
 
 /*
  * The StateMachine Class does all the heavy lifting, controlling all the logic for each state of the game.
@@ -22,9 +26,8 @@ import javax.swing.JFrame;
  * 		DeadState      - Informs the player on their death and resets state to the MenuState 
  */
 
-public class StateMachine extends Canvas implements Runnable, KeyListener {
+public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener  {
 	
-	public int CurrentState;
 	
 	// Static variables
 	
@@ -33,24 +36,25 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 	public static final int PauseState     = 2;
 	public static final int InventoryState = 3;
 	public static final int DeadState      = 4;
-	
-	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
-			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-	public static final String NAME = "Stupor";
-	private static final long serialVersionUID = 1L;
 
-	public static int tileSize = 100;
+	public int CurrentState = MenuState;
 
 	public ArrayList<Integer> currentKeys = new ArrayList<Integer>();
-
-	private boolean running = false;
-	private boolean keyPressed;
-	private int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
-	private Render render = new Render();
 	public JFrame frame = new JFrame();
 	public boolean closeGame = false;
-	
 	public Physics physics = new Physics();
+	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
+			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
+	public static int tileSize = 100;
+	public static final String NAME = "Stupor";
+	
+	private static final long serialVersionUID = 1L;
+	private int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
+	private boolean running = false;
+	private boolean keyPressed;
+	private Render render = new Render();
+	
+	
 
 	public StateMachine() {
 		/*
@@ -94,6 +98,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 
 		// Required so that the programs keeps tracks KeyEvents
 		addKeyListener(this);
+		addMouseListener(this);
+		addMouseMotionListener(this);
 
 		// These variables are specific only to the run method, and keep track of
 		// the FramesPerSecond and each tick as well as if the program is allowed
@@ -133,52 +139,77 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 						}
 		
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
-							if (render.currentWorld == 1) {
-								render.ChangeWorld(2);
-							} else if (render.currentWorld == 2) {
-								render.ChangeWorld(1);
-							}
+							CurrentState = MenuState;
 						}
 		
 						if (currentKeys.indexOf(87) != -1) { // W Key
-							Physics.player.Jump();
+							physics.player.Jump();
 						}
 						if (currentKeys.indexOf(65) != -1) { // A Key
-							physics.mobMove(Physics.player, 3, Physics.player.speed);
+							physics.mobMove(physics.player, 3, physics.player.speed);
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
 							// Add ground pound function
 						}
 						if (currentKeys.indexOf(68) != -1) { // D Key
-							physics.mobMove(Physics.player, 4, Physics.player.speed);
+							physics.mobMove(physics.player, 4, physics.player.speed);
+						}
+						if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
+							SaveData data = new SaveData();
+							data.playerCurrentX = physics.player.currentX;
+							data.playerCurrentY = physics.player.currentY;
+							try {
+								ResourceManager.Save(data, "SaveData");
+							} catch (Exception e) {
+								System.out.println("Couldn't save: " + e.getMessage());
+							}
+						}
+						if (currentKeys.indexOf(88) != -1) { // X key and Load Data
+							try {	
+								SaveData data = (SaveData) ResourceManager.Load("SaveData");
+								physics.player.currentX = data.playerCurrentX;
+								physics.player.currentY = data.playerCurrentY;
+							} catch (Exception e) {
+								System.out.println("Couldn't load save data: " + e.getMessage());
+							}
+						}
+
+						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
+							for (Mob entity : physics.mobs) {
+								physics.Dampening(entity);
+							}
+						}
+						physics.Movement();
+					case MenuState:
+						if (currentKeys.indexOf(87) != -1) { // W Key
+							render.currentMenuPos -= 1;
+							currentKeys.remove(currentKeys.indexOf(87));
+						}
+						if (currentKeys.indexOf(83) != -1) { // S Key
+							render.currentMenuPos += 1;
+							currentKeys.remove(currentKeys.indexOf(83));
+						}
+						if (currentKeys.indexOf(38) != -1) { // Up Arrow
+							render.currentMenuPos -= 1;
+							currentKeys.remove(currentKeys.indexOf(38));
+						}
+						if (currentKeys.indexOf(40) != -1) { // Down Arrow
+							render.currentMenuPos += 1;
+							currentKeys.remove(currentKeys.indexOf(40));
+						}
+						if (render.currentMenuPos > 2) {
+							render.currentMenuPos = 2;
+						} else if (render.currentMenuPos < 0) {
+							render.currentMenuPos = 0;
+						}
+						//Am Broke
+						if (currentKeys.indexOf(10) != -1) { // Enter Key
+							if (render.currentMenuPos == 0) {
+								CurrentState = GameState;
+							}
 						}
 					}
-				if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
-					SaveData data = new SaveData();
-					data.playerCurrentX = physics.player.currentX;
-					data.playerCurrentY = physics.player.currentY;
-					try {
-						ResourceManager.Save(data, "SaveData");
-					} catch (Exception e) {
-						System.out.println("Couldn't save: " + e.getMessage());
-					}
-				}
-				if (currentKeys.indexOf(88) != -1) { // X key and Load Data
-					try {	
-						SaveData data = (SaveData) ResourceManager.Load("SaveData");
-						physics.player.currentX = data.playerCurrentX;
-						physics.player.currentY = data.playerCurrentY;
-					} catch (Exception e) {
-						System.out.println("Couldn't load save data: " + e.getMessage());
-					}
-				}
-
-				if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
-					for (Mob entity : physics.mobs) {
-						physics.Dampening(entity);
-					}
-				}
-				physics.Movement();
+				
 				
 				// Beautiful ticks are ticking!!!
 				tick++;
@@ -229,7 +260,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 		
 		// Calling the RenderState here to render based off of the current state wanting to be displayed
 		
-		render.RenderState(g, getWidth(), getHeight(), CurrentState);
+		render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
 		
 		// Done with rendering, Moving to situating the canvas and displaying it
 		g.dispose();
@@ -317,8 +348,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 		 * 
 		 * We use it to remove a key from an ArrayList of all Keys currently "Pressed"
 		 */
-
-		currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
+		try {
+			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
+		} catch (Exception e1) {}
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -341,5 +373,62 @@ public class StateMachine extends Canvas implements Runnable, KeyListener {
 		if (!keyPressed) {
 			currentKeys.add(e.getKeyCode());
 		}
+	}
+
+
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0) {
+		render.currentMouseX = arg0.getX();
+		render.currentMouseY = arg0.getY();
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		if (render.currentMenuPos == 0 && CurrentState == MenuState) {
+			CurrentState = GameState;
+		} 
+		if (CurrentState == GameState) {
+			physics.player.Shoot(arg0.getPoint(), new Point(getWidth()/2, getHeight()/2));
+		}
+	}
+
+
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

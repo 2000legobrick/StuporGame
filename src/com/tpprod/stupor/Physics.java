@@ -11,13 +11,13 @@ import java.util.ArrayList;
 public class Physics {
 	
 	public Mob player = null;
-	public int playerStartingX = 115;
-	public int playerStartingY = 300;
+	public int playerStartingX = 1300;
+	public int playerStartingY = 1300;
 	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	public World world;
      
     
-    private int physicsFogOfWar = 1;
+    private int physicsFogOfWar = 2;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
     
     private int GRAVITY = 2;
@@ -113,6 +113,22 @@ public class Physics {
 					entity.accelerationX = 0;
 				}
 			}
+			try {
+				entity.projectileList[0].currentX += entity.projectileList[0].velocityX;
+				entity.projectileList[0].currentY += entity.projectileList[0].velocityY;
+	
+				if (!ProjectileIntersection(entity.projectileList[0])) {
+					entity.projectileList[0] = null;
+				}
+			}catch (Exception e) {}
+			try {
+				entity.projectileList[1].currentX += entity.projectileList[1].velocityX;
+				entity.projectileList[1].currentY += entity.projectileList[1].velocityY;
+				
+				if (!ProjectileIntersection(entity.projectileList[1])) {
+					entity.projectileList[1] = null;
+				}
+			}catch (Exception e) {}
 		}
 	}
 	
@@ -227,7 +243,7 @@ public class Physics {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					entity.jump = 0;
+					entity.jump = 2;
 					return 0;
 				} 
 			} else if (direction == 3) {
@@ -249,6 +265,41 @@ public class Physics {
 		return direction;
 	}
 
+    public boolean ProjectileIntersection(Projectile entity) {
+    	/*
+    	 * The Intersection method checks if in the next movement of the entity will be intersecting with
+    	 * 	another block. If it does intersect the speed and acceleration are set to 0.
+    	 */
+    	
+		// 1: North
+		// 2: South
+		// 3: West
+		// 4: East
+    	
+    	// Iterates through the world surrounding the block (checks a 2 block square radius around the entity)
+    	//	and adds the blocks that impede movement
+		wallObjects = new ArrayList<NewRectangle>();
+		for (int y = (int)(entity.currentY / StateMachine.tileSize)-physicsFogOfWar; y <= (int)(entity.currentY / StateMachine.tileSize)+physicsFogOfWar; y++) {
+			for (int x = (int)(entity.currentX / StateMachine.tileSize)-physicsFogOfWar; x <= (int)(entity.currentX / StateMachine.tileSize)+physicsFogOfWar; x++) {
+				try {
+					if (world.worldGrid.get(y).get(x).type == 1) {
+						wallObjects.add(world.worldGrid.get(y).get(x));
+					}
+				} catch (Exception e) {}
+			}
+		}
+		
+		// Iterates through the ArrayList wallObjects and checks if the next players movement will intersect with
+		//	any of the NewRectangles
+		for (NewRectangle rect: wallObjects) {
+			Rectangle tempRect = new Rectangle(entity.currentX, entity.currentY, entity.size, entity.size);
+			if (tempRect.intersects(rect.rect)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public Physics () {
 		/*
 		 * This is the constructor for the Physics class.
@@ -266,9 +317,7 @@ public class Physics {
 		}
 		
 		
-		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 25));
-		mobs.add(new Mob(150, 100));
-		mobs.add(new Mob(500, 100));
+		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 40));
 		player = mobs.get(0);
 	}
 }
