@@ -2,15 +2,29 @@ package com.tpprod.stupor;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 /*
  * The NewRectangle class stores data for the tiles that will be rendered.
  */
 
 public class NewRectangle {
+	
 	public int type = 3;
 	public Color color;
 	public Rectangle rect;
+	public BufferedImage image;
+	
+	public NewRectangle(BufferedImage tempImage, Rectangle tempRectangle) {
+		/*
+		 * This is a constructor where the type is not important,
+		 * 	but the color and the size needs to be set when the 
+		 * 	object is created.
+		 */
+		
+		rect = tempRectangle;
+		image = tempImage;
+	}
 	
 	public NewRectangle(Color tempColor, Rectangle tempRectangle) {
 		/*

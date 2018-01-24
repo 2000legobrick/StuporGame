@@ -1,8 +1,8 @@
 package com.tpprod.stupor;
 
-public class Projectile extends Physics {
+public class Projectile {
 	
-	public int currentX, currentY, velocityY, velocityX, size;
+	public int currentX, currentY, velocityY, velocityX, accelerationY, size;
 	public boolean shown;
 	
 	public Projectile () {

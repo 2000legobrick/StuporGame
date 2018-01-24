@@ -3,8 +3,16 @@ package com.tpprod.stupor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 /*
  * The Render Class draws everything to the canvas that is stored in 
@@ -20,6 +28,9 @@ public class Render {
 	public int currentWorld;
 	public int currentMenuPos = 0;
 	public int currentMouseX, currentMouseY;
+	public BufferedImage img = null;
+	public BufferedImage person = null;
+	public BufferedImage arm = null;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
@@ -32,6 +43,14 @@ public class Render {
 		/*
 		 * This is the constructor for the Render Class, intentionally left blank
 		 */
+		try {
+			img = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
+			person = ImageIO.read(new File("./Content/Textures/Player.png"));
+			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -142,19 +161,12 @@ public class Render {
 		for (Mob entity: entities) { 
 			if (entity.currentX + tileSize > player.currentX - tileSize*fogOfWar && entity.currentX < player.currentX + tileSize*fogOfWar) {
 				if (entity.currentY + tileSize > player.currentY - tileSize*fogOfWar && entity.currentY < player.currentY + tileSize*fogOfWar) {
-					DisplayedMobs.add(new NewRectangle(entity.playerColor, new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+					DisplayedMobs.add(new NewRectangle(entity.image, new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
 				}
 			}
 			if (entity.projectileList[0] != null) {
 				if (entity.projectileList[0].shown) {
-					g.setColor(Color.RED);
-					g.fillRect(entity.projectileList[0].currentX - player.currentX - player.width/2 + width / 2, entity.projectileList[0].currentY - player.currentY - player.height/2 + height/2, entity.projectileList[0].size, entity.projectileList[0].size);
-				}
-			}
-			if (entity.projectileList[1] != null) {
-				if (entity.projectileList[1].shown) {
-					g.setColor(Color.RED);
-					g.fillRect(entity.projectileList[1].currentX - player.currentX - player.width/2 + width / 2, entity.projectileList[1].currentY - player.currentY - player.height/2 + height/2, entity.projectileList[1].size, entity.projectileList[1].size);
+					DisplayedMobs.add(new NewRectangle(Color.BLACK, new Rectangle(entity.projectileList[0].currentX, entity.projectileList[0].currentY, entity.projectileList[0].size, entity.projectileList[0].size)));
 				}
 			}
 		}
@@ -163,7 +175,13 @@ public class Render {
 		//  which is located at the center of the screen
 		for (NewRectangle rect: DisplayedObjects) {
 			try {
-				if (rect.type != 0) {
+				if (rect.type == 1) {
+					g.drawImage(img, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
+					/*
+					g.setColor(GetColorArray(currentWorld)[rect.type]);
+					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+					*/
+				} else  if (rect.type != 0) {
 					g.setColor(GetColorArray(currentWorld)[rect.type]);
 					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 				}
@@ -171,9 +189,19 @@ public class Render {
 		}
 		
 		for (NewRectangle rect: DisplayedMobs) {
-			g.setColor(rect.color);
-			g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
-			
+			//g.setColor(rect.color);
+			//g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+			if (rect.image != null) {
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-person.getWidth(null), 0);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+				person = op.filter(person, null);
+		
+				g.drawImage(rect.image, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
+			} else {
+				g.setColor(rect.color);
+				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+			}
 		}
 	}
 	

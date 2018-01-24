@@ -2,6 +2,7 @@ package com.tpprod.stupor;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 /*
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 public class Physics {
 	
 	public Mob player = null;
-	public int playerStartingX = 1300;
-	public int playerStartingY = 1300;
+	public int playerStartingX = 1200;
+	public int playerStartingY = 1200;
 	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	public World world;
      
@@ -33,6 +34,9 @@ public class Physics {
 			} else {
 				entity.accelerationY = GRAVITY;
 			}
+			try {
+				entity.projectileList[0].accelerationY = GRAVITY;
+			} catch (Exception e) {}
 		}
 	}
 	
@@ -113,22 +117,14 @@ public class Physics {
 					entity.accelerationX = 0;
 				}
 			}
-			try {
+			
+			entity.projectileList[0].velocityY -= entity.projectileList[0].accelerationY;
+			if (ProjectileIntersection(entity.projectileList[0], entity.projectileList[0].velocityX, entity.projectileList[0].velocityY)) {
 				entity.projectileList[0].currentX += entity.projectileList[0].velocityX;
-				entity.projectileList[0].currentY += entity.projectileList[0].velocityY;
-	
-				if (!ProjectileIntersection(entity.projectileList[0])) {
-					entity.projectileList[0] = null;
-				}
-			}catch (Exception e) {}
-			try {
-				entity.projectileList[1].currentX += entity.projectileList[1].velocityX;
-				entity.projectileList[1].currentY += entity.projectileList[1].velocityY;
-				
-				if (!ProjectileIntersection(entity.projectileList[1])) {
-					entity.projectileList[1] = null;
-				}
-			}catch (Exception e) {}
+				entity.projectileList[0].currentY -= entity.projectileList[0].velocityY;
+			} else { 
+				entity.projectileList[0].shown = false;
+			}
 		}
 	}
 	
@@ -265,7 +261,7 @@ public class Physics {
 		return direction;
 	}
 
-    public boolean ProjectileIntersection(Projectile entity) {
+    public boolean ProjectileIntersection(Projectile entity, int magnitudeX, int magnitudeY) {
     	/*
     	 * The Intersection method checks if in the next movement of the entity will be intersecting with
     	 * 	another block. If it does intersect the speed and acceleration are set to 0.
@@ -289,11 +285,12 @@ public class Physics {
 			}
 		}
 		
+		Line2D projectedLine = new Line2D.Float(entity.currentX + magnitudeX, entity.currentY + magnitudeY, entity.currentX + magnitudeX, entity.currentY + magnitudeY);
+		
 		// Iterates through the ArrayList wallObjects and checks if the next players movement will intersect with
 		//	any of the NewRectangles
 		for (NewRectangle rect: wallObjects) {
-			Rectangle tempRect = new Rectangle(entity.currentX, entity.currentY, entity.size, entity.size);
-			if (tempRect.intersects(rect.rect)) {
+			if (projectedLine.intersects(rect.rect)) {
 				return false;
 			}
 		}
@@ -317,7 +314,7 @@ public class Physics {
 		}
 		
 		
-		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 40));
+		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 75, 33));
 		player = mobs.get(0);
 	}
 }

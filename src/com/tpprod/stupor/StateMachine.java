@@ -147,12 +147,14 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 						if (currentKeys.indexOf(65) != -1) { // A Key
 							physics.mobMove(physics.player, 3, physics.player.speed);
+							physics.player.FaceLeft();
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
 							// Add ground pound function
 						}
 						if (currentKeys.indexOf(68) != -1) { // D Key
 							physics.mobMove(physics.player, 4, physics.player.speed);
+							physics.player.FaceRight();
 						}
 						if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
 							SaveData data = new SaveData();

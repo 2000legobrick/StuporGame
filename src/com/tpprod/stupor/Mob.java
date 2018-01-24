@@ -2,6 +2,13 @@ package com.tpprod.stupor;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 
 /*
@@ -13,15 +20,17 @@ import java.awt.Point;
 public class Mob {
 	
 	public Color playerColor = Color.RED;
+	public BufferedImage image = null;
+	public BufferedImage arm = null;
     public int accelerationX, accelerationY;
 	public int currentX, currentY;
 	public int jump = 0;
-	public int height = 90;
+	public int height = 75;
 	public int width = height;
-	public int speed = 8;
+	public int speed = 12;
     public int velocityX, velocityY;
 	public int maxVelocity = 20;
-	public int shootingVelocity = 1;
+	public int shootingVelocity = 60;
 	public int projectileSize = 10;
 	public int maxJump = 30;
 	public int dampening = 1;
@@ -29,16 +38,25 @@ public class Mob {
 	public Projectile[] projectileList = new Projectile[2];
 	
 	private Inventory inventory = new Inventory();
+	private boolean FacingLeft = false;
 	
-	public Mob (int posX, int posY, Color tempCol, int tempSize) {
+	public Mob (int posX, int posY, Color tempCol, int tempHeight, int tempWidth) {
 		/*
 		 * This is a constructor where the position, color, and size can be set.
 		 */
 		currentX = posX;
 		currentY = posY;
 		playerColor = tempCol;
-		height = tempSize;
-		width = tempSize;
+		height = tempHeight;
+		width = tempWidth;
+		try {
+			image = ImageIO.read(new File("./Content/Textures/Player.png"));
+			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		projectileList[0] = new Projectile();
 	}
 	
 	public Mob (int posX, int posY) {
@@ -49,23 +67,43 @@ public class Mob {
 		currentY = posY;
 	}
 	
+	public void FaceLeft() {
+		if (!FacingLeft) {
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			tx.translate(-image.getWidth(null), 0);
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			image = op.filter(image, null);
+			FacingLeft = true;
+		}
+	}
+	
+	public void FaceRight() {
+		if (FacingLeft) {
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			tx.translate(-image.getWidth(null), 0);
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			image = op.filter(image, null);
+			FacingLeft = false;
+		}
+	}
+	
 	public void Shoot(Point mousePoint, Point middleScreen) {
-		if (projectileList[0] == null) {
-			double rY = middleScreen.getY() - mousePoint.getY();
-			double rX = middleScreen.getX() - mousePoint.getX();
-		
-			double theta = Math.tan(rY/rX);
+		if (!projectileList[0].shown) {
+			double rY = mousePoint.getY() - middleScreen.getY();
+			double rX = mousePoint.getX() - middleScreen.getX();
 			
-			projectileList[0] = new Projectile((int)(middleScreen.getX()+width*Math.cos(theta)), (int)(middleScreen.getY()+height*Math.sin(theta)),
-					(int)(shootingVelocity*Math.cos(theta)), (int)(shootingVelocity*Math.sin(theta)), projectileSize);
-		} else if (projectileList[1] == null) {
-			double rY = middleScreen.getY() - mousePoint.getY();
-			double rX = middleScreen.getX() - mousePoint.getX();
-		
-			double theta = Math.tan(rY/rX);
+			double theta = Math.atan(rY/rX);
+	
+			double magnitude = Math.sqrt(rX*rX + rY*rY) / 360;
+			magnitude = (int) (shootingVelocity * magnitude);
 			
-			projectileList[1] = new Projectile((int)(middleScreen.getX()+width*Math.cos(theta)), (int)(middleScreen.getY()+height*Math.sin(theta)),
-					(int)(shootingVelocity*Math.cos(theta)), (int)(shootingVelocity*Math.sin(theta)), projectileSize);
+			if (rX > 0) {
+				projectileList[0] = new Projectile((int)(currentX)+width/2, (int)(currentY)+height/2,
+						(int)(-magnitude*Math.sin(theta)), (int)(magnitude*Math.cos(theta)), projectileSize);
+			} else if (rX < 0) {
+				projectileList[0] = new Projectile((int)(currentX)+width/2, (int)(currentY)+height/2,
+						(int)(magnitude*Math.sin(theta)), (int)(-magnitude*Math.cos(theta)), projectileSize);
+			}
 		}
 	}
 	
