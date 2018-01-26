@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * The Physics Class accounts for the movement and storage of all mobs that are currently .
  */
 
-public class Physics {
+public class Physics implements Runnable {
 	
 	public Mob player = null;
 	public int playerStartingX = 1200;
@@ -316,5 +316,10 @@ public class Physics {
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 75, 33));
 		player = mobs.get(0);
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 	}
 }
