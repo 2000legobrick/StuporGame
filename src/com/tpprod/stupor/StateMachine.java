@@ -5,12 +5,10 @@ import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferStrategy;
 import java.awt.Toolkit;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
@@ -26,11 +24,10 @@ import javax.swing.event.MouseInputListener;
  * 		DeadState      - Informs the player on their death and resets state to the MenuState 
  */
 
-public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener  {
-	
-	
+public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener {
+
 	// Static variables
-	
+
 	public static final int GameState      = 0;
 	public static final int MenuState      = 1;
 	public static final int PauseState     = 2;
@@ -47,23 +44,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public static int tileSize = 100;
 	public static final String NAME = "Stupor";
-	
+
 	private static final long serialVersionUID = 1L;
 	private int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	private boolean running = false;
 	private boolean keyPressed;
 	private Render render = new Render();
-	
-	
 
 	public StateMachine() {
 		/*
 		 * This is the StateMachine constructor, intentionally left empty.
 		 */
 	}
-	
-	
-	
+
 	@Override
 	public void run() {
 		/*
@@ -122,97 +115,90 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				/*
 				 * Switches actual game state based on current state
 				 */
-				switch(CurrentState){
-					case GameState:
-						
-						// Updates game objects
-						physics.Gravity();
-		
-						// These are the actions that each key is tied to,
-						// the key that is referenced is found in-line with
-						// the if statement.
-		
-						if (currentKeys.indexOf(17) != -1) { // Ctrl key
-							// player does wallSlide
-						} else {
-							// player stops wallSlide
-						}
-		
-						if (currentKeys.indexOf(27) != -1) { // Escape Key
-							CurrentState = MenuState;
-						}
-		
-						if (currentKeys.indexOf(87) != -1) { // W Key
-							physics.player.Jump();
-						}
-						if (currentKeys.indexOf(65) != -1) { // A Key
-							physics.mobMove(physics.player, 3, physics.player.speed);
-							physics.player.FaceLeft();
-						}
-						if (currentKeys.indexOf(83) != -1) { // S Key
-							// Add ground pound function
-						}
-						if (currentKeys.indexOf(68) != -1) { // D Key
-							physics.mobMove(physics.player, 4, physics.player.speed);
-							physics.player.FaceRight();
-						}
-						if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
-							SaveData data = new SaveData();
-							data.playerCurrentX = physics.player.currentX;
-							data.playerCurrentY = physics.player.currentY;
-							try {
-								ResourceManager.Save(data, "SaveData");
-							} catch (Exception e) {
-								System.out.println("Couldn't save: " + e.getMessage());
-							}
-						}
-						if (currentKeys.indexOf(88) != -1) { // X key and Load Data
-							try {	
-								SaveData data = (SaveData) ResourceManager.Load("SaveData");
-								physics.player.currentX = data.playerCurrentX;
-								physics.player.currentY = data.playerCurrentY;
-							} catch (Exception e) {
-								System.out.println("Couldn't load save data: " + e.getMessage());
-							}
-						}
+				switch (CurrentState) {
+				case GameState:
 
-						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
-							for (Mob entity : physics.mobs) {
-								physics.Dampening(entity);
-							}
-						}
-						physics.Movement();
-					case MenuState:
-						if (currentKeys.indexOf(87) != -1) { // W Key
-							render.currentMenuPos -= 1;
-							currentKeys.remove(currentKeys.indexOf(87));
-						}
-						if (currentKeys.indexOf(83) != -1) { // S Key
-							render.currentMenuPos += 1;
-							currentKeys.remove(currentKeys.indexOf(83));
-						}
-						if (currentKeys.indexOf(38) != -1) { // Up Arrow
-							render.currentMenuPos -= 1;
-							currentKeys.remove(currentKeys.indexOf(38));
-						}
-						if (currentKeys.indexOf(40) != -1) { // Down Arrow
-							render.currentMenuPos += 1;
-							currentKeys.remove(currentKeys.indexOf(40));
-						}
-						if (render.currentMenuPos > 2) {
-							render.currentMenuPos = 2;
-						} else if (render.currentMenuPos < 0) {
-							render.currentMenuPos = 0;
-						}
-						//Am Broke
-						if (currentKeys.indexOf(10) != -1) { // Enter Key
-							if (render.currentMenuPos == 0) {
-								CurrentState = GameState;
-							}
+					// Updates game objects
+					physics.Gravity();
+
+					// These are the actions that each key is tied to,
+					// the key that is referenced is found in-line with
+					// the if statement.
+
+					if (currentKeys.indexOf(17) != -1) { // Ctrl key
+						// player does wallSlide
+					} else {
+						// player stops wallSlide
+					}
+
+					if (currentKeys.indexOf(27) != -1) { // Escape Key
+						CurrentState = MenuState;
+					}
+
+					if (currentKeys.indexOf(87) != -1) { // W Key
+						physics.player.Jump();
+					}
+					if (currentKeys.indexOf(65) != -1) { // A Key
+						physics.mobMove(physics.player, 3, physics.player.speed);
+						physics.player.FaceLeft();
+					}
+					if (currentKeys.indexOf(83) != -1) { // S Key
+						// Add ground pound function
+					}
+					if (currentKeys.indexOf(68) != -1) { // D Key
+						physics.mobMove(physics.player, 4, physics.player.speed);
+						physics.player.FaceRight();
+					}
+					if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
+						SaveData data = new SaveData();
+						data.playerCurrentX = physics.player.currentX;
+						data.playerCurrentY = physics.player.currentY;
+						try {
+							ResourceManager.Save(data, "SaveData");
+						} catch (Exception e) {
+							System.out.println("Couldn't save: " + e.getMessage());
 						}
 					}
-				
-				
+					if (currentKeys.indexOf(88) != -1) { // X key
+						
+					}
+
+					if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
+						for (Mob entity : physics.mobs) {
+							physics.Dampening(entity);
+						}
+					}
+					physics.Movement();
+				case MenuState:
+					if (currentKeys.indexOf(87) != -1) { // W Key
+						render.currentMenuPos -= 1;
+						currentKeys.remove(currentKeys.indexOf(87));
+					}
+					if (currentKeys.indexOf(83) != -1) { // S Key
+						render.currentMenuPos += 1;
+						currentKeys.remove(currentKeys.indexOf(83));
+					}
+					if (currentKeys.indexOf(38) != -1) { // Up Arrow
+						render.currentMenuPos -= 1;
+						currentKeys.remove(currentKeys.indexOf(38));
+					}
+					if (currentKeys.indexOf(40) != -1) { // Down Arrow
+						render.currentMenuPos += 1;
+						currentKeys.remove(currentKeys.indexOf(40));
+					}
+					if (render.currentMenuPos > 2) {
+						render.currentMenuPos = 2;
+					} else if (render.currentMenuPos < 0) {
+						render.currentMenuPos = 0;
+					}
+					// Am Broke
+					if (currentKeys.indexOf(10) != -1) { // Enter Key
+						if (render.currentMenuPos == 0) {
+							CurrentState = GameState;
+						}
+					}
+				}
+
 				// Beautiful ticks are ticking!!!
 				tick++;
 				tick();
@@ -224,12 +210,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			//Draws the current frame
+			// Draws the current frame
 			if (canRender) {
 				fps++;
 				render();
 			}
-			//Print current fps and ticks
+			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
 				System.out.printf("%d fps, %d tick%n", fps, tick);
 				fps = 0;
@@ -238,7 +224,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 		}
 	}
-	
+
 	private void render() {
 		/*
 		 * The render method tells the render class to draw to the canvas.
@@ -247,7 +233,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * 	methods that draw the background and foreground to the canvas and then 
 		 * 	update the canvas that is shown.
 		 */
-		
+
 		// BufferStategy is a way of rendering a certain amount of frames ahead
 		// 	of the current frame to help with stuttering issues
 		BufferStrategy bs = getBufferStrategy();
@@ -258,12 +244,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			return;
 		}
 		Graphics g = bs.getDrawGraphics();
-		
-		
-		// Calling the RenderState here to render based off of the current state wanting to be displayed
-		
+
+		// Calling the RenderState here to render based off of the current state wanting
+		// to be displayed
+
 		render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
-		
+
 		// Done with rendering, Moving to situating the canvas and displaying it
 		g.dispose();
 		bs.show();
@@ -285,17 +271,17 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// print to later.
 
 		StateMachine game = new StateMachine();
-		
+
 		game.start();
-	
+
 	}
-	
+
 	public void start() {
 		/*
 		 * The start method is called upon launching the app and starts the thread that
 		 * 	the game runs on.
 		 */
-		
+
 		Dimension dimension = new Dimension(WIDTH, HEIGHT);
 		this.setMaximumSize(dimension);
 		this.setMinimumSize(dimension);
@@ -315,24 +301,34 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		
+
 		if (!running) {
-			
+
 			running = true;
 			new Thread(this).start();
-		} 
+		}
 	}
-	
-	public void stop () {
+
+	public void stop() {
 		/*
 		 * The stop method ends the program by causing the run method's while loop
 		 *  to finish and finally reach the end of the run method
 		 */
-		running = false;
+		SaveData data = new SaveData();
+		data.playerCurrentX = physics.player.currentX;
+		data.playerCurrentY = physics.player.currentY;
+		try {
+			ResourceManager.Save(data, "SaveData");
+		} catch (Exception e) {
+			System.out.println("Couldn't save: " + e.getMessage());
+		}
+		
 		frame.setVisible(false);
 		frame.dispose();
+
+		running = false;
 	}
-	
+
 	public void keyTyped(KeyEvent e) {
 		/*
 		 * The method keyTyped is required by the KeyListener class and is an event that
@@ -352,7 +348,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 		try {
 			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
-		} catch (Exception e1) {}
+		} catch (Exception e1) {
+		}
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -377,12 +374,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		}
 	}
 
-
-
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -394,43 +389,37 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		if (render.currentMenuPos == 0 && CurrentState == MenuState) {
 			CurrentState = GameState;
-		} 
+		} else if(render.currentMenuPos == 2 && CurrentState == MenuState) {
+			stop();
+		}
 		if (CurrentState == GameState) {
-			physics.player.Shoot(arg0.getPoint(), new Point(getWidth()/2, getHeight()/2));
+			physics.player.Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
 		}
 	}
-
-
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
-
-
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
