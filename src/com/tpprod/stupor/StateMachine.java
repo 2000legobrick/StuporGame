@@ -306,7 +306,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 			running = true;
 			new Thread(this).start();
-		}
+			new Thread(physics).start();
+			new Thread(render).start();
+		} 
 	}
 
 	public void stop() {

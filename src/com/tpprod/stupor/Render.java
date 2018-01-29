@@ -17,8 +17,8 @@ import javax.imageio.ImageIO;
  * 	the class StateMachine. 
  */
 
-public class Render {
-
+public class Render implements Runnable {
+	
 	public World world = new World();
 
 	public static int fogOfWar = 12;
@@ -93,6 +93,7 @@ public class Render {
 	public void RenderMenu(Graphics g, int width, int height) {
 		/*
 		 * The method RenderMenud renders out the menu for the game.
+		 * The method RenderMenu renders out the menu for the game.
 		 */
 		g.setColor(Color.BLUE);
 		g.fillRect(0, 0, width, height);
@@ -236,5 +237,11 @@ public class Render {
 		 */
 
 		currentWorld = newWorld;
+	}
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 	}
 }
