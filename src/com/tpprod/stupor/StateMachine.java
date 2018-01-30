@@ -183,6 +183,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 						physics.Movement();
 					case MenuState:
+
+						if (currentKeys.indexOf(27) != -1) { // Escape Key
+							this.stop();
+						}
 						if (currentKeys.indexOf(87) != -1) { // W Key
 							render.currentMenuPos -= 1;
 							currentKeys.remove(currentKeys.indexOf(87));
@@ -208,6 +212,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
 							if (render.currentMenuPos == 0) {
 								CurrentState = GameState;
+							} else if (render.currentMenuPos == 2) {
+								this.stop();
 							}
 						}
 					}
@@ -330,9 +336,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * The stop method ends the program by causing the run method's while loop
 		 *  to finish and finally reach the end of the run method
 		 */
-		running = false;
 		frame.setVisible(false);
 		frame.dispose();
+		running = false;
 	}
 	
 	public void keyTyped(KeyEvent e) {
