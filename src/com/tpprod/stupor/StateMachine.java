@@ -167,34 +167,40 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						for (Mob entity : physics.mobs) {
 							physics.Dampening(entity);
 						}
-					}
-					physics.Movement();
-				case MenuState:
-					if (currentKeys.indexOf(87) != -1) { // W Key
-						render.currentMenuPos -= 1;
-						currentKeys.remove(currentKeys.indexOf(87));
-					}
-					if (currentKeys.indexOf(83) != -1) { // S Key
-						render.currentMenuPos += 1;
-						currentKeys.remove(currentKeys.indexOf(83));
-					}
-					if (currentKeys.indexOf(38) != -1) { // Up Arrow
-						render.currentMenuPos -= 1;
-						currentKeys.remove(currentKeys.indexOf(38));
-					}
-					if (currentKeys.indexOf(40) != -1) { // Down Arrow
-						render.currentMenuPos += 1;
-						currentKeys.remove(currentKeys.indexOf(40));
-					}
-					if (render.currentMenuPos > 2) {
-						render.currentMenuPos = 2;
-					} else if (render.currentMenuPos < 0) {
-						render.currentMenuPos = 0;
-					}
-					// Am Broke
-					if (currentKeys.indexOf(10) != -1) { // Enter Key
-						if (render.currentMenuPos == 0) {
-							CurrentState = GameState;
+						physics.Movement();
+					case MenuState:
+
+						if (currentKeys.indexOf(27) != -1) { // Escape Key
+							this.stop();
+						}
+						if (currentKeys.indexOf(87) != -1) { // W Key
+							render.currentMenuPos -= 1;
+							currentKeys.remove(currentKeys.indexOf(87));
+						}
+						if (currentKeys.indexOf(83) != -1) { // S Key
+							render.currentMenuPos += 1;
+							currentKeys.remove(currentKeys.indexOf(83));
+						}
+						if (currentKeys.indexOf(38) != -1) { // Up Arrow
+							render.currentMenuPos -= 1;
+							currentKeys.remove(currentKeys.indexOf(38));
+						}
+						if (currentKeys.indexOf(40) != -1) { // Down Arrow
+							render.currentMenuPos += 1;
+							currentKeys.remove(currentKeys.indexOf(40));
+						}
+						if (render.currentMenuPos > 2) {
+							render.currentMenuPos = 2;
+						} else if (render.currentMenuPos < 0) {
+							render.currentMenuPos = 0;
+						}
+						//Am Broke
+						if (currentKeys.indexOf(10) != -1) { // Enter Key
+							if (render.currentMenuPos == 0) {
+								CurrentState = GameState;
+							} else if (render.currentMenuPos == 2) {
+								this.stop();
+							}
 						}
 					}
 				}
@@ -327,7 +333,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		
 		frame.setVisible(false);
 		frame.dispose();
-
 		running = false;
 	}
 

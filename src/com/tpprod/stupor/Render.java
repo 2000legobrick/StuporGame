@@ -27,6 +27,7 @@ public class Render implements Runnable {
 	public int currentMenuPos = 0;
 	public int currentMouseX, currentMouseY;
 	public BufferedImage img = null;
+	public BufferedImage cave = null;
 	public BufferedImage person = null;
 	public BufferedImage arm = null;
 
@@ -41,6 +42,7 @@ public class Render implements Runnable {
 		 */
 		try {
 			img = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
+			cave = ImageIO.read(new File("./Content/Textures/cave.png"));
 			person = ImageIO.read(new File("./Content/Textures/Player.png"));
 			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
 		} catch (IOException e) {
@@ -60,39 +62,46 @@ public class Render implements Runnable {
 	public void RenderState(Graphics g, int width, int height, int state, Mob player) {
 
 		// renders a state based on what state is passed through the constructor
-
-		switch (state) {
-		case StateMachine.GameState:
-			RenderBackground(g, width, height);
-			RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
-			break;
-		case StateMachine.MenuState:
-			RenderMenu(g, width, height);
-			break;
-		case StateMachine.PauseState:
-
-			break;
-		case StateMachine.InventoryState:
-
-			break;
-		case StateMachine.DeadState:
-
-			break;
+		
+		switch(state) {
+			case StateMachine.GameState:
+				RenderBackground(g, width, height, player);
+				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+				break;
+			case StateMachine.MenuState:
+				RenderMenu(g, width,height);
+				break;
+			case StateMachine.PauseState:
+				
+				break;
+			case StateMachine.InventoryState:
+				
+				break;
+			case StateMachine.DeadState:
+				
+				break;
 		}
 
 	}
-
-	public void RenderBackground(Graphics g, int width, int height) {
+	
+	public void RenderBackground(Graphics g, int width, int height, Mob player) {
 		/*
 		 * The method RenderBackground renders out the backdrop of the game.
 		 */
-		g.setColor(new Color(0, 0, 0, 255));
-		g.fillRect(0, 0, width, height);
-	}
-
+		boolean flipBool = false;
+		for (int x = (width - player.currentX / 3) - width; x < width; x += width) {
+			if (flipBool) {
+				g.drawImage(cave, x, 0, width, height, null);
+				flipBool = !flipBool;
+			} else {
+				g.drawImage(cave, x + width, 0, -width, height, null);
+				flipBool = !flipBool;
+			}
+		}
+	} 
+	
 	public void RenderMenu(Graphics g, int width, int height) {
 		/*
-		 * The method RenderMenud renders out the menu for the game.
 		 * The method RenderMenu renders out the menu for the game.
 		 */
 		g.setColor(Color.BLUE);
