@@ -29,6 +29,7 @@ public class Render implements Runnable {
 	public int currentMenuPos = 0;
 	public int currentMouseX, currentMouseY;
 	public BufferedImage img = null;
+	public BufferedImage cave = null;
 	public BufferedImage person = null;
 	public BufferedImage arm = null;
 
@@ -46,6 +47,7 @@ public class Render implements Runnable {
 		 */
 		try {
 			img = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
+			cave = ImageIO.read(new File("./Content/Textures/cave.png"));
 			person = ImageIO.read(new File("./Content/Textures/Player.png"));
 			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
 		} catch (IOException e) {
@@ -70,8 +72,8 @@ public class Render implements Runnable {
 		
 		switch(state) {
 			case StateMachine.GameState:
-				RenderBackground(g, width, height);
-				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
+				RenderBackground(g, width, height, player);
+				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
 				break;
 			case StateMachine.MenuState:
 				RenderMenu(g, width,height);
@@ -89,12 +91,20 @@ public class Render implements Runnable {
 		
 	}
 	
-	public void RenderBackground(Graphics g, int width, int height) {
+	public void RenderBackground(Graphics g, int width, int height, Mob player) {
 		/*
 		 * The method RenderBackground renders out the backdrop of the game.
 		 */
-		g.setColor(new Color(0,0,0));
-		g.fillRect(0, 0, width, height);
+		boolean flipBool = false;
+		for (int x = (width - player.currentX / 3) - width; x < width; x += width) {
+			if (flipBool) {
+				g.drawImage(cave, x, 0, width, height, null);
+				flipBool = !flipBool;
+			} else {
+				g.drawImage(cave, x + width, 0, -width, height, null);
+				flipBool = !flipBool;
+			}
+		}
 	} 
 	
 	public void RenderMenu(Graphics g, int width, int height) {
