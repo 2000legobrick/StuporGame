@@ -34,6 +34,7 @@ public class Render implements Runnable {
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
+	private ArrayList<NewRectangle> DisplayedItems = new ArrayList<NewRectangle>();
 	
 	
 	//private Mob player;
@@ -63,14 +64,14 @@ public class Render implements Runnable {
 	}
 	
 	
-	public void RenderState(Graphics g, int width, int height, int state, Mob player){
+	public void RenderState(Graphics g, int width, int height, int state, Mob player, World world){
 		
 		// renders a state based on what state is passed through the constructor
 		
 		switch(state) {
 			case StateMachine.GameState:
 				RenderBackground(g, width, height);
-				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
 				break;
 			case StateMachine.MenuState:
 				RenderMenu(g, width,height);
@@ -92,13 +93,12 @@ public class Render implements Runnable {
 		/*
 		 * The method RenderBackground renders out the backdrop of the game.
 		 */
-		g.setColor(Color.BLUE);
+		g.setColor(new Color(0,0,0));
 		g.fillRect(0, 0, width, height);
 	} 
 	
 	public void RenderMenu(Graphics g, int width, int height) {
 		/*
-		 * The method RenderMenud renders out the menu for the game.
 		 * The method RenderMenu renders out the menu for the game.
 		 */
 		g.setColor(Color.BLUE);
@@ -141,7 +141,7 @@ public class Render implements Runnable {
 		}
 	} 
 	
-	public void RenderForeground(Graphics g, int width, int height, int tileSize, ArrayList<Mob> entities, Mob player) {
+	public void RenderForeground(Graphics g, int width, int height, int tileSize, ArrayList<Mob> entities, Mob player, World world) {
 		/*
 		 * The RenderForeground method takes the blocks on screen and actually prints them to the canvas,
 		 *  allowing the player to see the world.
@@ -149,6 +149,7 @@ public class Render implements Runnable {
 		
 		DisplayedObjects = new ArrayList<NewRectangle>();
 		DisplayedMobs = new ArrayList<NewRectangle>();
+		DisplayedItems = new ArrayList<NewRectangle>();
 		
 		// Iterates through the world blocks and mobs adding the objects and mobs that will be on screen
 		for (int y = (int)(player.currentY / tileSize)-fogOfWar; y <= (int)(player.currentY / tileSize)+fogOfWar; y++) {
@@ -171,6 +172,13 @@ public class Render implements Runnable {
 				}
 			}
 		}
+		for (Item item: world.inventory.currentItems) { 
+			if (item.itemX + tileSize > player.currentX - tileSize*fogOfWar && item.itemX < player.currentX + tileSize*fogOfWar) {
+				if (item.itemY + tileSize > player.currentY - tileSize*fogOfWar && item.itemY < player.currentY + tileSize*fogOfWar) {
+					DisplayedItems.add(new NewRectangle(item.itemColor, new Rectangle(item.itemX, item.itemY, item.itemSize, item.itemSize)));
+				}
+			}
+		}
 		
 		// Iterates through all objects that are on screen and displays them based off the players current position
 		//  which is located at the center of the screen
@@ -182,11 +190,18 @@ public class Render implements Runnable {
 					g.setColor(GetColorArray(currentWorld)[rect.type]);
 					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 					*/
-				} else  if (rect.type != 0) {
+				} else if (rect.type != 0) {
 					g.setColor(GetColorArray(currentWorld)[rect.type]);
 					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 				}
 			} catch (Exception e) {}
+		}
+		
+		for (NewRectangle rect: DisplayedItems) {
+			try {
+				g.setColor(rect.color);
+				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+			}catch(Exception e) {}
 		}
 		
 		for (NewRectangle rect: DisplayedMobs) {

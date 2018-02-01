@@ -3,7 +3,7 @@ package com.tpprod.stupor;
 import java.util.ArrayList;
 
 public class Inventory {
-	ArrayList<Item> currentItems;
+	ArrayList<Item> currentItems = new ArrayList<Item>();
 	public Inventory () {
 		
 	}

@@ -53,6 +53,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private boolean running = false;
 	private boolean keyPressed;
 	private Render render = new Render();
+	private MusicPlayer musicPlayer = new MusicPlayer("strings3");
 	
 	
 
@@ -156,24 +157,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 							physics.mobMove(physics.player, 4, physics.player.speed);
 							physics.player.FaceRight();
 						}
-						if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
-							SaveData data = new SaveData();
-							data.playerCurrentX = physics.player.currentX;
-							data.playerCurrentY = physics.player.currentY;
-							try {
-								ResourceManager.Save(data, "SaveData");
-							} catch (Exception e) {
-								System.out.println("Couldn't save: " + e.getMessage());
-							}
+						if (currentKeys.indexOf(90) != -1) { // Z Key
+							System.out.println("This is the World Inventory Before: " + physics.world.inventory.currentItems);
+							System.out.println("This is the Player's Inventory Before: " + physics.player.inventory.currentItems);
+							physics.pickUpItem(physics.player);
+							System.out.println("This is the Player's Inventory After: " + physics.player.inventory.currentItems);
+							System.out.println("This is the World Inventory After: " + physics.world.inventory.currentItems);
 						}
-						if (currentKeys.indexOf(88) != -1) { // X key and Load Data
-							try {	
-								SaveData data = (SaveData) ResourceManager.Load("SaveData");
-								physics.player.currentX = data.playerCurrentX;
-								physics.player.currentY = data.playerCurrentY;
-							} catch (Exception e) {
-								System.out.println("Couldn't load save data: " + e.getMessage());
-							}
+						if (currentKeys.indexOf(88) != -1) { // X key
+							
 						}
 
 						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
@@ -262,7 +254,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		
 		// Calling the RenderState here to render based off of the current state wanting to be displayed
 		
-		render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
+		render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player, physics.world);
 		
 		// Done with rendering, Moving to situating the canvas and displaying it
 		g.dispose();
@@ -322,6 +314,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			new Thread(this).start();
 			new Thread(physics).start();
 			new Thread(render).start();
+			new Thread(musicPlayer).start();
 		} 
 	}
 	

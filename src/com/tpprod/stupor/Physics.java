@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -149,6 +150,28 @@ public class Physics implements Runnable {
 			entity.velocityX = magnitude;
 		}
 		
+	}
+	
+	public double getDistanceTo(Point point1, Point point2) {
+		double distance = Math.sqrt(Math.pow(point1.getX() - point2.getX(), 2) + Math.pow(point1.getY() - point2.getY(), 2));
+		return distance;
+	}
+	
+	public void pickUpItem(Mob entity) {
+		Item closestItem = null;
+		double closestDistance = 500;
+		double tempDistance;
+		for (Item i:world.inventory.currentItems) {
+			tempDistance = getDistanceTo(new Point (entity.currentX, entity.currentY), new Point(i.itemX, i.itemY));
+			if (tempDistance < closestDistance) {
+				closestDistance = tempDistance;
+				closestItem = i;
+			}
+		}
+		if (closestItem != null) {
+			entity.addItem(closestItem);
+			world.inventory.removeItem(closestItem);
+		}
 	}
 	
 	public void MoveToWall(Mob entity, int direction) {

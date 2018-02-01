@@ -37,7 +37,6 @@ public class Mob {
 	public boolean wallSlide;
 	public Projectile[] projectileList = new Projectile[2];
 	
-	private Inventory inventory = new Inventory();
 	private boolean FacingLeft = false;
 	
 	public Mob (int posX, int posY, Color tempCol, int tempHeight, int tempWidth) {
