@@ -167,6 +167,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						for (Mob entity : physics.mobs) {
 							physics.Dampening(entity);
 						}
+					}
 						physics.Movement();
 					case MenuState:
 
@@ -203,7 +204,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 							}
 						}
 					}
-				}
+				
 
 				// Beautiful ticks are ticking!!!
 				tick++;
@@ -229,7 +230,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				timer += 1000;
 			}
 		}
-	}
+}
 
 	private void render() {
 		/*
