@@ -181,6 +181,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 								physics.Dampening(entity);
 							}
 						}
+						if (tick % 5 == 0) {
+						physics.player.NextFrame();
+						}
 						physics.Movement();
 					case MenuState:
 

@@ -19,7 +19,6 @@ import javax.imageio.ImageIO;
 
 public class Mob {
 	
-	public Color playerColor = Color.RED;
 	public BufferedImage image = null;
 	public BufferedImage arm = null;
     public int accelerationX, accelerationY;
@@ -37,26 +36,53 @@ public class Mob {
 	public boolean wallSlide;
 	public Projectile[] projectileList = new Projectile[2];
 	
+	private final int spriteWidth = 10;
+	private final int spriteHeight = 10;
+	private final int rows = 10;
+	private final int cols = 10;
 	private Inventory inventory = new Inventory();
+	private BufferedImage[] sprites = new BufferedImage[rows * cols];
 	private boolean FacingLeft = false;
+	private int currentFrame = 0;
 	
-	public Mob (int posX, int posY, Color tempCol, int tempHeight, int tempWidth) {
+	public void NextFrame() {
+		if (currentFrame < sprites.length-1) {
+			currentFrame++;
+		} else {
+			currentFrame = 0;
+		}
+		image = sprites[currentFrame];
+	}
+	
+	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
 		/*
 		 * This is a constructor where the position, color, and size can be set.
 		 */
 		currentX = posX;
 		currentY = posY;
-		playerColor = tempCol;
 		height = tempHeight;
 		width = tempWidth;
 		try {
-			image = ImageIO.read(new File("./Content/Textures/Player.png"));
+			image = ImageIO.read(new File("./Content/Textures/PlayerSpriteSheet.png"));
 			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		projectileList[0] = new Projectile();
+
+		for (int i = 0; i < cols; i++)
+		{
+		    for (int j = 0; j < rows; j++)
+		    {
+		        sprites[(i * rows) + j] = image.getSubimage(
+		            i * spriteWidth,
+		            j * spriteHeight,
+		            spriteWidth,
+		            spriteHeight
+		        );
+		    }
+		}
 	}
 	
 	public Mob (int posX, int posY) {

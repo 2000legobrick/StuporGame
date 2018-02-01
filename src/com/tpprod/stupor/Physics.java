@@ -314,7 +314,7 @@ public class Physics implements Runnable {
 		}
 		
 		
-		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 75, 33));
+		mobs.add(new Mob(playerStartingX, playerStartingY, 150, 75));
 		player = mobs.get(0);
 	}
 

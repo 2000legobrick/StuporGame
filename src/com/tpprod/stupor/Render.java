@@ -22,16 +22,13 @@ import javax.imageio.ImageIO;
 public class Render implements Runnable {
 	
 	public World world = new World();
+	public ColorSchemes palette = new ColorSchemes();
 	
 	public static int fogOfWar = 12;
 	
 	public int currentWorld;
 	public int currentMenuPos = 0;
 	public int currentMouseX, currentMouseY;
-	public BufferedImage img = null;
-	public BufferedImage cave = null;
-	public BufferedImage person = null;
-	public BufferedImage arm = null;
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
@@ -44,15 +41,6 @@ public class Render implements Runnable {
 		/*
 		 * This is the constructor for the Render Class, intentionally left blank
 		 */
-		try {
-			img = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
-			cave = ImageIO.read(new File("./Content/Textures/cave.png"));
-			person = ImageIO.read(new File("./Content/Textures/Player.png"));
-			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	
@@ -95,12 +83,12 @@ public class Render implements Runnable {
 		 * The method RenderBackground renders out the backdrop of the game.
 		 */
 		boolean flipBool = false;
-		for (int x = (width - player.currentX / 3) - width; x < width; x += width) {
+		for (int x = (width - player.currentX / 5) - width; x < width; x += width) {
 			if (flipBool) {
-				g.drawImage(cave, x, 0, width, height, null);
+				g.drawImage(palette.Background, x, 0, width, height, null);
 				flipBool = !flipBool;
 			} else {
-				g.drawImage(cave, x + width, 0, -width, height, null);
+				g.drawImage(palette.Background, x + width, 0, -width, height, null);
 				flipBool = !flipBool;
 			}
 		}
@@ -186,14 +174,9 @@ public class Render implements Runnable {
 		for (NewRectangle rect: DisplayedObjects) {
 			try {
 				if (rect.type == 1) {
-					g.drawImage(img, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
-					/*
-					g.setColor(GetColorArray(currentWorld)[rect.type]);
-					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
-					*/
+					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
 				} else  if (rect.type != 0) {
-					g.setColor(GetColorArray(currentWorld)[rect.type]);
-					g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+					
 				}
 			} catch (Exception e) {}
 		}
@@ -203,23 +186,15 @@ public class Render implements Runnable {
 			//g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 			if (rect.image != null) {
 				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-person.getWidth(null), 0);
+				tx.translate(-palette.Player.getWidth(null), 0);
 				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-				person = op.filter(person, null);
+				palette.Player = op.filter(palette.Player, null);
 		
 				g.drawImage(rect.image, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
 			} else {
 				g.setColor(rect.color);
 				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
 			}
-		}
-	}
-	
-	public Color[] GetColorArray(int selection) {
-		if (selection == 1) {
-			return ColorSchemes.World1;
-		} else {
-			return ColorSchemes.World2;
 		}
 	}
 	
