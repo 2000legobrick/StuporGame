@@ -35,7 +35,8 @@ public class Mob {
 	public int dampening = 1;
 	public boolean wallSlide;
 	public Projectile[] projectileList = new Projectile[2];
-	public Inventory inventory = new Inventory();
+	public int Health;
+	public int MaxHealth = 30;
 	
 	private final int spriteWidth = 10;
 	private final int spriteHeight = 10;
@@ -45,15 +46,7 @@ public class Mob {
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
 	private boolean FacingLeft = false;
 	private int currentFrame = 0;
-	
-	public void NextFrame() {
-		if (currentFrame < sprites.length-1) {
-			currentFrame++;
-		} else {
-			currentFrame = 0;
-		}
-		image = sprites[currentFrame];
-	}
+	private boolean crouching = false;
 	
 	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
 		/*
@@ -84,16 +77,30 @@ public class Mob {
 		        );
 		    }
 		}
+		ResetHealth();
 	}
 
-	public Mob(int posX, int posY) {
-		/*
-		 * This is a constructor where the position can be set.
-		 */
-		currentX = posX;
-		currentY = posY;
+	public void NextFrame() {
+		if (currentFrame < sprites.length-1) {
+			currentFrame++;
+		} else {
+			currentFrame = 0;
+		}
+		image = sprites[currentFrame];
 	}
-
+	
+	public void HurtMob(int damage) {
+		if (Health - damage <= 0) {
+			Health = 0;
+		} else {
+			Health -= damage;
+		}
+	}
+	
+	public void ResetHealth() {
+		Health = MaxHealth;
+	}
+	
 	public void FaceLeft() {
 		if (!FacingLeft) {
 			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);

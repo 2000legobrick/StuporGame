@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
@@ -56,6 +57,7 @@ public class Render implements Runnable {
 			case StateMachine.GameState:
 				RenderBackground(g, width, height, player);
 				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+				RenderHUD(g, player, width, height);
 				break;
 			case StateMachine.MenuState:
 				RenderMenu(g, width,height);
@@ -176,17 +178,6 @@ public class Render implements Runnable {
 		// Iterates through all objects that are on screen and displays them based off
 		// the players current position
 		// which is located at the center of the screen
-		for (NewRectangle rect : DisplayedObjects) {
-			try {
-				if (rect.type == 1) {
-					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
-				} else  if (rect.type != 0) {
-					
-				}
-			} catch (Exception e) {
-			}
-		}
-
 		for (NewRectangle rect : DisplayedMobs) {
 			// g.setColor(rect.color);
 			// g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,
@@ -206,8 +197,45 @@ public class Render implements Runnable {
 						rect.rect.height);
 			}
 		}
+		
+		for (NewRectangle rect : DisplayedObjects) {
+			try {
+				if (rect.type == 1) {
+					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
+				} else  if (rect.type != 0) {
+					
+				}
+			} catch (Exception e) {
+			}
+		}
 	}
 	
+	public void RenderHUD (Graphics g, Mob player, int width, int height) {
+		int middleWidth = width / 2;
+		int middleHeight = height / 2;
+		Dimension box = new Dimension(100,100);
+		// Render Background for Items
+		g.setColor(new Color(40,0,50, 200)); 
+		g.fillArc(middleWidth - box.width*2 - (box.width + 10) - 20, height - (box.height + 20) - 10, box.width+20, box.height+20, 90, 180);
+		g.fillArc(middleWidth + box.width + (box.width + 10), height - (box.height + 20) - 10, box.width+20, box.height+20, 270, 180);
+		g.fillRect(middleWidth - box.width*3/2 - (box.width + 10) - 10, height - (box.height + 20) - 10, box.width*5+40, box.height+20);
+		// Render Item Boxes
+		g.setColor(new Color(255,255,255,200));
+		for (int x = -1; x <= 2; x++) {
+			g.fillRect(middleWidth + 5 - (box.width + 10) * x, height - (box.height + 20), box.width, box.height);
+		}
+		// Render Health
+		double average = (double) player.Health / player.MaxHealth;
+		g.setColor(new Color(255, 0, 0, 200));
+		g.fillArc(middleWidth - box.width - (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
+		// Render Mana
+		g.setColor(new Color(50, 0, 255, 200));
+		g.fillArc(middleWidth + (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
+		// Render Center Lines
+		g.setColor(Color.MAGENTA);
+		g.drawLine(middleWidth, 0, middleWidth, height);
+		g.drawLine(0, middleHeight, width, middleHeight);
+	}
 	public void ChangeWorld(int newWorld) {
 		/*
 		 * This is used to change the current world that
