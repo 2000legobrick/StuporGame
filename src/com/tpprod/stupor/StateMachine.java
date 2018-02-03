@@ -46,23 +46,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public static int tileSize = 100;
+	public static final int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	public static final String NAME = "Stupor";
 	
 	private static final long serialVersionUID = 1L;
-	private int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	private boolean running = false;
 	private boolean keyPressed;
 	private Render render = new Render();
 	
-	
-
 	public StateMachine() {
 		/*
 		 * This is the StateMachine constructor, intentionally left empty.
 		 */
 	}
-	
-	
 	
 	@Override
 	public void run() {
@@ -124,9 +120,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				 */
 				switch(CurrentState){
 					case GameState:
-						
-						// Updates game objects
-						physics.Gravity();
 		
 						// These are the actions that each key is tied to,
 						// the key that is referenced is found in-line with
@@ -139,6 +132,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 		
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
+							physics.stop();
 							CurrentState = MenuState;
 						}
 		
@@ -181,12 +175,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 								physics.Dampening(entity);
 							}
 						}
-						physics.Movement();
 					case MenuState:
-
-						if (currentKeys.indexOf(27) != -1) { // Escape Key
-							this.stop();
-						}
 						if (currentKeys.indexOf(87) != -1) { // W Key
 							render.currentMenuPos -= 1;
 							currentKeys.remove(currentKeys.indexOf(87));
@@ -208,7 +197,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						} else if (render.currentMenuPos < 0) {
 							render.currentMenuPos = 0;
 						}
-						//Am Broke
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
 							if (render.currentMenuPos == 0) {
 								CurrentState = GameState;
@@ -325,8 +313,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		if (!running) {
 			
 			running = true;
+			physics.start();
 			new Thread(this).start();
-			new Thread(physics).start();
 			new Thread(render).start();
 		} 
 	}
@@ -338,6 +326,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 		frame.setVisible(false);
 		frame.dispose();
+		physics.stop();
+		
+		// finish implementing multithreading for physics and then set up render to do the same
 		running = false;
 	}
 	

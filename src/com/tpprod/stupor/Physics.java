@@ -22,6 +22,7 @@ public class Physics implements Runnable {
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
     
     private int GRAVITY = 2;
+	private boolean running = false;
 	
 
 	public void Gravity() { 
@@ -317,9 +318,43 @@ public class Physics implements Runnable {
 		mobs.add(new Mob(playerStartingX, playerStartingY, new Color(191, 87, 0), 75, 33));
 		player = mobs.get(0);
 	}
-
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		
+		// These variables are specific only to the run method
+		
+		double nsPerTick = 1000000000.0d / StateMachine.tickPerSec;
+		double previous = System.nanoTime();
+		double unprocessed = 0;
+		
+		while (running) {
+			double current = System.nanoTime();
+			unprocessed += (current - previous) / nsPerTick;
+			previous = current;
+			while (unprocessed >= 1) {
+				// Updates game objects
+				Gravity();
+				Movement();
+				--unprocessed;
+			}
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void start() {
+		if (!running) {
+			running = true;
+			new Thread(this).start();
+		}
+	}
+	
+	public void stop() {
+		running = false;
 	}
 }
