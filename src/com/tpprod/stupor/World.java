@@ -26,7 +26,7 @@ public class World {
 		 */
 
 		BufferedReader bR = new BufferedReader(
-				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "\\Content\\WorldFile"));
+				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"));
 		String lineString;
 		ArrayList<String> line;
 		int accY = 0;

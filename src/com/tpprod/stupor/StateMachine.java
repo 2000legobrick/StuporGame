@@ -1,17 +1,20 @@
 package com.tpprod.stupor;
 
 import java.awt.Canvas;
-import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.image.BufferStrategy;
-import java.awt.Toolkit;
 import java.util.ArrayList;
+
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
+
 
 /*
  * The StateMachine Class does all the heavy lifting, controlling all the logic for each state of the game.
@@ -48,7 +51,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	private static final long serialVersionUID = 1L;
 	private boolean running = false;
-	private boolean keyPressed;
 	private Render render = new Render();
 	
 	public StateMachine() {
@@ -93,11 +95,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-
 		// These variables are specific only to the run method, and keep track of
 		// the FramesPerSecond and each tick as well as if the program is allowed
 		// to render objects
-		int fps = 0, tick = 0;
+		int tick = 0;
 		double timer = System.currentTimeMillis();
 
 		double nsPerTick = 1000000000.0d / tickPerSec;
@@ -113,6 +114,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				/*
 				 * Switches actual game state based on current state
 				 */
+				//System.out.println(currentKeys);
 				switch (CurrentState) {
 					case GameState:
 		
@@ -197,6 +199,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				tick++;
 				tick();
 				--unprocessed;
+				//draws current frame
+				fps++;
+				render();
+				
 			}
 			try {
 				Thread.sleep(1);
@@ -211,6 +217,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				tick = 0;
 				fps = 0;
 				timer += 1000;
+				frame.requestFocusInWindow();
+				System.out.println(currentKeys);
 			}
 		}
 }
@@ -225,7 +233,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 
 		// BufferStategy is a way of rendering a certain amount of frames ahead
-		// 	of the current frame to help with stuttering issues
+		// 	of the current frame to help with shuttering issues
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
 			// If no BufferStrategy is found, create another one that buffers 3 frames ahead
@@ -277,18 +285,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * 	the game runs on.
 		 */
 
-		Dimension dimension = new Dimension(WIDTH, HEIGHT);
-		this.setMaximumSize(dimension);
-		this.setMinimumSize(dimension);
-		this.setPreferredSize(dimension);
-		this.setSize(dimension);
+//		Dimension dimension = new Dimension(WIDTH, HEIGHT);
+//		this.setMaximumSize(dimension);
+//		this.setMinimumSize(dimension);
+//		this.setPreferredSize(dimension);
+//		this.setSize(dimension);
+//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		
-			
+		
 		// The second chunk adds the canvas to a JFrame in order to display everything onto 
 		// 	a frame that is more versatile than a canvas in terms of dimensioning and 
 		//  positioning. 
-
-		frame.setUndecorated(true);
+		frame.setFocusable(true);
+		frame.setUndecorated(true);	
 		frame.setTitle(NAME);
 		frame.add(this);
 		frame.pack();
@@ -296,7 +305,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-
+		device.setFullScreenWindow(frame);
 		if (!running) {
 			running = true;
 			new Thread(this).start();
@@ -333,19 +342,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * 
 		 * Keys NOT registered: F5, F11, Enter, Ctrl
 		 */
+		
 	}
-
 	public void keyReleased(KeyEvent e) {
 		/*
 		 * keyReleased is called when ANY key is released from a "Pressed" state.
 		 * 
 		 * We use it to remove a key from an ArrayList of all Keys currently "Pressed"
 		 */
-		try {
+		
+		if(currentKeys.indexOf(e.getKeyCode()) != -1) {
 			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
 		} catch (Exception e1) {}
 	}
-
+	
 	public void keyPressed(KeyEvent e) {
 		/*
 		 * keyPressed is called every time a Key registers as "Pressed"
@@ -356,16 +366,26 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * "currentKeys" and making sure that the Key that is being checked is not in
 		 * the list.
 		 */
-
-		keyPressed = false;
-		for (int item : currentKeys) {
-			if (e.getKeyCode() == item) {
-				keyPressed = true;
-			}
+		
+		if(e.getKeyCode() == 157) {
+			return;
 		}
-		if (!keyPressed) {
+		
+		if(currentKeys.indexOf(e.getKeyCode()) == -1) {
 			currentKeys.add(e.getKeyCode());
 		}
+	
+		
+		
+//		keyPressed = false;
+//		for (int item : currentKeys) {
+//			if (e.getKeyCode() == item) {
+//				keyPressed = true;
+//			}
+//		}
+//		if (!keyPressed) {
+//			currentKeys.add(e.getKeyCode());
+//		}
 	}
 
 	@Override
