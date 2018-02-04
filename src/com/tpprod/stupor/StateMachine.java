@@ -104,8 +104,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		double previous = System.nanoTime();
 		double unprocessed = 0;
 
-		boolean canRender = false;
-
 		// If the program is running, we run this chunk of code
 		while (running) {
 			double current = System.nanoTime();
@@ -123,17 +121,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						// the if statement.
 	
 						if (currentKeys.indexOf(17) != -1) { // Ctrl key
-							// player does wallSlide
+							physics.player.ResetMana();
 						} else {
 							// player stops wallSlide
 						}
-	
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
 							physics.stop();
 							CurrentState = MenuState;
 						}
-	
-						if (currentKeys.indexOf(87) != -1) { // W Key
+						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
 							physics.player.Jump();
 						}
 						if (currentKeys.indexOf(65) != -1) { // A Key
@@ -159,7 +155,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(88) != -1) { // X key
 							physics.player.HurtMob(1);
 						}
-	
 						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
 							for (Mob entity : physics.mobs) {
 								physics.Dampening(entity);
@@ -190,6 +185,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
 							if (render.currentMenuPos == 0) {
 								CurrentState = GameState;
+								physics.start();
 							} else if (render.currentMenuPos == 2) {
 								this.stop();
 							}
@@ -200,7 +196,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				// Beautiful ticks are ticking!!!
 				tick++;
 				tick();
-				canRender = true;
 				--unprocessed;
 			}
 			try {
@@ -208,16 +203,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			// Draws the current frame
-			if (canRender) {
-				fps++;
-				render();
-			}
+			render();
+			fps++;
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
-				System.out.printf("%d fps, %d tick%n", fps, tick);
-				fps = 0;
+				System.out.printf("%d fps, %d tick%n", fps,  tick);
 				tick = 0;
+				fps = 0;
 				timer += 1000;
 			}
 		}
@@ -237,26 +229,31 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
 			// If no BufferStrategy is found, create another one that buffers 3 frames ahead
-			createBufferStrategy(3);
+			createBufferStrategy(2);
 			requestFocus();
 			return;
 		}
-		Graphics g = bs.getDrawGraphics();
+		
+		try {
+			Graphics g = bs.getDrawGraphics();
+			// Calling the RenderState here to render based off of the current state wanting
+			// to be displayed
 
-		// Calling the RenderState here to render based off of the current state wanting
-		// to be displayed
+			render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
 
-		render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
-
-		// Done with rendering, Moving to situating the canvas and displaying it
-		g.dispose();
-		bs.show();
+			// Done with rendering, Moving to situating the canvas and displaying it
+			g.dispose();
+			bs.show();
+		} catch (Exception e) {}
 	}
 
 	private void tick() {
 		/*
 		 * This method Ticks, entirely crucial to the flow of this game.
+		 *   Updates the canvas by calling the render method
 		 */
+		
+		// Draws the current frame
 	}
 
 	public static void main(String[] args) {
@@ -301,11 +298,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setVisible(true);
 
 		if (!running) {
-
 			running = true;
-			physics.start();
 			new Thread(this).start();
-			new Thread(render).start();
 		} 
 	}
 
@@ -327,7 +321,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.dispose();
 		physics.stop();
 		
-		// finish implementing multithreading for physics and then set up render to do the same
 		running = false;
 	}
 
@@ -350,8 +343,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 		try {
 			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
-		} catch (Exception e1) {
-		}
+		} catch (Exception e1) {}
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -405,10 +397,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// TODO Auto-generated method stub
 		if (render.currentMenuPos == 0 && CurrentState == MenuState) {
 			CurrentState = GameState;
+			physics.start();
 		} else if(render.currentMenuPos == 2 && CurrentState == MenuState) {
 			stop();
 		}
-		if (CurrentState == GameState) {
+		if (CurrentState == GameState && arg0.getButton() == arg0.BUTTON1) {
 			physics.player.Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
 		}
 	}

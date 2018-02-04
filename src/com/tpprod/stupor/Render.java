@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  * 	the class StateMachine. 
  */
 
-public class Render implements Runnable {
+public class Render {
 	
 	public World world = new World();
 	public ColorSchemes palette = new ColorSchemes();
@@ -31,7 +31,7 @@ public class Render implements Runnable {
 
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
-
+	
 	// private Mob player;
 
 	public Render() {
@@ -158,20 +158,20 @@ public class Render implements Runnable {
 		}
 
 		for (Mob entity : entities) {
-			if (entity.currentX + tileSize > player.currentX - tileSize * fogOfWar
-					&& entity.currentX < player.currentX + tileSize * fogOfWar) {
-				if (entity.currentY + tileSize > player.currentY - tileSize * fogOfWar
-						&& entity.currentY < player.currentY + tileSize * fogOfWar) {
-					DisplayedMobs.add(new NewRectangle(entity.image,
-							new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+			if (entity.Health > 0) {
+				if (entity.currentX + tileSize > player.currentX - tileSize * fogOfWar
+						&& entity.currentX < player.currentX + tileSize * fogOfWar) {
+					if (entity.currentY + tileSize > player.currentY - tileSize * fogOfWar
+							&& entity.currentY < player.currentY + tileSize * fogOfWar) {
+						DisplayedMobs.add(new NewRectangle(entity.image,
+								new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+					}
 				}
 			}
-			if (entity.projectileList[0] != null) {
-				if (entity.projectileList[0].shown) {
-					DisplayedMobs.add(new NewRectangle(Color.BLACK,
-							new Rectangle(entity.projectileList[0].currentX, entity.projectileList[0].currentY,
-									entity.projectileList[0].size, entity.projectileList[0].size)));
-				}
+			for (Projectile proj: entity.projectileList) {
+				DisplayedMobs.add(new NewRectangle(Color.WHITE,
+						new Rectangle(proj.currentX, proj.currentY,
+								proj.bulletSize, proj.bulletSize)));
 			}
 		}
 
@@ -229,6 +229,7 @@ public class Render implements Runnable {
 		g.setColor(new Color(255, 0, 0, 200));
 		g.fillArc(middleWidth - box.width - (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
 		// Render Mana
+		average = (double) player.Mana / player.MaxMana;
 		g.setColor(new Color(50, 0, 255, 200));
 		g.fillArc(middleWidth + (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
 		// Render Center Lines
@@ -243,11 +244,5 @@ public class Render implements Runnable {
 		 */
 
 		currentWorld = newWorld;
-	}
-
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
 	}
 }

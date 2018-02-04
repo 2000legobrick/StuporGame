@@ -1,7 +1,7 @@
 package com.tpprod.stupor;
 
-import java.awt.Color;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -18,35 +18,21 @@ import javax.imageio.ImageIO;
  */
 
 public class Mob {
-	
+
+	public ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
 	public BufferedImage image = null;
 	public BufferedImage arm = null;
-	public int accelerationX, accelerationY;
-	public int currentX, currentY;
-	public int jump = 0;
-	public int height = 75;
-	public int width = height;
-	public int speed = 12;
-	public int velocityX, velocityY;
-	public int maxVelocity = 20;
-	public int shootingVelocity = 60;
-	public int projectileSize = 10;
-	public int maxJump = 30;
-	public int dampening = 1;
 	public boolean wallSlide;
-	public Projectile[] projectileList = new Projectile[2];
-	public int Health;
-	public int MaxHealth = 30;
+	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width;
+	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 12, maxVelocity = 20, shootingVelocity = 60,
+			projectileSize = 10, maxJump = 30, dampening = 1;
 	
-	private final int spriteWidth = 10;
-	private final int spriteHeight = 10;
-	private final int rows = 10;
-	private final int cols = 10;
-	private Inventory inventory = new Inventory();
+	private final int spriteWidth = 10, spriteHeight = 10;
+	private final int rows = 10, cols = 10;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
 	private boolean FacingLeft = false;
+	private Inventory inventory = new Inventory();
 	private int currentFrame = 0;
-	private boolean crouching = false;
 	
 	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
 		/*
@@ -63,7 +49,6 @@ public class Mob {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		projectileList[0] = new Projectile();
 
 		for (int i = 0; i < cols; i++)
 		{
@@ -78,6 +63,7 @@ public class Mob {
 		    }
 		}
 		ResetHealth();
+		ResetMana();
 	}
 
 	public void NextFrame() {
@@ -87,6 +73,19 @@ public class Mob {
 			currentFrame = 0;
 		}
 		image = sprites[currentFrame];
+		if (FacingLeft) {
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			tx.translate(-image.getWidth(null), 0);
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			image = op.filter(image, null);
+			FacingLeft = false;
+		} else {
+			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			tx.translate(-image.getWidth(null), 0);
+			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			image = op.filter(image, null);
+			FacingLeft = true;
+		}
 	}
 	
 	public void HurtMob(int damage) {
@@ -99,6 +98,10 @@ public class Mob {
 	
 	public void ResetHealth() {
 		Health = MaxHealth;
+	}
+	
+	public void ResetMana() {
+		Mana = MaxMana;
 	}
 	
 	public void FaceLeft() {
@@ -120,24 +123,31 @@ public class Mob {
 			FacingLeft = false;
 		}
 	}
-
+	
+	public void Attack () {
+		projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
+	}
+	
 	public void Shoot(Point mousePoint, Point middleScreen) {
-		if (!projectileList[0].shown) {
+		if (Mana >= 5) {
 			double rY = mousePoint.getY() - middleScreen.getY();
 			double rX = mousePoint.getX() - middleScreen.getX();
-
 			double theta = Math.atan(rY / rX);
-
 			double magnitude = Math.sqrt(rX * rX + rY * rY) / 360;
-			magnitude = (int) (shootingVelocity * magnitude);
-
-			if (rX > 0) {
-				projectileList[0] = new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-						(int) (-magnitude * Math.sin(theta)), (int) (magnitude * Math.cos(theta)), projectileSize);
-			} else if (rX < 0) {
-				projectileList[0] = new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize);
+			if (magnitude > 1.35) {
+				magnitude = 1.35;
+			} else if (magnitude < .3) {
+				magnitude = .3;
 			}
+			magnitude = (int) (shootingVelocity * magnitude);
+			if (rX > 0) {
+				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
+						(int) (-magnitude * Math.sin(theta)), (int) (magnitude * Math.cos(theta)), projectileSize));
+			} else if (rX < 0) {
+				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
+						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize));
+			}
+			Mana -= 5;
 		}
 	}
 

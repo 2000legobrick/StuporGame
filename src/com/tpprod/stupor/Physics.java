@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -35,9 +36,22 @@ public class Physics implements Runnable {
 				entity.accelerationY = GRAVITY;
 			}
 			try {
-				entity.projectileList[0].accelerationY = GRAVITY;
+				for (Projectile proj: entity.projectileList)
+					proj.accelerationY = GRAVITY;
 			} catch (Exception e) {
 			}
+		}
+	}
+	
+	public void CheckForDead() {
+		ArrayList<Integer> removeList = new ArrayList<Integer>();
+		for (Mob entity:mobs) {
+			if (entity.Health <= 0)  {
+				removeList.add(mobs.indexOf(entity));
+			}
+		}
+		for (Integer i:removeList) {
+			mobs.remove((int) i);
 		}
 	}
 
@@ -52,7 +66,9 @@ public class Physics implements Runnable {
 		// 2: South
 		// 3: West
 		// 4: East
-
+		
+		CheckForDead();
+		
 		for (Mob entity : mobs) {
 			// Changing velocity by acceleration
 			entity.velocityY += entity.accelerationY;
@@ -117,18 +133,45 @@ public class Physics implements Runnable {
 					entity.accelerationX = 0;
 				}
 			}
-
-			entity.projectileList[0].velocityY -= entity.projectileList[0].accelerationY;
-			if (ProjectileIntersection(entity.projectileList[0], entity.projectileList[0].velocityX,
-					entity.projectileList[0].velocityY)) {
-				entity.projectileList[0].currentX += entity.projectileList[0].velocityX;
-				entity.projectileList[0].currentY -= entity.projectileList[0].velocityY;
-			} else {
-				entity.projectileList[0].shown = false;
+			
+			ArrayList<Integer> removeIndex = new ArrayList<Integer>();
+			try {
+				for (Projectile proj: entity.projectileList) {
+					if (proj.timer == 0) {
+						proj.previousX = proj.currentX;
+						proj.previousY = proj.currentY;
+						proj.velocityY -= proj.accelerationY;
+						if (MobIntersection(proj, proj.type)) {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						} else if (!ProjectileIntersection(proj)) {
+							proj.currentX += proj.velocityX;
+							proj.currentY -= proj.velocityY;
+						} else {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						}
+						if (getDistance(new Point(proj.currentX, proj.currentY), new Point(entity.currentX, entity.currentY)) > 5000) {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						}
+					} else {
+						if (MobIntersection(proj, proj.type)) {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						}
+						proj.currentX = entity.currentX + entity.width/2;
+						proj.currentY = entity.currentY + entity.height/2;
+						proj.timer--;
+					}
+				}
+			} catch (Exception e) {}
+			for (int i: removeIndex) {
+				entity.projectileList.remove(i);
 			}
 		}
 	}
-
+	
+	public int getDistance(Point p1, Point p2) {
+		return  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
+	}
+	
 	public void mobMove(Mob entity, int direction, int magnitude) {
 		/*
 		 * The mobMove method sets the velocity of a certain mob to a specified magnitude
@@ -271,9 +314,9 @@ public class Physics implements Runnable {
 		return direction;
 	}
 
-	public boolean ProjectileIntersection(Projectile entity, int magnitudeX, int magnitudeY) {
+	public boolean ProjectileIntersection(Projectile proj) {
 		/*
-    	 * The Intersection method checks if in the next movement of the entity will be intersecting with
+    	 * The Intersection method checks if in the next movement of the proj will be intersecting with
     	 * 	another block. If it does intersect the speed and acceleration are set to 0.
 		 */
 
@@ -283,13 +326,13 @@ public class Physics implements Runnable {
 		// 4: East
 
 		// Iterates through the world surrounding the block (checks a 2 block square
-		// radius around the entity)
+		// radius around the proj)
 		// and adds the blocks that impede movement
 		wallObjects = new ArrayList<NewRectangle>();
-		for (int y = (int) (entity.currentY / StateMachine.tileSize)
-				- physicsFogOfWar; y <= (int) (entity.currentY / StateMachine.tileSize) + physicsFogOfWar; y++) {
-			for (int x = (int) (entity.currentX / StateMachine.tileSize)
-					- physicsFogOfWar; x <= (int) (entity.currentX / StateMachine.tileSize) + physicsFogOfWar; x++) {
+		for (int y = (int) (proj.currentY / StateMachine.tileSize)
+				- physicsFogOfWar; y <= (int) (proj.currentY / StateMachine.tileSize) + physicsFogOfWar; y++) {
+			for (int x = (int) (proj.currentX / StateMachine.tileSize)
+					- physicsFogOfWar; x <= (int) (proj.currentX / StateMachine.tileSize) + physicsFogOfWar; x++) {
 				try {
 					if (world.worldGrid.get(y).get(x).type == 1) {
 						wallObjects.add(world.worldGrid.get(y).get(x));
@@ -299,18 +342,39 @@ public class Physics implements Runnable {
 			}
 		}
 
-		Line2D projectedLine = new Line2D.Float(entity.currentX + magnitudeX, entity.currentY + magnitudeY,
-				entity.currentX + magnitudeX, entity.currentY + magnitudeY);
+		Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY,
+				proj.currentX, proj.currentY);
 
 		// Iterates through the ArrayList wallObjects and checks if the next players
 		// movement will intersect with
 		// any of the NewRectangles
 		for (NewRectangle rect : wallObjects) {
 			if (projectedLine.intersects(rect.rect)) {
-				return false;
+				return true;
 			}
 		}
-		return true;
+		return false;
+	}
+	
+	public boolean MobIntersection (Projectile proj, int type) {
+		for (int x = 1; x < mobs.size(); x++) {
+			Mob entity = mobs.get(x);
+			if (proj.type == Projectile.ARM) {
+				if (new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height).intersects(
+						new Rectangle(proj.currentX, proj.currentY, proj.width, proj.height))) {
+					entity.Health -= proj.damage;
+					return true;
+				}
+			} else if (proj.type == Projectile.BULLET) {
+				Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY,
+						proj.currentX, proj.currentY);
+				if (projectedLine.intersects(new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height))) {
+					entity.Health -= proj.damage;
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public Physics() {
@@ -330,8 +394,10 @@ public class Physics implements Runnable {
 		}
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
-		
-		mobs.add(new Mob(playerStartingX, playerStartingY, 150, 75));
+
+		for (int x = 1; x < 5; x++) {
+			mobs.add(new Mob( 100 * x, 0, 50,50));
+		}
 		player = mobs.get(0);
 		
 		new AI(mobs.get(1),player);

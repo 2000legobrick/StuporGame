@@ -2,7 +2,10 @@ package com.tpprod.stupor;
 
 public class Projectile {
 	
-	public int currentX, currentY, velocityY, velocityX, accelerationY, size;
+	public static final int BULLET = 0, ARM = 1;
+	public int currentX, currentY, previousX, previousY, timer, type,
+				velocityY, velocityX, accelerationY, bulletSize, width, height;
+	public int damage = 10;
 	public boolean shown;
 	
 	public Projectile () {
@@ -10,11 +13,23 @@ public class Projectile {
 	}
 	
 	public Projectile (int x, int y, int vX, int vY, int s) {
-		currentX  = x;
-		currentY  = y;
-		velocityY = vX;
-		velocityX = vY;
-		size      = s;
-		shown = true;
+		currentX   = x;
+		currentY   = y;
+		previousX  = x;
+		previousY  = y;
+		velocityY  = vX;
+		velocityX  = vY;
+		bulletSize = s;
+		shown      = true;
+		type       = BULLET;
+	}
+	
+	public Projectile(int x, int y, int tempWidth, int tempHeight) {
+		currentX = x;
+		currentY = y;
+		width    = tempWidth;
+		height   = tempHeight;
+		timer    = 60; // Approximately a second
+		type     = ARM;
 	}
 }
