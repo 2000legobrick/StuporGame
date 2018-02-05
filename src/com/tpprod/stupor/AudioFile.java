@@ -40,6 +40,11 @@ public class AudioFile implements LineListener{
         playing = true;
     }
 
+    public void stop() {
+        clip.stop();
+        playing = false;
+    }
+
     public boolean isPlaying() {
         return playing;
     }

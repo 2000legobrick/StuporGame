@@ -8,33 +8,63 @@ import java.util.ArrayList;
 public class MusicPlayer implements Runnable {
 
     private ArrayList<AudioFile> musicFiles;
-    private int currentSongIndex;
+    private int currentSongIndex = 0;
+    private String bgPath = "Content/Audio/BackgroundMusic/";
+    private String sePath = "Content/Audio/Sound/";
     private boolean running;
-
+    private ArrayList<AudioFile> bgMusic = new ArrayList<AudioFile>();;
+    private ArrayList<AudioFile> soundEffects;
+    
     //Creates a playlist of all the songs in the audio folder
-    public MusicPlayer(String... files) {
-        musicFiles = new ArrayList<AudioFile>();
-        for(String file : files)
-            musicFiles.add(new AudioFile("./resources/audio/" + file + ".wav"));
+    public MusicPlayer() {
+        File[] bgFiles = new File(bgPath).listFiles();
+        //File[] seFiles = new File(sePath).listFiles();
+    	setPlaylist(bgMusic,bgPath, bgFiles);
+    }
+    
+    public void setPlaylist(ArrayList<AudioFile> playlist, String pathName, File[] files) {
+    	try {
+	    	for (File file : files) {
+	    	    playlist.add(new AudioFile("./" + pathName + file.getName()));
+	    	}
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    	
     }
 
-    public void run() {
+    public void playBackgroundMusic() {
         running = true;
-        AudioFile song = musicFiles.get(currentSongIndex);
+        AudioFile song = bgMusic.get(currentSongIndex);
         song.play();
         while(running) {
-                if(!song.isPlaying()) {
-                    currentSongIndex++;
-                    if(currentSongIndex >= musicFiles.size())
-                        currentSongIndex = 0;
-                    song = musicFiles.get(currentSongIndex);
-                    song.play();
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            if(!song.isPlaying()) {
+                currentSongIndex++;
+                if(currentSongIndex >= bgMusic.size())
+                    currentSongIndex = 0;
+                song = bgMusic.get(currentSongIndex);
+                song.play();
+            }
+            try {
+                Thread.sleep(1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        song.stop();
+    }
+    public void run() {
+        running = true;
+        playBackgroundMusic();
+    }
+    public void start() {
+        if (!running) {
+            running = true;
+            new Thread(this).start();
+        }
+    }
+
+    public void stop() {
+        running = false;
     }
 }

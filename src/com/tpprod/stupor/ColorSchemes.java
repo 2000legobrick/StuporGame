@@ -1,6 +1,10 @@
 package com.tpprod.stupor;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /*
  * 
@@ -8,7 +12,30 @@ import java.awt.Color;
 
 public class ColorSchemes {
 	
-	public static Color[] World1 = {Color.CYAN, new Color(51, 0, 72), Color.WHITE, Color.RED};
-	public static Color[] World2 = {Color.WHITE, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK,};
+	public BufferedImage GroundTile  = null;
+	public BufferedImage Background = null;
+	public BufferedImage Player     = null;
+	public BufferedImage PlayerArm  = null;
 	
+	public ColorSchemes () {
+
+		try {
+			GroundTile = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
+			Background = ImageIO.read(new File("./Content/Textures/cave.png"));
+			Player = ImageIO.read(new File("./Content/Textures/Player.png"));
+			PlayerArm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void ChangeBackground() {
+		try {
+			Background = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
