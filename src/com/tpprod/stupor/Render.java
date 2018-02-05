@@ -1,11 +1,15 @@
 package com.tpprod.stupor;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -25,12 +29,13 @@ public class Render {
 	
 	public static int fogOfWar = 12;
 
-	public int currentWorld;
+	public boolean loading = false;
 	public int currentMenuPos = 0;
 	public int currentMouseX, currentMouseY;
-
+	
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
+	private int percentLoad = 0;
 	
 	// private Mob player;
 
@@ -48,31 +53,61 @@ public class Render {
 		 */
 		world.Initialize();
 	}
+	
+	public void RenderLoad(Graphics g, int width, int height) {
 
-	public void RenderState(Graphics g, int width, int height, int state, Mob player) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.WHITE);
+		g.fillRect(width - 150, height - 150, 110, 40);
+		g.setColor(Color.BLACK);
+		g.fillRect(width - 150, height - 150, 100, 35);
+		g.setColor(Color.WHITE);
+		g.fillRect(width - 150, height - 150, percentLoad/5, 30);
+		g.setFont(new Font("Impact", Font.PLAIN, 500));
+		g.setColor(new Color(150, 150, 150));
+		g.drawString("LOADING", 125, 475);
+		g.setColor(new Color(200, 200, 200));
+		g.drawString("LOADING", 160, 525);
+		g.setColor(Color.WHITE);
+		g.drawString("LOADING", 150, 500);
+		if (percentLoad >= 500) {
+			loading = false;
+			percentLoad = 0;
+		} else {
+			percentLoad++;
+		}
+	}
+
+	public void RenderState(Graphics g, int width, int height, int state, Mob player, int NextState) {
 
 		// renders a state based on what state is passed through the constructor
-		
-		switch(state) {
-			case StateMachine.GameState:
-				RenderBackground(g, width, height, player);
-				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
-				RenderHUD(g, player, width, height);
-				break;
-			case StateMachine.MenuState:
-				RenderMenu(g, width,height);
-				break;
-			case StateMachine.PauseState:
-				
-				break;
-			case StateMachine.InventoryState:
-				
-				break;
-			case StateMachine.DeadState:
-				
-				break;
+		if (NextState == state) {
+			switch(state) {
+				case StateMachine.GameState:
+					RenderBackground(g, width, height, player);
+					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+					RenderHUD(g, player, width, height);
+					break;
+				case StateMachine.MenuState:
+					RenderMenu(g, width,height);
+					break;
+				case StateMachine.PauseState:
+					
+					break;
+				case StateMachine.UpgradeState:
+					RenderBackground(g, width, height, player);
+					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+					RenderUpgrade(g, width, height);
+					break;
+				case StateMachine.DeadState:
+					
+					break;
+			}
+		} else {
+			loading = true;
+			RenderLoad(g, width, height);
 		}
-
 	}
 	
 	public void RenderBackground(Graphics g, int width, int height, Mob player) {
@@ -171,7 +206,7 @@ public class Render {
 			for (Projectile proj: entity.projectileList) {
 				DisplayedMobs.add(new NewRectangle(Color.WHITE,
 						new Rectangle(proj.currentX, proj.currentY,
-								proj.bulletSize, proj.bulletSize)));
+								proj.width, proj.height)));
 			}
 		}
 
@@ -210,6 +245,26 @@ public class Render {
 		}
 	}
 	
+	public void RenderUpgrade (Graphics g, int width, int height) {
+		int middleWidth = width / 2;
+		int middleHeight = height / 2;
+		Dimension box = new Dimension(125,125);
+		Graphics2D g2D = (Graphics2D) g;
+		g2D.setStroke(new BasicStroke(4));
+		for (int x = 0; x < 3; x++) {
+			g.setColor(Color.BLACK);
+			g2D.fillOval((int) (middleWidth + 500*Math.cos(Math.toRadians(120*x)) - box.width/2), 
+					(int) (middleHeight + 500*Math.sin(Math.toRadians(120*x)) - box.height/2),
+					box.width, box.height);
+			g.setColor(Color.WHITE);
+			g2D.drawOval((int) (middleWidth + 500*Math.cos(Math.toRadians(120*x)) - box.width/2), 
+					(int) (middleHeight + 500*Math.sin(Math.toRadians(120*x)) - box.height/2),
+					box.width, box.height);
+		}
+		g.setColor(Color.WHITE);
+		g.drawLine(middleWidth, middleHeight, currentMouseX, currentMouseY);
+	}
+	
 	public void RenderHUD (Graphics g, Mob player, int width, int height) {
 		int middleWidth = width / 2;
 		int middleHeight = height / 2;
@@ -236,13 +291,9 @@ public class Render {
 		g.setColor(Color.MAGENTA);
 		g.drawLine(middleWidth, 0, middleWidth, height);
 		g.drawLine(0, middleHeight, width, middleHeight);
-	}
-	public void ChangeWorld(int newWorld) {
-		/*
-		 * This is used to change the current world that
-		 * 	is being rendered.
-		 */
-
-		currentWorld = newWorld;
+		// Render EXP
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.drawString("EXP: " + Integer.toString(player.EXP), 10, height - 10);
 	}
 }

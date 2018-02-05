@@ -22,15 +22,14 @@ public class Mob {
 	public ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
 	public BufferedImage image = null;
 	public BufferedImage arm = null;
-	public boolean wallSlide;
-	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width;
+	public boolean wallSlide, FacingLeft = false;
+	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
 	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 12, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 30, dampening = 1;
+			projectileSize = 10, maxJump = 30, dampening = 1, ManaRefreshTimer = 20;
 	
 	private final int spriteWidth = 10, spriteHeight = 10;
 	private final int rows = 10, cols = 10;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
-	private boolean FacingLeft = false;
 	private Inventory inventory = new Inventory();
 	private int currentFrame = 0;
 	
@@ -125,11 +124,18 @@ public class Mob {
 	}
 	
 	public void Attack () {
-		projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
+		if (Mana >= 5) {
+			if (FacingLeft) {
+				projectileList.add(new Projectile(currentX - width/2, currentY + height/2, width, 20));
+			} else {
+				projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
+			} 
+			Mana -= 5;
+		}
 	}
 	
 	public void Shoot(Point mousePoint, Point middleScreen) {
-		if (Mana >= 5) {
+		if (Mana >= 10) {
 			double rY = mousePoint.getY() - middleScreen.getY();
 			double rX = mousePoint.getX() - middleScreen.getX();
 			double theta = Math.atan(rY / rX);
@@ -147,7 +153,7 @@ public class Mob {
 				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
 						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize));
 			}
-			Mana -= 5;
+			Mana -= 10;
 		}
 	}
 

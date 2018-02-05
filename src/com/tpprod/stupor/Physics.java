@@ -156,15 +156,22 @@ public class Physics implements Runnable {
 						if (MobIntersection(proj, proj.type)) {
 							removeIndex.add(entity.projectileList.indexOf(proj));
 						}
-						proj.currentX = entity.currentX + entity.width/2;
+						if (entity.FacingLeft) {
+							proj.currentX = entity.currentX - entity.width/2;
+						} else {
+							proj.currentX = entity.currentX + entity.width/2;
+						}
 						proj.currentY = entity.currentY + entity.height/2;
 						proj.timer--;
+						if (proj.timer == 1) {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						}
 					}
 				}
+				for (int i: removeIndex) {
+					entity.projectileList.remove(i);
+				}
 			} catch (Exception e) {}
-			for (int i: removeIndex) {
-				entity.projectileList.remove(i);
-			}
 		}
 	}
 	
@@ -363,18 +370,49 @@ public class Physics implements Runnable {
 				if (new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height).intersects(
 						new Rectangle(proj.currentX, proj.currentY, proj.width, proj.height))) {
 					entity.Health -= proj.damage;
+					if (player.projectileList.contains(proj)) {
+						player.EXP++;
+					}
 					return true;
 				}
 			} else if (proj.type == Projectile.BULLET) {
-				Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY,
-						proj.currentX, proj.currentY);
+				Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY, proj.currentX, proj.currentY);
 				if (projectedLine.intersects(new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height))) {
 					entity.Health -= proj.damage;
+					if (player.projectileList.contains(proj)) {
+						player.EXP++;
+					}
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+	
+	public void Save() {
+		SaveData data = new SaveData();
+		data.playerCurrentX = player.currentX;
+		data.playerCurrentY = player.currentY;
+		data.playerHealth = player.Health;
+		data.playerMana = player.Mana;
+		try {
+			ResourceManager.Save(data, "SaveData");
+		} catch (Exception e) {
+			System.out.println("Couldn't save: " + e.getMessage());
+		}
+	}
+	
+	public void Load() {
+		try {
+			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			player.currentX = data.playerCurrentX;
+			player.currentY = data.playerCurrentY;
+			player.Health = data.playerHealth;
+			player.Mana = data.playerMana;
+			player.EXP = data.playerEXP;
+		} catch (Exception e) {
+			System.out.println("Couldn't load save data: " + e.getMessage());
+		}
 	}
 
 	public Physics() {
@@ -384,19 +422,11 @@ public class Physics implements Runnable {
 		 * Currently we are using this to create enemy mobs, and the player entity.
 		 * 	We also set the player entity to the first index of the mobs ArrayList
 		 */
-
-		try {
-			SaveData data = (SaveData) ResourceManager.Load("SaveData");
-			playerStartingX = data.playerCurrentX;
-			playerStartingY = data.playerCurrentY;
-		} catch (Exception e) {
-			System.out.println("Couldn't load save data: " + e.getMessage());
-		}
 		
-		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
+		mobs.add(new Mob(0, 0, 125, 50));
 
 		for (int x = 1; x < 5; x++) {
-			mobs.add(new Mob( 100 * x, 0, 50,50));
+			mobs.add(new Mob( 100 * x, 0, 50, 100));
 		}
 		player = mobs.get(0);
 		
@@ -412,6 +442,8 @@ public class Physics implements Runnable {
 		double nsPerTick = 1000000000.0d / StateMachine.tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
+		
+		Load();
 		
 		while (running) {
 			double current = System.nanoTime();
@@ -439,6 +471,7 @@ public class Physics implements Runnable {
 	}
 	
 	public void stop() {
+		Save();
 		running = false;
 	}
 }
