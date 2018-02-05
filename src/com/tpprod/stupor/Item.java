@@ -19,7 +19,4 @@ public class Item {
 		itemSize = size;
 		name = n;
 	}
-
-
-
 }

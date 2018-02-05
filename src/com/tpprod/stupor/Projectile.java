@@ -19,7 +19,8 @@ public class Projectile {
 		previousY  = y;
 		velocityY  = vX;
 		velocityX  = vY;
-		bulletSize = s;
+		width      = s;
+		height     = s;
 		shown      = true;
 		type       = BULLET;
 	}
