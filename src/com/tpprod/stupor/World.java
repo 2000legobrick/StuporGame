@@ -13,8 +13,7 @@ import java.util.Arrays;
 
 public class World {
 
-	public ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
-	public Inventory inventory = new Inventory();
+                worldGrid.add(new ArrayList<NewRectangle>());
 
 	public World() {
 	}

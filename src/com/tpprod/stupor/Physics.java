@@ -149,22 +149,29 @@ public class Physics implements Runnable {
 						} else {
 							removeIndex.add(entity.projectileList.indexOf(proj));
 						}
-						if (getDistanceTo(new Point(proj.currentX, proj.currentY), new Point(entity.currentX, entity.currentY)) > 5000) {
+						if (getDistance(new Point(proj.currentX, proj.currentY), new Point(entity.currentX, entity.currentY)) > 5000) {
 							removeIndex.add(entity.projectileList.indexOf(proj));
 						}
 					} else {
 						if (MobIntersection(proj, proj.type)) {
 							removeIndex.add(entity.projectileList.indexOf(proj));
 						}
-						proj.currentX = entity.currentX + entity.width/2;
+						if (entity.FacingLeft) {
+							proj.currentX = entity.currentX - entity.width/2;
+						} else {
+							proj.currentX = entity.currentX + entity.width/2;
+						}
 						proj.currentY = entity.currentY + entity.height/2;
 						proj.timer--;
+						if (proj.timer == 1) {
+							removeIndex.add(entity.projectileList.indexOf(proj));
+						}
 					}
 				}
+				for (int i: removeIndex) {
+					entity.projectileList.remove(i);
+				}
 			} catch (Exception e) {}
-			for (int i: removeIndex) {
-				entity.projectileList.remove(i);
-			}
 		}
 	}
 
@@ -188,6 +195,10 @@ public class Physics implements Runnable {
 			entity.addItem(closestItem);
 			world.inventory.removeInventoryItem(closestItem);
 		}
+	}
+	
+	public int getDistance(Point p1, Point p2) {
+		return  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
 	}
 	
 	public void mobMove(Mob entity, int direction, int magnitude) {
@@ -381,18 +392,49 @@ public class Physics implements Runnable {
 				if (new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height).intersects(
 						new Rectangle(proj.currentX, proj.currentY, proj.width, proj.height))) {
 					entity.Health -= proj.damage;
+					if (player.projectileList.contains(proj)) {
+						player.EXP++;
+					}
 					return true;
 				}
 			} else if (proj.type == Projectile.BULLET) {
-				Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY,
-						proj.currentX, proj.currentY);
+				Line2D projectedLine = new Line2D.Float(proj.previousX, proj.previousY, proj.currentX, proj.currentY);
 				if (projectedLine.intersects(new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height))) {
 					entity.Health -= proj.damage;
+					if (player.projectileList.contains(proj)) {
+						player.EXP++;
+					}
 					return true;
 				}
 			}
 		}
 		return false;
+	}
+	
+	public void Save() {
+		SaveData data = new SaveData();
+		data.playerCurrentX = player.currentX;
+		data.playerCurrentY = player.currentY;
+		data.playerHealth = player.Health;
+		data.playerMana = player.Mana;
+		try {
+			ResourceManager.Save(data, "SaveData");
+		} catch (Exception e) {
+			System.out.println("Couldn't save: " + e.getMessage());
+		}
+	}
+	
+	public void Load() {
+		try {
+			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			player.currentX = data.playerCurrentX;
+			player.currentY = data.playerCurrentY;
+			player.Health = data.playerHealth;
+			player.Mana = data.playerMana;
+			player.EXP = data.playerEXP;
+		} catch (Exception e) {
+			System.out.println("Couldn't load save data: " + e.getMessage());
+		}
 	}
 
 	public Physics() {
@@ -410,6 +452,7 @@ public class Physics implements Runnable {
 		} catch (Exception e) {
 			System.out.println("Couldn't load save data: " + e.getMessage());
 		}
+		player = mobs.get(0);
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
 
@@ -457,6 +500,7 @@ public class Physics implements Runnable {
 	}
 	
 	public void stop() {
+		Save();
 		running = false;
 	}
 }
