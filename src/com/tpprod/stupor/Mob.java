@@ -26,11 +26,11 @@ public class Mob {
 	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
 	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 12, maxVelocity = 20, shootingVelocity = 60,
 			projectileSize = 10, maxJump = 30, dampening = 1, ManaRefreshTimer = 20;
+	public Inventory inventory = new Inventory();
 	
 	private final int spriteWidth = 10, spriteHeight = 10;
 	private final int rows = 10, cols = 10;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
-	private Inventory inventory = new Inventory();
 	private int currentFrame = 0;
 	
 	public Mob (int posX, int posY, int tempHeight, int tempWidth) {

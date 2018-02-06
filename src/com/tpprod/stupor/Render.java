@@ -101,7 +101,7 @@ public class Render {
 					break;
 				case StateMachine.UpgradeState:
 					RenderBackground(g, width, height, player);
-					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player);
+					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
 					RenderUpgrade(g, width, height);
 					break;
 				case StateMachine.DeadState:
@@ -112,11 +112,6 @@ public class Render {
 			loading = true;
 			RenderLoad(g, width, height);
 		}
-<<<<<<<
-
-=======
-
->>>>>>>
 	}
 	
 	public void RenderBackground(Graphics g, int width, int height, Mob player) {
