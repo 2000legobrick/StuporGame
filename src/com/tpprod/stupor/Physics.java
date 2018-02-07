@@ -452,7 +452,6 @@ public class Physics implements Runnable {
 		} catch (Exception e) {
 			System.out.println("Couldn't load save data: " + e.getMessage());
 		}
-		player = mobs.get(0);
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
 		player = mobs.get(0);

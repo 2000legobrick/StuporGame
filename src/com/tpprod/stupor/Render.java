@@ -307,7 +307,7 @@ public class Render {
 		g.fillRect(middleWidth - box.width*3/2 - (box.width + 10) - 10, height - (box.height + 20) - 10, box.width*5+40, box.height+20);
 		// Render Item Boxes
 		g.setColor(new Color(255,255,255,200));
-		for (int x = -1; x <= 2; x++) {
+		for (int x = 2; x >= -1; x--) {
 			g.fillRect(middleWidth + 5 - (box.width + 10) * x, height - (box.height + 20), box.width, box.height);
 		}
 		// Render Health
@@ -318,6 +318,14 @@ public class Render {
 		average = (double) player.Mana / player.MaxMana;
 		g.setColor(new Color(50, 0, 255, 200));
 		g.fillArc(middleWidth + (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
+		// Render Item
+		for (int i = 0; i < 4; i++) {
+			try {
+				g.setColor(player.inventory.currentItems.get(i).itemColor);
+				g.fillRect(middleWidth + 5 + (box.width + 10) * (i-1) + box.width/4, height - (box.height + 20) + box.height/4, box.width/2, box.height/2);
+			} catch(Exception e) {
+			}
+		}
 		// Render Center Lines
 		g.setColor(Color.MAGENTA);
 		g.drawLine(middleWidth, 0, middleWidth, height);
