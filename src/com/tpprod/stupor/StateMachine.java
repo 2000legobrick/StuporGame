@@ -42,6 +42,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public JFrame frame = new JFrame();
 	public boolean closeGame = false;
 	public Physics physics = new Physics();
+	public static AI ai = new AI();
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public static int tileSize = 100;
@@ -49,7 +50,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public static final String NAME = "Stupor";
 
 	private static final long serialVersionUID = 1L;
-	private boolean running = false;
+	public static boolean running = false;
 	private boolean keyPressed;
 	private Render render = new Render();
 	private int NextState = MenuState;
@@ -367,16 +368,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * the list.
 		 */
 
-		keyPressed = false;
-		for (int item : currentKeys) {
-			if (e.getKeyCode() == item) {
-				keyPressed = true;
-			}
-		}
-		if (!keyPressed) {
+		
+		if(currentKeys.indexOf(e.getKeyCode()) == -1) {
 			currentKeys.add(e.getKeyCode());
 		}
-		System.out.println(currentKeys);
 	}
 
 	@Override

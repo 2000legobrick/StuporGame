@@ -1,6 +1,5 @@
 package com.tpprod.stupor;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
@@ -367,6 +366,7 @@ public class Physics implements Runnable {
 						wallObjects.add(world.worldGrid.get(y).get(x));
 					}
 				} catch (Exception e) {
+					
 				}
 			}
 		}
@@ -461,7 +461,7 @@ public class Physics implements Runnable {
 		}
 		player = mobs.get(0);
 		
-		new AI(mobs.get(1),player);
+		StateMachine.ai.AIs(mobs,player);
 	}
 	
 	@Override
