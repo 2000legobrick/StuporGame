@@ -44,6 +44,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public JFrame frame = new JFrame();
 	public boolean closeGame = false;
 	public Physics physics = new Physics();
+	public static AI ai = new AI();
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	public static int tileSize = 100;
@@ -375,26 +376,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * "currentKeys" and making sure that the Key that is being checked is not in
 		 * the list.
 		 */
-		
-		if(e.getKeyCode() == 157) {
-			return;
-		}
+
 		
 		if(currentKeys.indexOf(e.getKeyCode()) == -1) {
 			currentKeys.add(e.getKeyCode());
 		}
-	
-		
-		
-//		keyPressed = false;
-//		for (int item : currentKeys) {
-//			if (e.getKeyCode() == item) {
-//				keyPressed = true;
-//			}
-//		}
-//		if (!keyPressed) {
-//			currentKeys.add(e.getKeyCode());
-//		}
 	}
 
 	@Override
