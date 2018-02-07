@@ -1,6 +1,6 @@
 package com.tpprod.stupor;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,6 +14,9 @@ import java.util.Arrays;
 public class World {
 
 	public ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
+	 
+	  public Inventory inventory = new Inventory();
+	 
 
 	public World() {
 	}
@@ -40,6 +43,11 @@ public class World {
 
 				int accX = 0;
 				for (String item : line) {
+					if (Integer.parseInt(item) == 4) {
+						inventory.addInventoryItem(new Item(accX * StateMachine.tileSize + StateMachine.tileSize/4, accY * StateMachine.tileSize + StateMachine.tileSize/4, Color.MAGENTA, StateMachine.tileSize/2, "healthRegen"));
+					} else if (Integer.parseInt(item) == 5) {
+						inventory.addInventoryItem(new Item(accX * StateMachine.tileSize + StateMachine.tileSize/4, accY * StateMachine.tileSize + StateMachine.tileSize/4, Color.ORANGE, StateMachine.tileSize/2, "health"));
+					}
 					worldGrid.get(accY)
 							.add(new NewRectangle(Integer.parseInt(item), new Rectangle(accX * StateMachine.tileSize,
 									accY * StateMachine.tileSize, StateMachine.tileSize, StateMachine.tileSize)));

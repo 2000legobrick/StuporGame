@@ -31,11 +31,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	// Static variables
 
-	public static final int GameState      = 0;
-	public static final int MenuState      = 1;
-	public static final int PauseState     = 2;
-	public static final int InventoryState = 3;
-	public static final int DeadState      = 4;
+	public static final int GameState    = 0;
+	public static final int MenuState    = 1;
+	public static final int PauseState   = 2;
+	public static final int UpgradeState = 3;
+	public static final int DeadState    = 4;
+	public static final int LoadState    = 4;
 
 	public int CurrentState = MenuState;
 
@@ -52,6 +53,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private static final long serialVersionUID = 1L;
 	private boolean running = false;
 	private Render render = new Render();
+	private int NextState = MenuState;
 	
 	public StateMachine() {
 		/*
@@ -89,7 +91,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		}
 
 		// This resets the current world to the first world
-		render.ChangeWorld(1);
+		//render.ChangeWorld(1);
 
 		// Required so that the programs keeps tracks KeyEvents
 		addKeyListener(this);
@@ -104,6 +106,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		double nsPerTick = 1000000000.0d / tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
+		int fps = 0;
 
 		// If the program is running, we run this chunk of code
 		while (running) {
@@ -124,43 +127,46 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	
 						if (currentKeys.indexOf(17) != -1) { // Ctrl key
 							physics.player.ResetMana();
-						} else {
-							// player stops wallSlide
+							physics.player.ResetHealth();
 						}
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
 							physics.stop();
-							CurrentState = MenuState;
+							NextState = MenuState;
 						}
 						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
 							physics.player.Jump();
 						}
 						if (currentKeys.indexOf(65) != -1) { // A Key
 							physics.mobMove(physics.player, 3, physics.player.speed);
-							physics.player.FaceLeft();
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
 						}
 						if (currentKeys.indexOf(68) != -1) { // D Key
 							physics.mobMove(physics.player, 4, physics.player.speed);
-							physics.player.FaceRight();
 						}
-						if (currentKeys.indexOf(90) != -1) { // Z Key and Save Data
-							SaveData data = new SaveData();
-							data.playerCurrentX = physics.player.currentX;
-							data.playerCurrentY = physics.player.currentY;
-							try {
-								ResourceManager.Save(data, "SaveData");
-							} catch (Exception e) {
-								System.out.println("Couldn't save: " + e.getMessage());
-							}
+						if (currentKeys.indexOf(90) != -1) { // Z Key
+                            physics.pickUpItem(physics.player);
 						}
 						if (currentKeys.indexOf(88) != -1) { // X key
 							physics.player.HurtMob(1);
 						}
-						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) {
+						if (currentKeys.indexOf(192) != -1) {
+							physics.stop();
+							NextState = UpgradeState;
+							CurrentState = UpgradeState;
+						}
+                        if (currentKeys.indexOf(72) != -1) { // H key
+                            if(physics.player.inventory.currentItems.size() != 0)
+                                physics.player.useItem(physics.player.inventory.currentItems.get(0));
+						}
+						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
 							for (Mob entity : physics.mobs) {
 								physics.Dampening(entity);
 							}
+						}
+						if (tick % physics.player.ManaRefreshTimer == 0) {
+							if (physics.player.Mana < physics.player.MaxMana)
+								physics.player.Mana++;
 						}
 					case MenuState:
 						if (currentKeys.indexOf(87) != -1) { // W Key
@@ -186,12 +192,14 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
 							if (render.currentMenuPos == 0) {
-								CurrentState = GameState;
+								NextState = GameState;
 								physics.start();
 							} else if (render.currentMenuPos == 2) {
 								this.stop();
 							}
 						}
+					case UpgradeState:
+						
 					}
 				
 
@@ -221,7 +229,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				System.out.println(currentKeys);
 			}
 		}
-}
+	}
 
 	private void render() {
 		/*
@@ -236,7 +244,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// 	of the current frame to help with shuttering issues
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
-			// If no BufferStrategy is found, create another one that buffers 3 frames ahead
+			// If no BufferStrategy is found, create another one that buffers 2 frames ahead
 			createBufferStrategy(2);
 			requestFocus();
 			return;
@@ -246,9 +254,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			Graphics g = bs.getDrawGraphics();
 			// Calling the RenderState here to render based off of the current state wanting
 			// to be displayed
-
-			render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player);
-
+			render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player, NextState);
+			if (!render.loading) {
+				CurrentState = NextState;
+			}
 			// Done with rendering, Moving to situating the canvas and displaying it
 			g.dispose();
 			bs.show();
@@ -398,6 +407,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public void mouseMoved(MouseEvent arg0) {
 		render.currentMouseX = arg0.getX();
 		render.currentMouseY = arg0.getY();
+		if (CurrentState == GameState && arg0.getX() > getWidth() / 2) {
+			physics.player.FaceRight();
+		} else if (CurrentState == GameState && arg0.getX() <= getWidth() / 2) {
+			physics.player.FaceLeft();
+		}
 	}
 
 	@Override
@@ -415,14 +429,16 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		if (render.currentMenuPos == 0 && CurrentState == MenuState) {
-			CurrentState = GameState;
+		if (render.currentMenuPos == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+			NextState = GameState;
 			physics.start();
-		} else if(render.currentMenuPos == 2 && CurrentState == MenuState) {
+		} else if(render.currentMenuPos == 2 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			stop();
 		}
-		if (CurrentState == GameState && arg0.getButton() == arg0.BUTTON1) {
+		if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON1) {
 			physics.player.Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
+		} else if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON3) {
+			physics.player.Attack();
 		}
 	}
 
