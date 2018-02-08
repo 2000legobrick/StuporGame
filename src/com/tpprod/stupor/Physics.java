@@ -3,6 +3,8 @@ package com.tpprod.stupor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 /*
@@ -38,6 +40,13 @@ public class Physics implements Runnable {
 				for (Projectile proj: entity.projectileList)
 					proj.accelerationY = GRAVITY;
 			} catch (Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
 		}
 	}
@@ -170,7 +179,15 @@ public class Physics implements Runnable {
 				for (int i: removeIndex) {
 					entity.projectileList.remove(i);
 				}
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
+			}
 		}
 	}
 
@@ -296,6 +313,13 @@ public class Physics implements Runnable {
 						wallObjects.add(world.worldGrid.get(y).get(x));
 					}
 				} catch (Exception e) {
+					StringWriter error = new StringWriter();
+					e.printStackTrace(new PrintWriter(error));
+					try{
+						Log.add(error.toString());
+					}catch (Exception e1) {
+						
+					}
 				}
 			}
 		}
@@ -366,7 +390,13 @@ public class Physics implements Runnable {
 						wallObjects.add(world.worldGrid.get(y).get(x));
 					}
 				} catch (Exception e) {
-					
+					StringWriter error = new StringWriter();
+					e.printStackTrace(new PrintWriter(error));
+					try{
+						Log.add(error.toString());
+					}catch (Exception e1) {
+						
+					}
 				}
 			}
 		}
@@ -420,7 +450,13 @@ public class Physics implements Runnable {
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
-			System.out.println("Couldn't save: " + e.getMessage());
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 	}
 	
@@ -433,7 +469,13 @@ public class Physics implements Runnable {
 			player.Mana = data.playerMana;
 			player.EXP = data.playerEXP;
 		} catch (Exception e) {
-			System.out.println("Couldn't load save data: " + e.getMessage());
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 	}
 
@@ -450,7 +492,13 @@ public class Physics implements Runnable {
 			playerStartingX = data.playerCurrentX;
 			playerStartingY = data.playerCurrentY;
 		} catch (Exception e) {
-			System.out.println("Couldn't load save data: " + e.getMessage());
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
@@ -487,7 +535,13 @@ public class Physics implements Runnable {
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
 		}
 	}

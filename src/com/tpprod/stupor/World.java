@@ -29,7 +29,7 @@ public class World {
 		 */
 
 		BufferedReader bR = new BufferedReader(
-				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "\\Content\\WorldFile"));
+				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"));
 		String lineString;
 		ArrayList<String> line;
 		int accY = 0;
@@ -56,7 +56,13 @@ public class World {
 				accY++;
 			}
 		} catch (Exception e) {
-			System.err.println("Error thrown: " + e);
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 		bR.close();
 	}

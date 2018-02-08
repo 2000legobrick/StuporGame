@@ -1,18 +1,23 @@
 package com.tpprod.stupor;
 
 import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.image.BufferStrategy;
-import java.awt.Toolkit;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
+
 
 /*
  * The StateMachine Class does all the heavy lifting, controlling all the logic for each state of the game.
@@ -51,9 +56,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	private static final long serialVersionUID = 1L;
 	public static boolean running = false;
-	private boolean keyPressed;
 	private Render render = new Render();
 	private int NextState = MenuState;
+	
+	static GraphicsDevice device = GraphicsEnvironment
+	        .getLocalGraphicsEnvironment().getScreenDevices()[0];
 	
 	public StateMachine() {
 		/*
@@ -84,10 +91,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			render.InitializeWorld();
 
 			physics.world = render.world;
-		} catch (Exception e1) {
+		} catch (Exception e) {
 			// If the file isn't found an error is printed and the program stops
-			e1.printStackTrace();
-			stop();
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 
 		// This resets the current world to the first world
@@ -97,7 +109,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		addKeyListener(this);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-
 		// These variables are specific only to the run method, and keep track of
 		// the FramesPerSecond and each tick as well as if the program is allowed
 		// to render objects
@@ -118,6 +129,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				/*
 				 * Switches actual game state based on current state
 				 */
+				//System.out.println(currentKeys);
 				switch (CurrentState) {
 					case GameState:
 		
@@ -207,20 +219,30 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				tick++;
 				tick();
 				--unprocessed;
+				//draws current frame
+				fps++;
+				render();
+				
 			}
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
-			render();
-			fps++;
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
-				System.out.printf("%d fps, %d tick%n", fps,  tick);
+				//System.out.printf("%d fps, %d tick%n", fps,  tick);
 				tick = 0;
 				fps = 0;
 				timer += 1000;
+				requestFocusInWindow();
+				//System.out.println(currentKeys);
 			}
 		}
 	}
@@ -235,7 +257,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 
 		// BufferStategy is a way of rendering a certain amount of frames ahead
-		// 	of the current frame to help with stuttering issues
+		// 	of the current frame to help with shuttering issues
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
 			// If no BufferStrategy is found, create another one that buffers 2 frames ahead
@@ -255,7 +277,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			// Done with rendering, Moving to situating the canvas and displaying it
 			g.dispose();
 			bs.show();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
+		}
 	}
 
 	private void tick() {
@@ -267,39 +297,25 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// Draws the current frame
 	}
 
-	public static void main(String[] args) {
-		/*
-		 * The main method is used to create the frames and canvases that are displayed
-		 * and printed to respectively.
-		 */
-
-		// This first chunk of code creates the canvas that the object "render" will
-		// print to later.
-
-		StateMachine game = new StateMachine();
-
-		game.start();
-
-	}
-
 	public void start() {
 		/*
 		 * The start method is called upon launching the app and starts the thread that
 		 * 	the game runs on.
 		 */
 
-		Dimension dimension = new Dimension(WIDTH, HEIGHT);
-		this.setMaximumSize(dimension);
-		this.setMinimumSize(dimension);
-		this.setPreferredSize(dimension);
-		this.setSize(dimension);
+//		Dimension dimension = new Dimension(WIDTH, HEIGHT);
+//		this.setMaximumSize(dimension);
+//		this.setMinimumSize(dimension);
+//		this.setPreferredSize(dimension);
+//		this.setSize(dimension);
+//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		
-			
+		
 		// The second chunk adds the canvas to a JFrame in order to display everything onto 
 		// 	a frame that is more versatile than a canvas in terms of dimensioning and 
 		//  positioning. 
-
-		frame.setUndecorated(true);
+		frame.setFocusable(true);
+		frame.setUndecorated(true);	
 		frame.setTitle(NAME);
 		frame.add(this);
 		frame.pack();
@@ -307,7 +323,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-
+		device.setFullScreenWindow(frame);
 		if (!running) {
 			running = true;
 			new Thread(this).start();
@@ -325,8 +341,27 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
-			System.out.println("Couldn't save: " + e.getMessage());
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
+		try {
+			Log.add("Game End");
+			Log.close();
+		} catch (Exception e){
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
+		}
+		
 		
 		frame.setVisible(false);
 		frame.dispose();
@@ -344,19 +379,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * 
 		 * Keys NOT registered: F5, F11, Enter, Ctrl
 		 */
+		
 	}
-
 	public void keyReleased(KeyEvent e) {
 		/*
 		 * keyReleased is called when ANY key is released from a "Pressed" state.
 		 * 
 		 * We use it to remove a key from an ArrayList of all Keys currently "Pressed"
 		 */
-		try {
+		
+		if(currentKeys.indexOf(e.getKeyCode()) != -1) {
 			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
-		} catch (Exception e1) {}
+		} 
 	}
-
+	
 	public void keyPressed(KeyEvent e) {
 		/*
 		 * keyPressed is called every time a Key registers as "Pressed"
