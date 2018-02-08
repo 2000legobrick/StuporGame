@@ -11,8 +11,15 @@ public class ResourceManager {
 				Files.newOutputStream(Paths.get("./Content/" + fileName)))) {
 			oos.writeObject(data);
 		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
-		System.out.println(Paths.get(fileName));
+		//System.out.println(Paths.get(fileName));
 	}
 
 	public static Object Load(String fileName) throws Exception {
