@@ -2,6 +2,8 @@ package com.tpprod.stupor;
 
 import javax.sound.sampled.*;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class AudioFile implements LineListener{
 
@@ -25,7 +27,13 @@ public class AudioFile implements LineListener{
             gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 
         } catch (Exception e) {
-            e.printStackTrace();
+        		StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
             System.exit(1);
         }
     }

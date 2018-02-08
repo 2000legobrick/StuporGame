@@ -1,9 +1,11 @@
 package com.tpprod.stupor;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.imageio.ImageIO;
 
 /*
@@ -25,8 +27,13 @@ public class ColorSchemes {
 			Player = ImageIO.read(new File("./Content/Textures/Player.png"));
 			PlayerArm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 	}
 	
@@ -34,8 +41,13 @@ public class ColorSchemes {
 		try {
 			Background = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 	}
 }

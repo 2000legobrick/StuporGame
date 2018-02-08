@@ -10,6 +10,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -52,9 +55,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public static final String NAME = "Stupor";
 
 	private static final long serialVersionUID = 1L;
-	private boolean running = false;
+	public static boolean running = false;
 	private Render render = new Render();
 	private int NextState = MenuState;
+	
+	static GraphicsDevice device = GraphicsEnvironment
+	        .getLocalGraphicsEnvironment().getScreenDevices()[0];
 	
 	public StateMachine() {
 		/*
@@ -85,10 +91,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			render.InitializeWorld();
 
 			physics.world = render.world;
-		} catch (Exception e1) {
+		} catch (Exception e) {
 			// If the file isn't found an error is printed and the program stops
-			e1.printStackTrace();
-			stop();
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 
 		// This resets the current world to the first world
@@ -216,18 +227,22 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
-			render();
-			fps++;
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
-				System.out.printf("%d fps, %d tick%n", fps,  tick);
+				//System.out.printf("%d fps, %d tick%n", fps,  tick);
 				tick = 0;
 				fps = 0;
 				timer += 1000;
-				frame.requestFocusInWindow();
-				System.out.println(currentKeys);
+				requestFocusInWindow();
+				//System.out.println(currentKeys);
 			}
 		}
 	}
@@ -262,7 +277,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			// Done with rendering, Moving to situating the canvas and displaying it
 			g.dispose();
 			bs.show();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
+		}
 	}
 
 	private void tick() {
@@ -272,21 +295,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 		
 		// Draws the current frame
-	}
-
-	public static void main(String[] args) {
-		/*
-		 * The main method is used to create the frames and canvases that are displayed
-		 * and printed to respectively.
-		 */
-
-		// This first chunk of code creates the canvas that the object "render" will
-		// print to later.
-
-		StateMachine game = new StateMachine();
-
-		game.start();
-
 	}
 
 	public void start() {
@@ -333,8 +341,27 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
-			System.out.println("Couldn't save: " + e.getMessage());
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
+		try {
+			Log.add("Game End");
+			Log.close();
+		} catch (Exception e){
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
+		}
+		
 		
 		frame.setVisible(false);
 		frame.dispose();
@@ -363,7 +390,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		
 		if(currentKeys.indexOf(e.getKeyCode()) != -1) {
 			currentKeys.remove(currentKeys.indexOf(e.getKeyCode()));
-		} catch (Exception e1) {}
+		} 
 	}
 	
 	public void keyPressed(KeyEvent e) {

@@ -1,8 +1,9 @@
 package com.tpprod.stupor;
 
 
-import javax.sound.sampled.*;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 public class MusicPlayer implements Runnable {
@@ -28,7 +29,13 @@ public class MusicPlayer implements Runnable {
 	    	    playlist.add(new AudioFile("./" + pathName + file.getName()));
 	    	}
     	} catch(Exception e) {
-    		e.printStackTrace();
+    		StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
     	}
     	
     }
@@ -48,7 +55,13 @@ public class MusicPlayer implements Runnable {
             try {
                 Thread.sleep(1);
             } catch (Exception e) {
-                e.printStackTrace();
+	            	StringWriter error = new StringWriter();
+	    			e.printStackTrace(new PrintWriter(error));
+	    			try{
+	    				Log.add(error.toString());
+	    			}catch (Exception e1) {
+	    				
+	    			}
             }
         }
         song.stop();

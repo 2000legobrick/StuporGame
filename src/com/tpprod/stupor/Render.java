@@ -9,13 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 /*
  * The Render Class draws everything to the canvas that is stored in 
@@ -193,6 +190,13 @@ public class Render {
 				try {
 					DisplayedObjects.add(world.worldGrid.get(y).get(x));
 				} catch (Exception e) {
+					StringWriter error = new StringWriter();
+					e.printStackTrace(new PrintWriter(error));
+					try{
+						Log.add(error.toString());
+					}catch (Exception e1) {
+						
+					}
 				}
 			}
 		}
@@ -250,17 +254,14 @@ public class Render {
 			try {
 				g.setColor(rect.color);
 				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
-			}catch(Exception e) {}
-		}
-		
-		for (NewRectangle rect : DisplayedObjects) {
-			try {
-				if (rect.type == 1) {
-					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
-				} else  if (rect.type != 0) {
+			}catch(Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
 					
 				}
-			} catch (Exception e) {
 			}
 		}
 		
@@ -272,6 +273,31 @@ public class Render {
 					
 				}
 			} catch (Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
+			}
+		}
+		
+		for (NewRectangle rect : DisplayedObjects) {
+			try {
+				if (rect.type == 1) {
+					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
+				} else  if (rect.type != 0) {
+					
+				}
+			} catch (Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
 		}
 	}
@@ -324,6 +350,13 @@ public class Render {
 				g.setColor(player.inventory.currentItems.get(i).itemColor);
 				g.fillRect(middleWidth + 5 + (box.width + 10) * (i-1) + box.width/4, height - (box.height + 20) + box.height/4, box.width/2, box.height/2);
 			} catch(Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			}
 		}
 		// Render Center Lines

@@ -1,5 +1,7 @@
 package com.tpprod.stupor;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 public class AI implements Runnable {
@@ -31,7 +33,13 @@ public class AI implements Runnable {
 					System.out.println(d);
 				}
 			} catch(Exception e) {
-				e.printStackTrace();;
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+					
+				}
 			} 
 		}
 	}
