@@ -25,7 +25,7 @@ public class Render {
 	private MusicPlayer bgMusic = new MusicPlayer();
 	public ColorSchemes palette = new ColorSchemes();
 	
-	public static int fogOfWar = 12;
+	public static int fogOfWar = 7;
 
 	public boolean loading = false;
 	public int currentMenuPos = 0;
@@ -62,7 +62,7 @@ public class Render {
 		g.setColor(Color.BLACK);
 		g.fillRect(width - 150, height - 150, 100, 35);
 		g.setColor(Color.WHITE);
-		g.fillRect(width - 150, height - 150, percentLoad/5, 30);
+		g.fillRect(width - 150, height - 150, percentLoad, 30);
 		g.setFont(new Font("Impact", Font.PLAIN, 500));
 		g.setColor(new Color(150, 150, 150));
 		g.drawString("LOADING", 125, 475);
@@ -70,7 +70,7 @@ public class Render {
 		g.drawString("LOADING", 160, 525);
 		g.setColor(Color.WHITE);
 		g.drawString("LOADING", 150, 500);
-		if (percentLoad >= 500) {
+		if (percentLoad >= 100) {
 			loading = false;
 			percentLoad = 0;
 		} else {
@@ -85,13 +85,13 @@ public class Render {
 			switch(state) {
 				case StateMachine.GameState:
 					RenderBackground(g, width, height, player);
-				RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
+					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
 					RenderHUD(g, player, width, height);
-				bgMusic.start();
+					bgMusic.start();
 					break;
 				case StateMachine.MenuState:
 					RenderMenu(g, width,height);
-				bgMusic.stop();
+					bgMusic.stop();
 					break;
 				case StateMachine.PauseState:
 					
@@ -99,6 +99,7 @@ public class Render {
 				case StateMachine.UpgradeState:
 					RenderBackground(g, width, height, player);
 					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
+					RenderHUD(g, player, width, height);
 					RenderUpgrade(g, width, height);
 					break;
 				case StateMachine.DeadState:
@@ -190,13 +191,7 @@ public class Render {
 				try {
 					DisplayedObjects.add(world.worldGrid.get(y).get(x));
 				} catch (Exception e) {
-					StringWriter error = new StringWriter();
-					e.printStackTrace(new PrintWriter(error));
-					try{
-						Log.add(error.toString());
-					}catch (Exception e1) {
-						
-					}
+					// NON FATAL ERROR
 				}
 			}
 		}
@@ -305,21 +300,31 @@ public class Render {
 	public void RenderUpgrade (Graphics g, int width, int height) {
 		int middleWidth = width / 2;
 		int middleHeight = height / 2;
+		int distanceFromCenter = 300;
 		Dimension box = new Dimension(125,125);
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
 		for (int x = 0; x < 3; x++) {
 			g.setColor(Color.BLACK);
-			g2D.fillOval((int) (middleWidth + 500*Math.cos(Math.toRadians(120*x)) - box.width/2), 
-					(int) (middleHeight + 500*Math.sin(Math.toRadians(120*x)) - box.height/2),
+			g2D.fillOval((int) (middleWidth + distanceFromCenter*Math.cos(Math.toRadians(120*x)) - box.width/2), 
+					(int) (middleHeight + distanceFromCenter*Math.sin(Math.toRadians(120*x)) - box.height/2),
 					box.width, box.height);
 			g.setColor(Color.WHITE);
-			g2D.drawOval((int) (middleWidth + 500*Math.cos(Math.toRadians(120*x)) - box.width/2), 
-					(int) (middleHeight + 500*Math.sin(Math.toRadians(120*x)) - box.height/2),
+			g2D.drawOval((int) (middleWidth + distanceFromCenter*Math.cos(Math.toRadians(120*x)) - box.width/2), 
+					(int) (middleHeight + distanceFromCenter*Math.sin(Math.toRadians(120*x)) - box.height/2),
 					box.width, box.height);
 		}
 		g.setColor(Color.WHITE);
 		g.drawLine(middleWidth, middleHeight, currentMouseX, currentMouseY);
+		double theta = Math.atan2((currentMouseY - middleHeight), (currentMouseX - middleWidth)) * 180 / Math.PI;
+		if (theta > -60 && theta < 60) {
+			currentMenuPos = 1;
+		} else if (theta > 60 && theta < 180) {
+			currentMenuPos = 2;
+		} else {
+			currentMenuPos = 3;
+		}
+		g.drawString(Double.toString(currentMenuPos), 100, 100);
 	}
 	
 	public void RenderHUD (Graphics g, Mob player, int width, int height) {
@@ -350,13 +355,7 @@ public class Render {
 				g.setColor(player.inventory.currentItems.get(i).itemColor);
 				g.fillRect(middleWidth + 5 + (box.width + 10) * (i-1) + box.width/4, height - (box.height + 20) + box.height/4, box.width/2, box.height/2);
 			} catch(Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try{
-					Log.add(error.toString());
-				}catch (Exception e1) {
-					
-				}
+				
 			}
 		}
 		// Render Center Lines
@@ -367,5 +366,7 @@ public class Render {
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.drawString("EXP: " + Integer.toString(player.EXP), 10, height - 10);
+		g.drawString("JUMP: " + Integer.toString(player.jumpAmount), 10, height - 50);
+		g.drawString("MANA REGEN: " + Integer.toString(player.ManaRefreshTimer), 10, height - 90);
 	}
 }

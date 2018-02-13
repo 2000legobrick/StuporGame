@@ -47,10 +47,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public JFrame frame = new JFrame();
 	public boolean closeGame = false;
 	public Physics physics = new Physics();
-	public static AI ai = new AI();
 	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-	public static int tileSize = 100;
+	public static int tileSize = 150;
 	public static final int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
 	public static final String NAME = "Stupor";
 
@@ -148,13 +147,22 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
 							physics.player.Jump();
 						}
-						if (currentKeys.indexOf(65) != -1) { // A Key
-							physics.mobMove(physics.player, 3, physics.player.speed);
+						if (currentKeys.indexOf(16) != -1) {
+							if (currentKeys.indexOf(65) != -1) { // A Key
+								physics.mobMove(physics.player, 3, physics.player.speed);
+							}
+							if (currentKeys.indexOf(68) != -1) { // D Key
+								physics.mobMove(physics.player, 4, physics.player.speed);
+							}
+						} else {
+							if (currentKeys.indexOf(65) != -1) { // A Key
+								physics.mobMove(physics.player, 3, physics.player.speed*2/3);
+							}
+							if (currentKeys.indexOf(68) != -1) { // D Key
+								physics.mobMove(physics.player, 4, physics.player.speed*2/3);
+							}
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
-						}
-						if (currentKeys.indexOf(68) != -1) { // D Key
-							physics.mobMove(physics.player, 4, physics.player.speed);
 						}
 						if (currentKeys.indexOf(90) != -1) { // Z Key
                             physics.pickUpItem(physics.player);
@@ -162,10 +170,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(88) != -1) { // X key
 							physics.player.HurtMob(1);
 						}
-						if (currentKeys.indexOf(192) != -1) {
+						if (currentKeys.indexOf(192) != -1) { // Tilde Key
 							physics.stop();
 							NextState = UpgradeState;
 							CurrentState = UpgradeState;
+							try {
+								Thread.sleep(200);
+							} catch (InterruptedException e) {}
 						}
                         if (currentKeys.indexOf(72) != -1) { // H key
                             if(physics.player.inventory.currentItems.size() != 0)
@@ -211,7 +222,46 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 							}
 						}
 					case UpgradeState:
-						
+						if (currentKeys.indexOf(10) != -1) { // EnterKey
+							if (render.currentMenuPos == 1) {
+								if (physics.player.EXP >= 5) {
+									physics.player.EXP -= 5;
+									physics.player.jumpAmount++;
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+							}
+							if (render.currentMenuPos == 2) {
+								if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
+									physics.player.EXP -= 5;
+									physics.player.ManaRefreshTimer -= 5;
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+							}
+							if (render.currentMenuPos == 3) {
+								if (physics.player.EXP >= 5) {
+									physics.player.EXP -= 5;
+									physics.player.jumpAmount++;
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+							}
+						}
+						if (currentKeys.indexOf(192) != -1) { // Tilde Key
+							physics.start();
+							NextState = GameState;
+							CurrentState = GameState;
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {}
+						}
 					}
 				
 
@@ -222,7 +272,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				//draws current frame
 				fps++;
 				render();
-				
 			}
 			try {
 				Thread.sleep(1);

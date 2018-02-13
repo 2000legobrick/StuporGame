@@ -17,13 +17,14 @@ public class Physics implements Runnable {
 	public int playerStartingX = 1200;
 	public int playerStartingY = 1200;
 	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
+	public AI ai = new AI();
 	public World world;
 
 	private int physicsFogOfWar = 2;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
 
-	private int GRAVITY = 2;
+	private int GRAVITY = 3;
 
 	public void Gravity() {
 		/*
@@ -144,40 +145,42 @@ public class Physics implements Runnable {
 			
 			ArrayList<Integer> removeIndex = new ArrayList<Integer>();
 			try {
+				if (!entity.projectileList.isEmpty()) {
 				for (Projectile proj: entity.projectileList) {
-					if (proj.timer == 0) {
-						proj.previousX = proj.currentX;
-						proj.previousY = proj.currentY;
-						proj.velocityY -= proj.accelerationY;
-						if (MobIntersection(proj, proj.type)) {
-							removeIndex.add(entity.projectileList.indexOf(proj));
-						} else if (!ProjectileIntersection(proj)) {
-							proj.currentX += proj.velocityX;
-							proj.currentY -= proj.velocityY;
+						if (proj.timer == 0) {
+							proj.previousX = proj.currentX;
+							proj.previousY = proj.currentY;
+							proj.velocityY -= proj.accelerationY;
+							if (MobIntersection(proj, proj.type)) {
+								removeIndex.add(entity.projectileList.indexOf(proj));
+							} else if (!ProjectileIntersection(proj)) {
+								proj.currentX += proj.velocityX;
+								proj.currentY -= proj.velocityY;
+							} else {
+								removeIndex.add(entity.projectileList.indexOf(proj));
+							}
+							if (getDistance(new Point(proj.currentX, proj.currentY), new Point(entity.currentX, entity.currentY)) > 5000) {
+								removeIndex.add(entity.projectileList.indexOf(proj));
+							}
 						} else {
-							removeIndex.add(entity.projectileList.indexOf(proj));
-						}
-						if (getDistance(new Point(proj.currentX, proj.currentY), new Point(entity.currentX, entity.currentY)) > 5000) {
-							removeIndex.add(entity.projectileList.indexOf(proj));
-						}
-					} else {
-						if (MobIntersection(proj, proj.type)) {
-							removeIndex.add(entity.projectileList.indexOf(proj));
-						}
-						if (entity.FacingLeft) {
-							proj.currentX = entity.currentX - entity.width/2;
-						} else {
-							proj.currentX = entity.currentX + entity.width/2;
-						}
-						proj.currentY = entity.currentY + entity.height/2;
-						proj.timer--;
-						if (proj.timer == 1) {
-							removeIndex.add(entity.projectileList.indexOf(proj));
+							if (MobIntersection(proj, proj.type)) {
+								removeIndex.add(entity.projectileList.indexOf(proj));
+							}
+							if (entity.FacingLeft) {
+								proj.currentX = entity.currentX - entity.width/2;
+							} else {
+								proj.currentX = entity.currentX + entity.width/2;
+							}
+							proj.currentY = entity.currentY + entity.height/2;
+							proj.timer--;
+							if (proj.timer == 1) {
+								removeIndex.add(entity.projectileList.indexOf(proj));
+							}
 						}
 					}
-				}
-				for (int i: removeIndex) {
-					entity.projectileList.remove(i);
+					for (int i: removeIndex) {
+						entity.projectileList.remove(i);
+					}
 				}
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
@@ -313,13 +316,7 @@ public class Physics implements Runnable {
 						wallObjects.add(world.worldGrid.get(y).get(x));
 					}
 				} catch (Exception e) {
-					StringWriter error = new StringWriter();
-					e.printStackTrace(new PrintWriter(error));
-					try{
-						Log.add(error.toString());
-					}catch (Exception e1) {
-						
-					}
+					// NON FATAL ERROR, do not report
 				}
 			}
 		}
@@ -342,7 +339,7 @@ public class Physics implements Runnable {
 				if (tempRect.intersects(rect.rect)) {
 					entity.accelerationY = 0;
 					entity.velocityY = 0;
-					entity.jump = 2;
+					entity.jump = entity.jumpAmount;
 					return 0;
 				}
 			} else if (direction == 3) {
@@ -502,22 +499,20 @@ public class Physics implements Runnable {
 		}
 		
 		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
-		player = mobs.get(0);
 
 		for (int x = 1; x < 5; x++) {
 			mobs.add(new Mob( 100 * x, 0, 50,50));
 		}
 		player = mobs.get(0);
 		
-		StateMachine.ai.AIs(mobs,player);
+		//ai.AI(mobs);
+		
 	}
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		
 		// These variables are specific only to the run method
-		
 		double nsPerTick = 1000000000.0d / StateMachine.tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
@@ -528,6 +523,7 @@ public class Physics implements Runnable {
 			previous = current;
 			while (unprocessed >= 1) {
 				// Updates game objects
+				ai.Move();
 				Gravity();
 				Movement();
 				--unprocessed;

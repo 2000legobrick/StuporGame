@@ -22,10 +22,11 @@ public class Mob {
 	public ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
 	public BufferedImage image = null;
 	public BufferedImage arm = null;
-	public boolean wallSlide, FacingLeft = false;
+	public boolean wallSlide, Agro, FacingLeft = false;
+	public boolean L1, L2, L3, R1, R2, R3;
 	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
-	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 12, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 30, dampening = 1, ManaRefreshTimer = 20;
+	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
+			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
 	public Inventory inventory = new Inventory();
 	
 	private final int spriteWidth = 10, spriteHeight = 10;
