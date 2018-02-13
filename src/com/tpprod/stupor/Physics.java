@@ -505,7 +505,7 @@ public class Physics implements Runnable {
 		}
 		player = mobs.get(0);
 		
-		//ai.AI(mobs);
+		ai.AIs(mobs);
 		
 	}
 	
@@ -523,7 +523,7 @@ public class Physics implements Runnable {
 			previous = current;
 			while (unprocessed >= 1) {
 				// Updates game objects
-				ai.Move();
+				ai.Move(world, player);
 				Gravity();
 				Movement();
 				--unprocessed;
