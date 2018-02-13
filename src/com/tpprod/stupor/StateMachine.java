@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -411,7 +410,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 		}
 		
-		
+		//new Crash().run();
 		frame.setVisible(false);
 		frame.dispose();
 		physics.stop();

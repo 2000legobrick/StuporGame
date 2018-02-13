@@ -14,7 +14,10 @@ public class Stupor {
 
 		StateMachine game = new StateMachine();
 		game.start();
+		
 		Log.start();
 		Log.add("Game Start");
+		
+		Runtime.getRuntime().addShutdownHook(new Crash());
 	}
 }
