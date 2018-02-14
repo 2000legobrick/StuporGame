@@ -21,25 +21,25 @@ public class AI{
 	
 	public void Move(World world, Mob player) {
 		for(Mob mob: mobsAi) {
-			Point pointL1 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY + StateMachine.tileSize);
-			Point pointL2 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY);
-			Point pointL3 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
-			Point pointR1 = new Point(mob.currentX + StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
-			Point pointR2 = new Point(mob.currentX, mob.currentY - StateMachine.tileSize);
-			Point pointR3 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
+			Point pointL1 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() + StateMachine.getTileSize());
+			Point pointL2 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY());
+			Point pointL3 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
+			Point pointR1 = new Point(mob.getCurrentX() + StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
+			Point pointR2 = new Point(mob.getCurrentX(), mob.getCurrentY() - StateMachine.getTileSize());
+			Point pointR3 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
 
-			mob.L1 = PointIntersection(pointL1, world); 
-			mob.L2 = PointIntersection(pointL2, world); 
-			mob.L3 = PointIntersection(pointL3, world); 
-			mob.R1 = PointIntersection(pointR1, world); 
-			mob.R2 = PointIntersection(pointR2, world); 
-			mob.R3 = PointIntersection(pointR3, world); 
+			mob.setL1(PointIntersection(pointL1, world)); 
+			mob.setL2(PointIntersection(pointL2, world)); 
+			mob.setL3(PointIntersection(pointL3, world)); 
+			mob.setR1(PointIntersection(pointR1, world)); 
+			mob.setR2(PointIntersection(pointR2, world)); 
+			mob.setR3(PointIntersection(pointR3, world)); 
 			
-			double distanceToPlayer = getDistance(new Point(mob.currentX, mob.currentY), new Point (player.currentX, player.currentY));
+			double distanceToPlayer = getDistance(new Point(mob.getCurrentX(), mob.getCurrentY()), new Point (player.getCurrentX(), player.getCurrentY()));
 			
-			if (distanceToPlayer <= StateMachine.tileSize * 6) {
-				if (player.currentX > mob.currentX) {
-					mob.velocityX = mob.speed;
+			if (distanceToPlayer <= StateMachine.getTileSize() * 6) {
+				if (player.getCurrentX() > mob.getCurrentX()) {
+					mob.setVelocityX(mob.getSpeed());
 				}
 			}
 		}

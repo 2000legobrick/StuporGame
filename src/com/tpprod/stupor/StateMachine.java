@@ -252,20 +252,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 										Thread.sleep(100);
 									} catch (InterruptedException e) {}
 								}
-								if (render.currentMenuPos == 1) {
-									if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
-										physics.player.EXP -= 5;
-										physics.player.ManaRefreshTimer -= 5;
+								if (render.getCurrentMenuPos() == 1) {
+									if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
+										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+										physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer()-5);
 										currentKeys.remove(currentKeys.indexOf(10));
 										try {
 											Thread.sleep(100);
 										} catch (InterruptedException e) {}
 									}
 								}
-								if (render.currentMenuPos == 2) {
-									if (physics.player.EXP >= 5) {
-										physics.player.EXP -= 5;
-										physics.player.MaxHealth++;
+								if (render.getCurrentMenuPos() == 2) {
+									if (physics.getPlayer().getEXP() >= 5) {
+										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+										physics.getPlayer().setMaxHealth(physics.getPlayer().getMaxHealth() + 1);
 										currentKeys.remove(currentKeys.indexOf(10));
 										try {
 											Thread.sleep(100);
@@ -508,10 +508,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
 			physics.start();
-		} else if (render.currentMenuPos == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
 			physics.start();
-		} else if(render.currentMenuPos == 3 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if(render.getCurrentMenuPos() == 3 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			stop();
 		}
 		if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON1) {
@@ -520,28 +520,28 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			physics.getPlayer().Attack();
 		}
 		if (CurrentState == UpgradeState && arg0.getButton() == MouseEvent.BUTTON1) {
-			if (render.currentMenuPos == 0) {
-				if (physics.player.EXP >= 5) {
-					physics.player.EXP -= 5;
-					physics.player.jumpAmount++;
+			if (render.getCurrentMenuPos() == 0) {
+				if (physics.getPlayer().getEXP() >= 5) {
+					physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+					physics.getPlayer().setJumpAmount(physics.getPlayer().getJumpAmount() + 1);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {}
 				}
 			}
-			if (render.currentMenuPos == 1) {
-				if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
-					physics.player.EXP -= 5;
-					physics.player.ManaRefreshTimer -= 5;
+			if (render.getCurrentMenuPos() == 1) {
+				if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
+					physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+					physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer()-5);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {}
 				}
 			}
-			if (render.currentMenuPos == 2) {
-				if (physics.player.EXP >= 5) {
-					physics.player.EXP -= 5;
-					physics.player.MaxHealth++;
+			if (render.getCurrentMenuPos() == 2) {
+				if (physics.getPlayer().getEXP() >= 5) {
+					physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+					physics.getPlayer().setMaxHealth(physics.getPlayer().getMaxHealth() + 1);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {}

@@ -311,7 +311,7 @@ public class Physics implements Runnable {
 					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
-						if (world.worldGrid.get(y).get(x).type == 1) {
+						if (world.worldGrid.get(y).get(x).getType() == 1) {
 							wallObjects.add(world.worldGrid.get(y).get(x));
 						}
 					}
@@ -384,7 +384,7 @@ public class Physics implements Runnable {
 					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
-						if (world.worldGrid.get(y).get(x).type == 1) {
+						if (world.worldGrid.get(y).get(x).getType() == 1) {
 							wallObjects.add(world.worldGrid.get(y).get(x));
 						}
 					}

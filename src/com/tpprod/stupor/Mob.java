@@ -319,6 +319,54 @@ public class Mob {
 		return Mana;
 	}
 
+	public boolean isL1() {
+		return L1;
+	}
+
+	public void setL1(boolean l1) {
+		L1 = l1;
+	}
+
+	public boolean isL2() {
+		return L2;
+	}
+
+	public void setL2(boolean l2) {
+		L2 = l2;
+	}
+
+	public boolean isL3() {
+		return L3;
+	}
+
+	public void setL3(boolean l3) {
+		L3 = l3;
+	}
+
+	public boolean isR1() {
+		return R1;
+	}
+
+	public void setR1(boolean r1) {
+		R1 = r1;
+	}
+
+	public boolean isR2() {
+		return R2;
+	}
+
+	public void setR2(boolean r2) {
+		R2 = r2;
+	}
+
+	public boolean isR3() {
+		return R3;
+	}
+
+	public void setR3(boolean r3) {
+		R3 = r3;
+	}
+
 	public void setMana(int mana) {
 		Mana = mana;
 	}
@@ -333,6 +381,10 @@ public class Mob {
 
 	public int getMaxHealth() {
 		return MaxHealth;
+	}
+	
+	public void setMaxHealth(int MaxHealth) {
+		this.MaxHealth = MaxHealth;
 	}
 
 	public int getMaxMana() {

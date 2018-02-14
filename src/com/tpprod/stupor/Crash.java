@@ -1,5 +1,5 @@
 package com.tpprod.stupor;
-/*
+
 import java.io.File;
 import java.util.Properties;
 import java.awt.*;
@@ -16,7 +16,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-*/
+
 public class Crash extends Thread {
 	private JFrame Crash = new JFrame("Crash Report");
 	@Override
