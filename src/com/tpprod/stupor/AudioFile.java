@@ -53,10 +53,6 @@ public class AudioFile implements LineListener{
         playing = false;
     }
 
-    public boolean isPlaying() {
-        return playing;
-    }
-
     @Override
     public void update(LineEvent event) {
         if(event.getType() == LineEvent.Type.START)
@@ -67,5 +63,9 @@ public class AudioFile implements LineListener{
             clip.setFramePosition(0);
             playing = false;
         }
+    }
+    
+    public boolean isPlaying() {
+        return playing;
     }
 }

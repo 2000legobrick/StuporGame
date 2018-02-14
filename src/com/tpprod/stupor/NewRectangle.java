@@ -10,10 +10,10 @@ import java.awt.image.BufferedImage;
 
 public class NewRectangle {
 	
-	public int type = 3;
-	public Color color;
-	public Rectangle rect;
-	public BufferedImage image;
+	private int type = 3;
+	private Color color;
+	private Rectangle rect;
+	private BufferedImage image;
 	
 	public NewRectangle(BufferedImage tempImage, Rectangle tempRectangle) {
 		/*
@@ -55,5 +55,21 @@ public class NewRectangle {
 		} else if (type == 3) { // This is a RED empty tile
 			color = Color.RED;
 		}
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public Rectangle getRect() {
+		return rect;
+	}
+
+	public BufferedImage getImage() {
+		return image;
 	}
 }
