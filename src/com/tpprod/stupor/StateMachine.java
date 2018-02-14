@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -33,30 +34,29 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	// Static variables
 
-	public static final int GameState    = 0;
-	public static final int MenuState    = 1;
-	public static final int PauseState   = 2;
-	public static final int UpgradeState = 3;
-	public static final int DeadState    = 4;
-	public static final int LoadState    = 4;
+	private static final int GameState    = 0;
+	private static final int MenuState    = 1;
+	private static final int PauseState   = 2;
+	private static final int UpgradeState = 3;
+	private static final int DeadState    = 4;
+	private static final int LoadState    = 4;
 
-	public int CurrentState = MenuState;
+	private static int CurrentState = MenuState;
 
-	public ArrayList<Integer> currentKeys = new ArrayList<Integer>();
-	public JFrame frame = new JFrame();
-	public boolean closeGame = false;
-	public Physics physics = new Physics();
-	public static AI ai = new AI();
-	public static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
+	private static ArrayList<Integer> currentKeys = new ArrayList<Integer>();
+	private JFrame frame = new JFrame();
+	private boolean closeGame = false;
+	private Physics physics = new Physics();
+	private static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
-	public static int tileSize = 100;
-	public static final int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
-	public static final String NAME = "Stupor";
+	private static int tileSize = 150;
+	private static final int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful ticks
+	private static final String NAME = "Stupor";
 
 	private static final long serialVersionUID = 1L;
-	public static boolean running = false;
+	private static boolean running = false;
 	private Render render = new Render();
-	private int NextState = MenuState;
+	private static int NextState = MenuState;
 	
 	static GraphicsDevice device = GraphicsEnvironment
 	        .getLocalGraphicsEnvironment().getScreenDevices()[0];
@@ -89,7 +89,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			// world
 			render.InitializeWorld();
 
-			physics.world = render.world;
+			physics.setWorld(render.getWorld());
 		} catch (Exception e) {
 			// If the file isn't found an error is printed and the program stops
 			StringWriter error = new StringWriter();
@@ -137,82 +137,145 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						// the if statement.
 	
 						if (currentKeys.indexOf(17) != -1) { // Ctrl key
-							physics.player.ResetMana();
-							physics.player.ResetHealth();
+							physics.getPlayer().ResetMana();
+							physics.getPlayer().ResetHealth();
 						}
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
 							physics.stop();
 							NextState = MenuState;
 						}
 						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
-							physics.player.Jump();
+							physics.getPlayer().Jump();
 						}
-						if (currentKeys.indexOf(65) != -1) { // A Key
-							physics.mobMove(physics.player, 3, physics.player.speed);
+						if (currentKeys.indexOf(16) != -1) {
+							if (currentKeys.indexOf(65) != -1) { // A Key
+								physics.mobMove(physics.getPlayer(), 3, physics.getPlayer().getSpeed());
+							}
+							if (currentKeys.indexOf(68) != -1) { // D Key
+								physics.mobMove(physics.getPlayer(), 4, physics.getPlayer().getSpeed());
+							}
+						} else {
+							if (currentKeys.indexOf(65) != -1) { // A Key
+								physics.mobMove(physics.getPlayer(), 3, physics.getPlayer().getSpeed()*2/3);
+							}
+							if (currentKeys.indexOf(68) != -1) { // D Key
+								physics.mobMove(physics.getPlayer(), 4, physics.getPlayer().getSpeed()*2/3);
+							}
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
 						}
-						if (currentKeys.indexOf(68) != -1) { // D Key
-							physics.mobMove(physics.player, 4, physics.player.speed);
-						}
 						if (currentKeys.indexOf(90) != -1) { // Z Key
-                            physics.pickUpItem(physics.player);
+                            physics.pickUpItem(physics.getPlayer());
 						}
 						if (currentKeys.indexOf(88) != -1) { // X key
-							physics.player.HurtMob(1);
+							physics.getPlayer().HurtMob(1);
 						}
-						if (currentKeys.indexOf(192) != -1) {
+						if (currentKeys.indexOf(192) != -1) { // Tilde Key
 							physics.stop();
 							NextState = UpgradeState;
 							CurrentState = UpgradeState;
+							try {
+								Thread.sleep(200);
+							} catch (InterruptedException e) {}
 						}
                         if (currentKeys.indexOf(72) != -1) { // H key
-                            if(physics.player.inventory.currentItems.size() != 0)
-                                physics.player.useItem(physics.player.inventory.currentItems.get(0));
+                            if(physics.getPlayer().getInventory().getCurrentItems().size() != 0)
+                                physics.getPlayer().useItem(physics.getPlayer().getInventory().getCurrentItems().get(0));
 						}
 						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
-							for (Mob entity : physics.mobs) {
+							for (Mob entity : physics.getMobs()) {
 								physics.Dampening(entity);
 							}
 						}
-						if (tick % physics.player.ManaRefreshTimer == 0) {
-							if (physics.player.Mana < physics.player.MaxMana)
-								physics.player.Mana++;
+						if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
+							if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
+								physics.getPlayer().setMana(physics.getPlayer().getMana()+1);
 						}
 					case MenuState:
 						if (currentKeys.indexOf(87) != -1) { // W Key
-							render.currentMenuPos -= 1;
+							render.setCurrentMenuPos(render.getCurrentMenuPos()-1);
 							currentKeys.remove(currentKeys.indexOf(87));
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
-							render.currentMenuPos += 1;
+							render.setCurrentMenuPos(render.getCurrentMenuPos()+1);
 							currentKeys.remove(currentKeys.indexOf(83));
 						}
 						if (currentKeys.indexOf(38) != -1) { // Up Arrow
-							render.currentMenuPos -= 1;
+							render.setCurrentMenuPos(render.getCurrentMenuPos()-1);
 							currentKeys.remove(currentKeys.indexOf(38));
 						}
 						if (currentKeys.indexOf(40) != -1) { // Down Arrow
-							render.currentMenuPos += 1;
+							render.setCurrentMenuPos(render.getCurrentMenuPos()+1);
 							currentKeys.remove(currentKeys.indexOf(40));
 						}
-						if (render.currentMenuPos > 2) {
-							render.currentMenuPos = 2;
-						} else if (render.currentMenuPos < 0) {
-							render.currentMenuPos = 0;
+						if (render.getCurrentMenuPos() > 2) {
+							render.setCurrentMenuPos(2);
+						} else if (render.getCurrentMenuPos() < 0) {
+							render.setCurrentMenuPos(0);
 						}
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
-							if (render.currentMenuPos == 0) {
+							if (render.getCurrentMenuPos() == 0) {
 								NextState = GameState;
 								physics.start();
-							} else if (render.currentMenuPos == 2) {
+							} else if (render.getCurrentMenuPos() == 2) {
 								this.stop();
 							}
 						}
 					case UpgradeState:
-						
+						if (currentKeys.indexOf(10) != -1) { // EnterKey
+							if (render.getCurrentMenuPos() == 1) {
+								if (physics.getPlayer().getEXP() >= 5) {
+									physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+									physics.getPlayer().setJumpAmount(physics.getPlayer().getJumpAmount() + 1);
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+							}
+							if (render.getCurrentMenuPos() == 2) {
+								if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
+									physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+									physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() - 5);
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+							}
+							if (render.getCurrentMenuPos() == 3) {
+								if (physics.getPlayer().getEXP() >= 5) {
+									physics.getPlayer().setEXP(physics.getPlayer().getEXP()- 5);
+									physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() + 1);
+									currentKeys.remove(currentKeys.indexOf(10));
+									try {
+										Thread.sleep(100);
+									} catch (InterruptedException e) {}
+								}
+								if (render.currentMenuPos == 1) {
+									if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
+										physics.player.EXP -= 5;
+										physics.player.ManaRefreshTimer -= 5;
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {}
+									}
+								}
+								if (render.currentMenuPos == 2) {
+									if (physics.player.EXP >= 5) {
+										physics.player.EXP -= 5;
+										physics.player.MaxHealth++;
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {}
+									}
+								}
+							}
+							break;
 					}
-				
+				}
 
 				// Beautiful ticks are ticking!!!
 				tick++;
@@ -221,7 +284,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				//draws current frame
 				fps++;
 				render();
-				
 			}
 			try {
 				Thread.sleep(1);
@@ -260,7 +322,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
 			// If no BufferStrategy is found, create another one that buffers 2 frames ahead
-			createBufferStrategy(2);
+			createBufferStrategy(3);
 			requestFocus();
 			return;
 		}
@@ -269,8 +331,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			Graphics g = bs.getDrawGraphics();
 			// Calling the RenderState here to render based off of the current state wanting
 			// to be displayed
-			render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.player, NextState);
-			if (!render.loading) {
+			render.RenderState(g, getWidth(), getHeight(), CurrentState, physics.getPlayer(), NextState);
+			if (!render.isLoading()) {
 				CurrentState = NextState;
 			}
 			// Done with rendering, Moving to situating the canvas and displaying it
@@ -301,14 +363,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * The start method is called upon launching the app and starts the thread that
 		 * 	the game runs on.
 		 */
-
-//		Dimension dimension = new Dimension(WIDTH, HEIGHT);
-//		this.setMaximumSize(dimension);
-//		this.setMinimumSize(dimension);
-//		this.setPreferredSize(dimension);
-//		this.setSize(dimension);
-//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-		
+		if(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+			Dimension dimension = new Dimension(WIDTH, HEIGHT);
+			this.setMaximumSize(dimension);
+			this.setMinimumSize(dimension);
+			this.setPreferredSize(dimension);
+			this.setSize(dimension);
+		}
 		
 		// The second chunk adds the canvas to a JFrame in order to display everything onto 
 		// 	a frame that is more versatile than a canvas in terms of dimensioning and 
@@ -322,7 +383,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		device.setFullScreenWindow(frame);
+		if(System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
+			device.setFullScreenWindow(frame);
+		}
 		if (!running) {
 			running = true;
 			new Thread(this).start();
@@ -335,8 +398,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 *  to finish and finally reach the end of the run method
 		 */
 		SaveData data = new SaveData();
-		data.playerCurrentX = physics.player.currentX;
-		data.playerCurrentY = physics.player.currentY;
+		data.setPlayerCurrentX(physics.getPlayer().getCurrentX());
+		data.setPlayerCurrentY(physics.getPlayer().getCurrentY());
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
@@ -361,7 +424,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 		}
 		
-		//new Crash().run();
+//		new Crash().run();
 		frame.setVisible(false);
 		frame.dispose();
 		physics.stop();
@@ -380,6 +443,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 */
 		
 	}
+	
 	public void keyReleased(KeyEvent e) {
 		/*
 		 * keyReleased is called when ANY key is released from a "Pressed" state.
@@ -417,12 +481,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		render.currentMouseX = arg0.getX();
-		render.currentMouseY = arg0.getY();
+		render.setCurrentMouseX(arg0.getX());
+		render.setCurrentMouseY(arg0.getY());
 		if (CurrentState == GameState && arg0.getX() > getWidth() / 2) {
-			physics.player.FaceRight();
+			physics.getPlayer().FaceRight();
 		} else if (CurrentState == GameState && arg0.getX() <= getWidth() / 2) {
-			physics.player.FaceLeft();
+			physics.getPlayer().FaceLeft();
 		}
 	}
 
@@ -441,16 +505,48 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		if (render.currentMenuPos == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
 			physics.start();
-		} else if(render.currentMenuPos == 2 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.currentMenuPos == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+			NextState = GameState;
+			physics.start();
+		} else if(render.currentMenuPos == 3 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			stop();
 		}
 		if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON1) {
-			physics.player.Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
+			physics.getPlayer().Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
 		} else if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON3) {
-			physics.player.Attack();
+			physics.getPlayer().Attack();
+		}
+		if (CurrentState == UpgradeState && arg0.getButton() == MouseEvent.BUTTON1) {
+			if (render.currentMenuPos == 0) {
+				if (physics.player.EXP >= 5) {
+					physics.player.EXP -= 5;
+					physics.player.jumpAmount++;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
+			if (render.currentMenuPos == 1) {
+				if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
+					physics.player.EXP -= 5;
+					physics.player.ManaRefreshTimer -= 5;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
+			if (render.currentMenuPos == 2) {
+				if (physics.player.EXP >= 5) {
+					physics.player.EXP -= 5;
+					physics.player.MaxHealth++;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
 		}
 	}
 
@@ -465,4 +561,45 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// TODO Auto-generated method stub
 
 	}
+	
+	public static boolean isRunning() {
+		return running;
+	}
+	
+	public static int getTileSize() {
+		return tileSize;
+	}
+
+	public static int getTickpersec() {
+		return tickPerSec;
+	}
+
+	public static final int getGamestate() {
+		return GameState;
+	}
+
+	public static final int getMenustate() {
+		return MenuState;
+	}
+
+	public static final int getPausestate() {
+		return PauseState;
+	}
+
+	public static final int getUpgradestate() {
+		return UpgradeState;
+	}
+
+	public final static int getDeadstate() {
+		return DeadState;
+	}
+
+	public static int getCurrentState() {
+		return CurrentState;
+	}
+
+	public static ArrayList<Integer> getCurrentKeys() {
+		return currentKeys;
+	}
+
 }

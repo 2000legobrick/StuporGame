@@ -2,11 +2,11 @@ package com.tpprod.stupor;
 
 public class Projectile {
 	
-	public static final int BULLET = 0, ARM = 1;
-	public int currentX, currentY, previousX, previousY, timer, type,
+	private static final int BULLET = 0, ARM = 1;
+	private int currentX, currentY, previousX, previousY, timer, type,
 				velocityY, velocityX, accelerationY, bulletSize, width, height;
-	public int damage = 10;
-	public boolean shown;
+	private int damage = 10;
+	private boolean shown;
 	
 	public Projectile () {
 		shown = false;
@@ -32,5 +32,97 @@ public class Projectile {
 		height   = tempHeight;
 		timer    = 60; // Approximately a second
 		type     = ARM;
+	}
+
+	public int getCurrentX() {
+		return currentX;
+	}
+
+	public void setCurrentX(int currentX) {
+		this.currentX = currentX;
+	}
+
+	public int getCurrentY() {
+		return currentY;
+	}
+
+	public void setCurrentY(int currentY) {
+		this.currentY = currentY;
+	}
+
+	public int getPreviousX() {
+		return previousX;
+	}
+
+	public void setPreviousX(int previousX) {
+		this.previousX = previousX;
+	}
+
+	public int getPreviousY() {
+		return previousY;
+	}
+
+	public void setPreviousY(int previousY) {
+		this.previousY = previousY;
+	}
+
+	public int getTimer() {
+		return timer;
+	}
+
+	public void setTimer(int timer) {
+		this.timer = timer;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public int getVelocityY() {
+		return velocityY;
+	}
+
+	public void setVelocityY(int velocityY) {
+		this.velocityY = velocityY;
+	}
+
+	public int getVelocityX() {
+		return velocityX;
+	}
+
+	public void setVelocityX(int velocityX) {
+		this.velocityX = velocityX;
+	}
+
+	public int getAccelerationY() {
+		return accelerationY;
+	}
+
+	public void setAccelerationY(int accelerationY) {
+		this.accelerationY = accelerationY;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getDamage() {
+		return damage;
+	}
+
+	public boolean isShown() {
+		return shown;
+	}
+
+	public static int getBullet() {
+		return BULLET;
+	}
+
+	public static int getArm() {
+		return ARM;
 	}
 }

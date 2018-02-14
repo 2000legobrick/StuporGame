@@ -20,7 +20,9 @@ public class MusicPlayer implements Runnable {
     public MusicPlayer() {
         File[] bgFiles = new File(bgPath).listFiles();
         //File[] seFiles = new File(sePath).listFiles();
-    	setPlaylist(bgMusic,bgPath, bgFiles);
+    	if (bgFiles.length != 0) {
+    		setPlaylist(bgMusic,bgPath, bgFiles);
+    	}
     }
     
     public void setPlaylist(ArrayList<AudioFile> playlist, String pathName, File[] files) {

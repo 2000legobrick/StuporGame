@@ -19,14 +19,15 @@ import javax.imageio.ImageIO;
 
 public class Mob {
 
-	public ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
-	public BufferedImage image = null;
-	public BufferedImage arm = null;
-	public boolean wallSlide, FacingLeft = false;
-	public int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
-	public int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 12, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 30, dampening = 1, ManaRefreshTimer = 20;
-	public Inventory inventory = new Inventory();
+	private ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
+	private BufferedImage image = null;
+	private BufferedImage arm = null;
+	private boolean wallSlide, Agro, FacingLeft = false;
+	private boolean L1, L2, L3, R1, R2, R3;
+	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
+	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
+			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
+	private Inventory inventory = new Inventory();
 	
 	private final int spriteWidth = 10, spriteHeight = 10;
 	private final int rows = 10, cols = 10;
@@ -162,7 +163,7 @@ public class Mob {
 		 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
 		 * northern direction) and sets jump to 1 if jump is 0 initially.
 		 */
-		if (jump > 0) {
+		if (jump > 0 && velocityY >= 0) {
 			velocityY = -maxJump;
 			jump--;
 		}
@@ -178,7 +179,7 @@ public class Mob {
 
 	public void useItem(Item item) {
 		String itemType = item.name;
-		if (inventory.currentItems.size() != 0) {
+		if (inventory.getCurrentItems().size() != 0) {
 			if (itemType == "health") {
 				healthUp(1);
 				inventory.removeInventoryItem(item);
@@ -199,7 +200,151 @@ public class Mob {
 	}
 
 	public ArrayList<Item> readItems() {
-		return inventory.currentItems;
+		return inventory.getCurrentItems();
+	}
+
+	public boolean getWallSlide() {
+		return wallSlide;
+	}
+	
+	public int getAccelerationX() {
+		return accelerationX;
+	}
+
+	public void setAccelerationX(int accelerationX) {
+		this.accelerationX = accelerationX;
+	}
+
+	public int getAccelerationY() {
+		return accelerationY;
+	}
+
+	public void setAccelerationY(int accelerationY) {
+		this.accelerationY = accelerationY;
+	}
+
+	public int getVelocityX() {
+		return velocityX;
+	}
+
+	public void setVelocityX(int velocityX) {
+		this.velocityX = velocityX;
+	}
+
+	public int getVelocityY() {
+		return velocityY;
+	}
+
+	public void setVelocityY(int velocityY) {
+		this.velocityY = velocityY;
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public int getMaxVelocity() {
+		return maxVelocity;
+	}
+
+	public int getJumpAmount() {
+		return jumpAmount;
+	}
+
+	public void setJumpAmount(int jumpAmount) {
+		this.jumpAmount = jumpAmount;
+	}
+
+	public int getDampening() {
+		return dampening;
+	}
+
+	public int getManaRefreshTimer() {
+		return ManaRefreshTimer;
+	}
+
+	public void setManaRefreshTimer(int manaRefreshTimer) {
+		ManaRefreshTimer = manaRefreshTimer;
+	}
+
+	public ArrayList<Projectile> getProjectileList() {
+		return projectileList;
+	}
+
+	public int getHealth() {
+		return Health;
+	}
+
+	public void setHealth(int health) {
+		Health = health;
+	}
+
+	public int getCurrentX() {
+		return currentX;
+	}
+
+	public void setCurrentX(int currentX) {
+		this.currentX = currentX;
+	}
+
+	public int getCurrentY() {
+		return currentY;
+	}
+
+	public void setCurrentY(int currentY) {
+		this.currentY = currentY;
+	}
+
+	public boolean isFacingLeft() {
+		return FacingLeft;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getEXP() {
+		return EXP;
+	}
+
+	public void setEXP(int eXP) {
+		EXP = eXP;
+	}
+
+	public int getMana() {
+		return Mana;
+	}
+
+	public void setMana(int mana) {
+		Mana = mana;
+	}
+
+	public int getJump() {
+		return jump;
+	}
+
+	public void setJump(int jump) {
+		this.jump = jump;
+	}
+
+	public int getMaxHealth() {
+		return MaxHealth;
+	}
+
+	public int getMaxMana() {
+		return MaxMana;
+	}
+
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public Inventory getInventory() {
+		return inventory;
 	}
 
 }
