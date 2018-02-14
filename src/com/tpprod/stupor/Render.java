@@ -21,16 +21,24 @@ import java.util.ArrayList;
 
 public class Render {
 	
-	public World world = new World();
+	private static final int GameState    =  StateMachine.getGamestate();
+	private static final int MenuState    =  StateMachine.getMenustate();
+	private static final int PauseState   =  StateMachine.getPausestate();
+	private static final int UpgradeState =  StateMachine.getUpgradestate();
+	private static final int DeadState    =  StateMachine.getDeadstate();
+	private static volatile int CurrentState       =  StateMachine.getCurrentState();
+	
+	private World world = new World();
 	private MusicPlayer bgMusic = new MusicPlayer();
-	public ColorSchemes palette = new ColorSchemes();
+	private ColorSchemes palette = new ColorSchemes();
 	
-	public static int fogOfWar = 7;
+	private static int fogOfWar = 7;
 
-	public boolean loading = false;
-	public int currentMenuPos = 0;
-	public int currentMouseX, currentMouseY;
+	private boolean loading = false;
+	private int currentMenuPos = 0;
+	private int currentMouseX, currentMouseY;
 	
+
 	private ArrayList<NewRectangle> DisplayedObjects = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedItems = new ArrayList<NewRectangle>();
@@ -79,32 +87,26 @@ public class Render {
 	}
 
 	public void RenderState(Graphics g, int width, int height, int state, Mob player, int NextState) {
-
+		CurrentState = state;
 		// renders a state based on what state is passed through the constructor
 		if (NextState == state) {
-			switch(state) {
-				case StateMachine.GameState:
+			if(CurrentState == GameState) {
 					RenderBackground(g, width, height, player);
-					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
+					RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
 					RenderHUD(g, player, width, height);
 					bgMusic.start();
-					break;
-				case StateMachine.MenuState:
+			}else if(CurrentState == MenuState) {
 					RenderMenu(g, width,height);
 					bgMusic.stop();
-					break;
-				case StateMachine.PauseState:
+			}else if(CurrentState == PauseState) {
 					
-					break;
-				case StateMachine.UpgradeState:
+			}else if(CurrentState == UpgradeState) {
 					RenderBackground(g, width, height, player);
-					RenderForeground(g, width, height, StateMachine.tileSize, Physics.mobs, player, world);
+					RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
 					RenderHUD(g, player, width, height);
 					RenderUpgrade(g, width, height);
-					break;
-				case StateMachine.DeadState:
+			}else if(CurrentState == DeadState) {
 					
-					break;
 			}
 		} else {
 			loading = true;
@@ -117,12 +119,12 @@ public class Render {
 		 * The method RenderBackground renders out the backdrop of the game.
 		 */
 		boolean flipBool = false;
-		for (int x = (width - player.currentX / 5) - width; x < width; x += width) {
+		for (int x = (width - player.getCurrentX() / 5) - width; x < width; x += width) {
 			if (flipBool) {
-				g.drawImage(palette.Background, x, 0, width, height, null);
+				g.drawImage(palette.getBackground(), x, 0, width, height, null);
 				flipBool = !flipBool;
 			} else {
-				g.drawImage(palette.Background, x + width, 0, -width, height, null);
+				g.drawImage(palette.getBackground(), x + width, 0, -width, height, null);
 				flipBool = !flipBool;
 			}
 		}
@@ -184,9 +186,9 @@ public class Render {
 
 		// Iterates through the world blocks and mobs adding the objects and mobs that
 		// will be on screen
-		for (int y = (int) (player.currentY / tileSize) - fogOfWar; y <= (int) (player.currentY / tileSize)
+		for (int y = (int) (player.getCurrentY() / tileSize) - fogOfWar; y <= (int) (player.getCurrentY() / tileSize)
 				+ fogOfWar; y++) {
-			for (int x = (int) (player.currentX / tileSize) - fogOfWar; x <= (int) (player.currentX / tileSize)
+			for (int x = (int) (player.getCurrentX() / tileSize) - fogOfWar; x <= (int) (player.getCurrentX() / tileSize)
 					+ fogOfWar; x++) {
 				try {
 					DisplayedObjects.add(world.worldGrid.get(y).get(x));
@@ -197,26 +199,26 @@ public class Render {
 		}
 
 		for (Mob entity : entities) {
-			if (entity.Health > 0) {
-				if (entity.currentX + tileSize > player.currentX - tileSize * fogOfWar
-						&& entity.currentX < player.currentX + tileSize * fogOfWar) {
-					if (entity.currentY + tileSize > player.currentY - tileSize * fogOfWar
-							&& entity.currentY < player.currentY + tileSize * fogOfWar) {
-						DisplayedMobs.add(new NewRectangle(entity.image,
-								new Rectangle(entity.currentX, entity.currentY, entity.width, entity.height)));
+			if (entity.getHealth() > 0) {
+				if (entity.getCurrentX() + tileSize > player.getCurrentX() - tileSize * fogOfWar
+						&& entity.getCurrentX() < player.getCurrentX() + tileSize * fogOfWar) {
+					if (entity.getCurrentY() + tileSize > player.getCurrentY() - tileSize * fogOfWar
+							&& entity.getCurrentY() < player.getCurrentY() + tileSize * fogOfWar) {
+						DisplayedMobs.add(new NewRectangle(entity.getImage(),
+								new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight())));
 					}
 				}
 			}
-			for (Projectile proj: entity.projectileList) {
+			for (Projectile proj: entity.getProjectileList()) {
 				DisplayedMobs.add(new NewRectangle(Color.WHITE,
-						new Rectangle(proj.currentX, proj.currentY,
-								proj.width, proj.height)));
+						new Rectangle(proj.getCurrentX(), proj.getCurrentY(),
+								proj.getWidth(), proj.getHeight())));
 			}
 		}
 
-		for (Item item: world.inventory.currentItems) {
-			if (item.itemX + tileSize > player.currentX - tileSize*fogOfWar && item.itemX < player.currentX + tileSize*fogOfWar) {
-				if (item.itemY + tileSize > player.currentY - tileSize*fogOfWar && item.itemY < player.currentY + tileSize*fogOfWar) {
+		for (Item item: world.inventory.getCurrentItems()) {
+			if (item.itemX + tileSize > player.getCurrentX() - tileSize*fogOfWar && item.itemX < player.getCurrentX() + tileSize*fogOfWar) {
+				if (item.itemY + tileSize > player.getCurrentY() - tileSize*fogOfWar && item.itemY < player.getCurrentY() + tileSize*fogOfWar) {
 					DisplayedItems.add(new NewRectangle(item.itemColor, new Rectangle(item.itemX, item.itemY, item.itemSize, item.itemSize)));
 				}
 			}
@@ -230,25 +232,25 @@ public class Render {
 			// g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,
 			// rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width,
 			// rect.rect.height);
-			if (rect.image != null) {
+			if (rect.getImage() != null) {
 				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-palette.Player.getWidth(null), 0);
+				tx.translate(-palette.getPlayer().getWidth(null), 0);
 				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-				palette.Player = op.filter(palette.Player, null);
+				palette.setPlayer(op.filter(palette.getPlayer(), null));
 		
-				g.drawImage(rect.image, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
+				g.drawImage(rect.getImage(), rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2, rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height, null);
 			} else {
-				g.setColor(rect.color);
-				g.fillRect(rect.rect.x - player.currentX - player.width / 2 + width / 2,
-						rect.rect.y - player.currentY - player.height / 2 + height / 2, rect.rect.width,
-						rect.rect.height);
+				g.setColor(rect.getColor());
+				g.fillRect(rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
+						rect.getRect().y - player.getCurrentY() - player.getHeight() / 2 + height / 2, rect.getRect().width,
+						rect.getRect().height);
 			}
 		}
 
 		for (NewRectangle rect: DisplayedItems) {
 			try {
-				g.setColor(rect.color);
-				g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,  rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height);
+				g.setColor(rect.getColor());
+				g.fillRect(rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2,  rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height);
 			}catch(Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -262,9 +264,9 @@ public class Render {
 		
 		for (NewRectangle rect : DisplayedObjects) {
 			try {
-				if (rect.type == 1) {
-					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
-				} else  if (rect.type != 0) {
+				if (rect.getType() == 1) {
+					g.drawImage(palette.getGroundTile(), rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2, rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height, null);
+				} else  if (rect.getType() != 0) {
 					
 				}
 			} catch (Exception e) {
@@ -280,9 +282,9 @@ public class Render {
 		
 		for (NewRectangle rect : DisplayedObjects) {
 			try {
-				if (rect.type == 1) {
-					g.drawImage(palette.GroundTile, rect.rect.x - player.currentX - player.width/2 + width / 2, rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width, rect.rect.height, null);
-				} else  if (rect.type != 0) {
+				if (rect.getType() == 1) {
+					g.drawImage(palette.getGroundTile(), rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2, rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height, null);
+				} else  if (rect.getType() != 0) {
 					
 				}
 			} catch (Exception e) {
@@ -342,17 +344,17 @@ public class Render {
 			g.fillRect(middleWidth + 5 - (box.width + 10) * x, height - (box.height + 20), box.width, box.height);
 		}
 		// Render Health
-		double average = (double) player.Health / player.MaxHealth;
+		double average = (double) player.getHealth() / player.getMaxHealth();;
 		g.setColor(new Color(255, 0, 0, 200));
 		g.fillArc(middleWidth - box.width - (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
 		// Render Mana
-		average = (double) player.Mana / player.MaxMana;
+		average = (double) player.getMana() / player.getMaxMana();
 		g.setColor(new Color(50, 0, 255, 200));
 		g.fillArc(middleWidth + (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90, (int) (360 * average));
 		// Render Item
 		for (int i = 0; i < 4; i++) {
 			try {
-				g.setColor(player.inventory.currentItems.get(i).itemColor);
+				g.setColor(player.getInventory().getCurrentItems().get(i).itemColor);
 				g.fillRect(middleWidth + 5 + (box.width + 10) * (i-1) + box.width/4, height - (box.height + 20) + box.height/4, box.width/2, box.height/2);
 			} catch(Exception e) {
 				
@@ -365,8 +367,33 @@ public class Render {
 		// Render EXP
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
-		g.drawString("EXP: " + Integer.toString(player.EXP), 10, height - 10);
-		g.drawString("JUMP: " + Integer.toString(player.jumpAmount), 10, height - 50);
-		g.drawString("MANA REGEN: " + Integer.toString(player.ManaRefreshTimer), 10, height - 90);
+		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 10);
+		g.drawString("JUMP: " + Integer.toString(player.getJumpAmount()), 10, height - 50);
+		g.drawString("MANA REGEN: " + Integer.toString(player.getManaRefreshTimer()), 10, height - 90);
 	}
+	
+	public boolean isLoading() {
+		return loading;
+	}
+	
+	public int getCurrentMenuPos() {
+		return currentMenuPos;
+	}
+
+	public void setCurrentMenuPos(int currentMenuPos) {
+		this.currentMenuPos = currentMenuPos;
+	}
+
+	public void setCurrentMouseX(int currentMouseX) {
+		this.currentMouseX = currentMouseX;
+	}
+
+	public void setCurrentMouseY(int currentMouseY) {
+		this.currentMouseY = currentMouseY;
+	}
+
+	public World getWorld() {
+		return world;
+	}
+
 }

@@ -14,10 +14,10 @@ import javax.imageio.ImageIO;
 
 public class ColorSchemes {
 	
-	public BufferedImage GroundTile  = null;
-	public BufferedImage Background = null;
-	public BufferedImage Player     = null;
-	public BufferedImage PlayerArm  = null;
+	private BufferedImage GroundTile  = null;
+	private BufferedImage Background = null;
+	private BufferedImage Player     = null;
+	private BufferedImage PlayerArm  = null;
 	
 	public ColorSchemes () {
 
@@ -50,4 +50,21 @@ public class ColorSchemes {
 			}
 		}
 	}
+
+	public BufferedImage getGroundTile() {
+		return GroundTile;
+	}
+
+	public BufferedImage getBackground() {
+		return Background;
+	}
+
+	public BufferedImage getPlayer() {
+		return Player;
+	}
+
+	public void setPlayer(BufferedImage player) {
+		Player = player;
+	}
+
 }

@@ -22,7 +22,7 @@ public class AI{
 	public void Move (World world, Mob player) {
 		for(Mob mob: mobsAi) {
 			
-			double distance = getDistance(new Point(mob.currentX, mob.currentY), new Point (player.currentX, player.currentY));
+			double distance = getDistance(new Point(mob.getCurrentX(), mob.getCurrentY()), new Point (player.getCurrentX(), player.getCurrentY()));
 			
 			//if (distance <= StateMachine.tileSize * 6)
 		}
@@ -34,7 +34,7 @@ public class AI{
 	
 	public boolean PointIntersection (Point point, World world) {
 		
-		if (world.worldGrid.get(point.x / StateMachine.tileSize).get(point.y / StateMachine.tileSize).type != 0) {
+		if (world.worldGrid.get(point.x / StateMachine.getTileSize()).get(point.y / StateMachine.getTileSize()).getType() != 0) {
 			return true;
 		}
 		return false;
