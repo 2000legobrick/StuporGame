@@ -1,5 +1,5 @@
 package com.tpprod.stupor;
-
+/*
 import java.io.File;
 import java.util.Properties;
 
@@ -12,10 +12,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
+*/
 public class Crash extends Thread {
 	@Override
 	public void run() {
+		/*
 		if(StateMachine.running) {
 			final String subject ="Crash Detected";
 			final String emailBody = "A crash has occured on a system with the properties: \n";
@@ -64,6 +65,6 @@ public class Crash extends Thread {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 }

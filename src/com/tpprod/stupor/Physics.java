@@ -14,8 +14,6 @@ import java.util.ArrayList;
 public class Physics implements Runnable {
 	
 	public Mob player = null;
-	public int playerStartingX = 1200;
-	public int playerStartingY = 1200;
 	public static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	public AI ai = new AI();
 	public World world;
@@ -312,8 +310,10 @@ public class Physics implements Runnable {
 			for (int x = (int) (entity.currentX / StateMachine.tileSize)
 					- physicsFogOfWar; x <= (int) (entity.currentX / StateMachine.tileSize) + physicsFogOfWar; x++) {
 				try {
-					if (world.worldGrid.get(y).get(x).type == 1) {
-						wallObjects.add(world.worldGrid.get(y).get(x));
+					if (x >= 0 && y >= 0) {
+						if (world.worldGrid.get(y).get(x).type == 1) {
+							wallObjects.add(world.worldGrid.get(y).get(x));
+						}
 					}
 				} catch (Exception e) {
 					// NON FATAL ERROR, do not report
@@ -383,8 +383,10 @@ public class Physics implements Runnable {
 			for (int x = (int) (proj.currentX / StateMachine.tileSize)
 					- physicsFogOfWar; x <= (int) (proj.currentX / StateMachine.tileSize) + physicsFogOfWar; x++) {
 				try {
-					if (world.worldGrid.get(y).get(x).type == 1) {
-						wallObjects.add(world.worldGrid.get(y).get(x));
+					if (x >= 0 && y >= 0) {
+						if (world.worldGrid.get(y).get(x).type == 1) {
+							wallObjects.add(world.worldGrid.get(y).get(x));
+						}
 					}
 				} catch (Exception e) {
 					StringWriter error = new StringWriter();
@@ -444,6 +446,7 @@ public class Physics implements Runnable {
 		data.playerCurrentY = player.currentY;
 		data.playerHealth = player.Health;
 		data.playerMana = player.Mana;
+		data.playerEXP = player.EXP;
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
@@ -460,8 +463,7 @@ public class Physics implements Runnable {
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
-			player.currentX = data.playerCurrentX;
-			player.currentY = data.playerCurrentY;
+			mobs.add(new Mob(data.playerCurrentX, data.playerCurrentY, 125, 50));
 			player.Health = data.playerHealth;
 			player.Mana = data.playerMana;
 			player.EXP = data.playerEXP;
@@ -486,8 +488,6 @@ public class Physics implements Runnable {
 
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
-			playerStartingX = data.playerCurrentX;
-			playerStartingY = data.playerCurrentY;
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -497,14 +497,12 @@ public class Physics implements Runnable {
 				
 			}
 		}
-		
-		mobs.add(new Mob(playerStartingX, playerStartingY, 125, 50));
 
 		for (int x = 1; x < 5; x++) {
 			mobs.add(new Mob( 100 * x, 0, 50,50));
 		}
-		player = mobs.get(0);
 		
+		player = mobs.get(0);
 		ai.AIs(mobs);
 		
 	}

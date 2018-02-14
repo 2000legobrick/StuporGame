@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -126,49 +127,69 @@ public class Render {
 				flipBool = !flipBool;
 			}
 		}
-	} 
+	}
+	
+	public int getClosestIndex(ArrayList<Point> pointList, Point p2) {
+		int closestIndex = 0, closestDistance = -1, currentDistance;
+		for (Point p1: pointList) {
+			currentDistance =  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
+			if (closestDistance == -1 || closestDistance > currentDistance) {
+				closestDistance = currentDistance;
+				closestIndex = pointList.indexOf(p1);
+			}
+		}
+		if (closestDistance < 100) 
+			return closestIndex;
+		return -1;
+	}
 	
 	public void RenderMenu(Graphics g, int width, int height) {
 		/*
 		 * The method RenderMenu renders out the menu for the game.
 		 */
+
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.BLUE);
 		g.fillRect(0, 0, width, height);
 		g.setColor(Color.RED);
-		g.drawString("testing awesome", 500, 500);
 
-		if (currentMouseX > 90 && currentMouseX < 210) {
-			if (currentMouseY > 90 && currentMouseY < 160) {
-				currentMenuPos = 0;
-			} else if (currentMouseY > 190 && currentMouseY < 260) {
-				currentMenuPos = 1;
-			} else if (currentMouseY > 290 && currentMouseY < 360) {
-				currentMenuPos = 2;
-			}
-		}
+		ArrayList<Point> menuPoints = new ArrayList<Point> ();
+		
+		for (int x = 0; x < 4; x++) 
+			menuPoints.add(new Point(150, 90 + (100 * x)));
+		
+		currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
 
 		if (currentMenuPos == 0) {
 			g.setColor(Color.RED);
-			g.drawString("Game", 100, 100);
+			g.drawString("New Game", 100, 100);
 		} else {
 			g.setColor(Color.GREEN);
-			g.drawString("Game", 100, 100);
+			g.drawString("New Game", 100, 100);
 		}
 
 		if (currentMenuPos == 1) {
 			g.setColor(Color.RED);
-			g.drawString("Settings", 100, 200);
+			g.drawString("Load Game", 100, 200);
 		} else {
 			g.setColor(Color.GREEN);
-			g.drawString("Settings", 100, 200);
+			g.drawString("Load Game", 100, 200);
 		}
 
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
-			g.drawString("Exit", 100, 300);
+			g.drawString("Settings", 100, 300);
 		} else {
 			g.setColor(Color.GREEN);
-			g.drawString("Exit", 100, 300);
+			g.drawString("Settings", 100, 300);
+		}
+		
+		if (currentMenuPos == 3) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 400);
+		} else {
+			g.setColor(Color.GREEN);
+			g.drawString("Exit", 100, 400);
 		}
 	}
 
@@ -301,10 +322,15 @@ public class Render {
 		int middleWidth = width / 2;
 		int middleHeight = height / 2;
 		int distanceFromCenter = 300;
+
+		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
+		
 		Dimension box = new Dimension(125,125);
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
 		for (int x = 0; x < 3; x++) {
+			upgradePoints.add(new Point((int) (middleWidth + distanceFromCenter*Math.cos(Math.toRadians(120*x))), 
+					(int) (middleHeight + distanceFromCenter*Math.sin(Math.toRadians(120*x)))));
 			g.setColor(Color.BLACK);
 			g2D.fillOval((int) (middleWidth + distanceFromCenter*Math.cos(Math.toRadians(120*x)) - box.width/2), 
 					(int) (middleHeight + distanceFromCenter*Math.sin(Math.toRadians(120*x)) - box.height/2),
@@ -314,17 +340,7 @@ public class Render {
 					(int) (middleHeight + distanceFromCenter*Math.sin(Math.toRadians(120*x)) - box.height/2),
 					box.width, box.height);
 		}
-		g.setColor(Color.WHITE);
-		g.drawLine(middleWidth, middleHeight, currentMouseX, currentMouseY);
-		double theta = Math.atan2((currentMouseY - middleHeight), (currentMouseX - middleWidth)) * 180 / Math.PI;
-		if (theta > -60 && theta < 60) {
-			currentMenuPos = 1;
-		} else if (theta > 60 && theta < 180) {
-			currentMenuPos = 2;
-		} else {
-			currentMenuPos = 3;
-		}
-		g.drawString(Double.toString(currentMenuPos), 100, 100);
+		currentMenuPos = getClosestIndex(upgradePoints, new Point(currentMouseX, currentMouseY));
 	}
 	
 	public void RenderHUD (Graphics g, Mob player, int width, int height) {
@@ -358,10 +374,6 @@ public class Render {
 				
 			}
 		}
-		// Render Center Lines
-		g.setColor(Color.MAGENTA);
-		g.drawLine(middleWidth, 0, middleWidth, height);
-		g.drawLine(0, middleHeight, width, middleHeight);
 		// Render EXP
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Impact", Font.PLAIN, 40));

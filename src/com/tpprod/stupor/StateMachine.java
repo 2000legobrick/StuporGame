@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 import java.awt.Canvas;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -128,141 +129,123 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				 * Switches actual game state based on current state
 				 */
 				//System.out.println(currentKeys);
-				switch (CurrentState) {
-					case GameState:
-		
-						// These are the actions that each key is tied to,
-						// the key that is referenced is found in-line with
-						// the if statement.
-	
-						if (currentKeys.indexOf(17) != -1) { // Ctrl key
-							physics.player.ResetMana();
-							physics.player.ResetHealth();
-						}
-						if (currentKeys.indexOf(27) != -1) { // Escape Key
-							physics.stop();
-							NextState = MenuState;
-						}
-						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
-							physics.player.Jump();
-						}
-						if (currentKeys.indexOf(16) != -1) {
-							if (currentKeys.indexOf(65) != -1) { // A Key
-								physics.mobMove(physics.player, 3, physics.player.speed);
+				if (CurrentState == NextState) {
+					switch (CurrentState) {
+						case GameState:
+			
+							// These are the actions that each key is tied to,
+							// the key that is referenced is found in-line with
+							// the if statement.
+							if (currentKeys.indexOf(17) != -1) { // Ctrl key
+								physics.player.ResetMana();
+								physics.player.ResetHealth();
 							}
-							if (currentKeys.indexOf(68) != -1) { // D Key
-								physics.mobMove(physics.player, 4, physics.player.speed);
+							if (currentKeys.indexOf(27) != -1) { // Escape Key
+								physics.stop();
+								NextState = MenuState;
 							}
-						} else {
-							if (currentKeys.indexOf(65) != -1) { // A Key
-								physics.mobMove(physics.player, 3, physics.player.speed*2/3);
+							if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
+								physics.player.Jump();
 							}
-							if (currentKeys.indexOf(68) != -1) { // D Key
-								physics.mobMove(physics.player, 4, physics.player.speed*2/3);
+							if (currentKeys.indexOf(16) != -1) {
+								if (currentKeys.indexOf(65) != -1) { // A Key
+									physics.mobMove(physics.player, 3, physics.player.speed);
+								}
+								if (currentKeys.indexOf(68) != -1) { // D Key
+									physics.mobMove(physics.player, 4, physics.player.speed);
+								}
+							} else {
+								if (currentKeys.indexOf(65) != -1) { // A Key
+									physics.mobMove(physics.player, 3, physics.player.speed*2/3);
+								}
+								if (currentKeys.indexOf(68) != -1) { // D Key
+									physics.mobMove(physics.player, 4, physics.player.speed*2/3);
+								}
 							}
-						}
-						if (currentKeys.indexOf(83) != -1) { // S Key
-						}
-						if (currentKeys.indexOf(90) != -1) { // Z Key
-                            physics.pickUpItem(physics.player);
-						}
-						if (currentKeys.indexOf(88) != -1) { // X key
-							physics.player.HurtMob(1);
-						}
-						if (currentKeys.indexOf(192) != -1) { // Tilde Key
-							physics.stop();
-							NextState = UpgradeState;
-							CurrentState = UpgradeState;
-							try {
-								Thread.sleep(200);
-							} catch (InterruptedException e) {}
-						}
-                        if (currentKeys.indexOf(72) != -1) { // H key
-                            if(physics.player.inventory.currentItems.size() != 0)
-                                physics.player.useItem(physics.player.inventory.currentItems.get(0));
-						}
-						if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
-							for (Mob entity : physics.mobs) {
-								physics.Dampening(entity);
+							if (currentKeys.indexOf(83) != -1) { // S Key
 							}
-						}
-						if (tick % physics.player.ManaRefreshTimer == 0) {
-							if (physics.player.Mana < physics.player.MaxMana)
-								physics.player.Mana++;
-						}
-					case MenuState:
-						if (currentKeys.indexOf(87) != -1) { // W Key
-							render.currentMenuPos -= 1;
-							currentKeys.remove(currentKeys.indexOf(87));
-						}
-						if (currentKeys.indexOf(83) != -1) { // S Key
-							render.currentMenuPos += 1;
-							currentKeys.remove(currentKeys.indexOf(83));
-						}
-						if (currentKeys.indexOf(38) != -1) { // Up Arrow
-							render.currentMenuPos -= 1;
-							currentKeys.remove(currentKeys.indexOf(38));
-						}
-						if (currentKeys.indexOf(40) != -1) { // Down Arrow
-							render.currentMenuPos += 1;
-							currentKeys.remove(currentKeys.indexOf(40));
-						}
-						if (render.currentMenuPos > 2) {
-							render.currentMenuPos = 2;
-						} else if (render.currentMenuPos < 0) {
-							render.currentMenuPos = 0;
-						}
-						if (currentKeys.indexOf(10) != -1) { // Enter Key
-							if (render.currentMenuPos == 0) {
-								NextState = GameState;
-								physics.start();
-							} else if (render.currentMenuPos == 2) {
+							if (currentKeys.indexOf(90) != -1) { // Z Key
+		                           physics.pickUpItem(physics.player);
+							}
+							if (currentKeys.indexOf(88) != -1) { // X key
+								physics.player.HurtMob(1);
+							}
+							if (currentKeys.indexOf(192) != -1) { // Tilde Key
+								physics.stop();
+								NextState = UpgradeState;
+								try {
+									Thread.sleep(50);
+								} catch (InterruptedException e) {}
+							}
+		                       if (currentKeys.indexOf(72) != -1) { // H key
+		                           if(physics.player.inventory.currentItems.size() != 0)
+		                               physics.player.useItem(physics.player.inventory.currentItems.get(0));
+							}
+							if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
+								for (Mob entity : physics.mobs) {
+									physics.Dampening(entity);
+								}
+							}
+							if (tick % physics.player.ManaRefreshTimer == 0) {
+								if (physics.player.Mana < physics.player.MaxMana)
+									physics.player.Mana++;
+							}
+							break;
+						case MenuState:
+							if (render.currentMenuPos > 2) {
+								render.currentMenuPos = 2;
+							} else if (render.currentMenuPos < 0) {
+								render.currentMenuPos = 0;
+							}
+							if (currentKeys.indexOf(10) != -1) { // Enter Key
+								if (render.currentMenuPos == 0) {
+									NextState = GameState;
+									physics.start();
+								} else if (render.currentMenuPos == 2) {
 								this.stop();
-							}
-						}
-					case UpgradeState:
-						if (currentKeys.indexOf(10) != -1) { // EnterKey
-							if (render.currentMenuPos == 1) {
-								if (physics.player.EXP >= 5) {
-									physics.player.EXP -= 5;
-									physics.player.jumpAmount++;
-									currentKeys.remove(currentKeys.indexOf(10));
-									try {
-										Thread.sleep(100);
-									} catch (InterruptedException e) {}
 								}
 							}
-							if (render.currentMenuPos == 2) {
-								if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
-									physics.player.EXP -= 5;
-									physics.player.ManaRefreshTimer -= 5;
-									currentKeys.remove(currentKeys.indexOf(10));
-									try {
-										Thread.sleep(100);
-									} catch (InterruptedException e) {}
+							break;
+						case UpgradeState:
+							if (currentKeys.indexOf(27) != -1) { // Escape Key
+								physics.start();
+								NextState = GameState;
+							}
+							if (currentKeys.indexOf(10) != -1) { // EnterKey
+								if (render.currentMenuPos == 0) {
+									if (physics.player.EXP >= 5) {
+										physics.player.EXP -= 5;
+										physics.player.jumpAmount++;
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {}
+									}
+								}
+								if (render.currentMenuPos == 1) {
+									if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
+										physics.player.EXP -= 5;
+										physics.player.ManaRefreshTimer -= 5;
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {}
+									}
+								}
+								if (render.currentMenuPos == 2) {
+									if (physics.player.EXP >= 5) {
+										physics.player.EXP -= 5;
+										physics.player.MaxHealth++;
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {}
+									}
 								}
 							}
-							if (render.currentMenuPos == 3) {
-								if (physics.player.EXP >= 5) {
-									physics.player.EXP -= 5;
-									physics.player.jumpAmount++;
-									currentKeys.remove(currentKeys.indexOf(10));
-									try {
-										Thread.sleep(100);
-									} catch (InterruptedException e) {}
-								}
-							}
-						}
-						if (currentKeys.indexOf(192) != -1) { // Tilde Key
-							physics.start();
-							NextState = GameState;
-							CurrentState = GameState;
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {}
-						}
+							break;
 					}
-				
+				}
 
 				// Beautiful ticks are ticking!!!
 				tick++;
@@ -309,7 +292,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
 			// If no BufferStrategy is found, create another one that buffers 2 frames ahead
-			createBufferStrategy(2);
+			createBufferStrategy(3);
 			requestFocus();
 			return;
 		}
@@ -351,12 +334,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * 	the game runs on.
 		 */
 
-//		Dimension dimension = new Dimension(WIDTH, HEIGHT);
-//		this.setMaximumSize(dimension);
-//		this.setMinimumSize(dimension);
-//		this.setPreferredSize(dimension);
-//		this.setSize(dimension);
-//		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+		Dimension dimension = new Dimension(WIDTH, HEIGHT);
+		this.setMaximumSize(dimension);
+		this.setMinimumSize(dimension);
+		this.setPreferredSize(dimension);
+		this.setSize(dimension);
+		frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		
 		
 		// The second chunk adds the canvas to a JFrame in order to display everything onto 
@@ -371,7 +354,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		device.setFullScreenWindow(frame);
+		//device.setFullScreenWindow(frame);
 		if (!running) {
 			running = true;
 			new Thread(this).start();
@@ -493,13 +476,45 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		if (render.currentMenuPos == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
 			physics.start();
-		} else if(render.currentMenuPos == 2 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.currentMenuPos == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+			NextState = GameState;
+			physics.start();
+		} else if(render.currentMenuPos == 3 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			stop();
 		}
 		if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON1) {
 			physics.player.Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
 		} else if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON3) {
 			physics.player.Attack();
+		}
+		if (CurrentState == UpgradeState && arg0.getButton() == MouseEvent.BUTTON1) {
+			if (render.currentMenuPos == 0) {
+				if (physics.player.EXP >= 5) {
+					physics.player.EXP -= 5;
+					physics.player.jumpAmount++;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
+			if (render.currentMenuPos == 1) {
+				if (physics.player.EXP >= 5 && physics.player.ManaRefreshTimer > 5) {
+					physics.player.EXP -= 5;
+					physics.player.ManaRefreshTimer -= 5;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
+			if (render.currentMenuPos == 2) {
+				if (physics.player.EXP >= 5) {
+					physics.player.EXP -= 5;
+					physics.player.MaxHealth++;
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {}
+				}
+			}
 		}
 	}
 

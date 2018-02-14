@@ -23,7 +23,7 @@ public class ColorSchemes {
 
 		try {
 			GroundTile = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
-			Background = ImageIO.read(new File("./Content/Textures/cave.png"));
+			Background = ImageIO.read(new File("./Content/Textures/Plains.png"));
 			Player = ImageIO.read(new File("./Content/Textures/Player.png"));
 			PlayerArm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
 		} catch (IOException e) {

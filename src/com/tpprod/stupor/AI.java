@@ -12,19 +12,36 @@ public class AI{
 	private ArrayList<Mob> mobsAi = new ArrayList<Mob>();
 	
 	public void AIs(ArrayList<Mob> mobs){
-		mobsAi = (ArrayList<Mob>) mobs.subList(1, mobs.size());
+		//mobsAi = (ArrayList<Mob>) mobs.subList(1, mobs.size());
 	}
 	
 	public AI() {
 		
 	}
 	
-	public void Move (World world, Mob player) {
+	public void Move(World world, Mob player) {
 		for(Mob mob: mobsAi) {
+			Point pointL1 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY + StateMachine.tileSize);
+			Point pointL2 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY);
+			Point pointL3 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
+			Point pointR1 = new Point(mob.currentX + StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
+			Point pointR2 = new Point(mob.currentX, mob.currentY - StateMachine.tileSize);
+			Point pointR3 = new Point(mob.currentX - StateMachine.tileSize, mob.currentY - StateMachine.tileSize);
+
+			mob.L1 = PointIntersection(pointL1, world); 
+			mob.L2 = PointIntersection(pointL2, world); 
+			mob.L3 = PointIntersection(pointL3, world); 
+			mob.R1 = PointIntersection(pointR1, world); 
+			mob.R2 = PointIntersection(pointR2, world); 
+			mob.R3 = PointIntersection(pointR3, world); 
 			
-			double distance = getDistance(new Point(mob.currentX, mob.currentY), new Point (player.currentX, player.currentY));
+			double distanceToPlayer = getDistance(new Point(mob.currentX, mob.currentY), new Point (player.currentX, player.currentY));
 			
-			//if (distance <= StateMachine.tileSize * 6)
+			if (distanceToPlayer <= StateMachine.tileSize * 6) {
+				if (player.currentX > mob.currentX) {
+					mob.velocityX = mob.speed;
+				}
+			}
 		}
 	}
 	

@@ -163,7 +163,7 @@ public class Mob {
 		 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
 		 * northern direction) and sets jump to 1 if jump is 0 initially.
 		 */
-		if (jump > 0) {
+		if (jump > 0 && velocityY >= 0) {
 			velocityY = -maxJump;
 			jump--;
 		}
