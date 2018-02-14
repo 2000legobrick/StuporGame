@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 public class Physics implements Runnable {
 	
+	public static int GRAVITY = 3;
+	
 	private Mob player = null;
 	private static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	private AI ai = new AI();
@@ -21,8 +23,6 @@ public class Physics implements Runnable {
 	private int physicsFogOfWar = 2;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
-
-	private int GRAVITY = 3;
 
 	public void Gravity() {
 		/*
@@ -58,7 +58,9 @@ public class Physics implements Runnable {
 			}
 		}
 		for (Integer i:removeList) {
-			mobs.remove((int) i);
+			try {
+				mobs.remove((int) i);
+			} catch(Exception e) {}
 		}
 	}
 
@@ -91,7 +93,7 @@ public class Physics implements Runnable {
 					MoveToWall(entity, 1);
 				}
 			} else {
-				// If the velocity is greater than max velocity then cap it off at maxvelocity
+				// If the velocity is greater than max velocity then cap it off at maxVelocity
 				if (entity.getVelocityY() > entity.getMaxVelocity()) {
 					entity.setVelocityY(entity.getMaxVelocity());
 				}
@@ -144,7 +146,7 @@ public class Physics implements Runnable {
 			ArrayList<Integer> removeIndex = new ArrayList<Integer>();
 			try {
 				if (!entity.getProjectileList().isEmpty()) {
-				for (Projectile proj: entity.getProjectileList()) {
+					for (Projectile proj: entity.getProjectileList()) {
 						if (proj.getTimer() == 0) {
 							proj.setPreviousX(proj.getCurrentX());
 							proj.setPreviousY(proj.getCurrentY());
@@ -415,25 +417,26 @@ public class Physics implements Runnable {
 	}
 	
 	public boolean MobIntersection (Projectile proj, int type) {
-		for (int x = 1; x < mobs.size(); x++) {
-			Mob entity = mobs.get(x);
-			if (proj.getType() == Projectile.getArm()) {
-				if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()).intersects(
-						new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(), proj.getHeight()))) {
-					entity.setHealth(entity.getHealth() - proj.getDamage());
-					if (player.getProjectileList().contains(proj)) {
-						player.setEXP(player.getEXP() + 1);
+		for (Mob entity:mobs) {
+			if (!entity.getProjectileList().contains(proj)) {
+				if (proj.getType() == Projectile.getArm()) {
+					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()).intersects(
+							new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(), proj.getHeight()))) {
+						entity.setHealth(entity.getHealth() - proj.getDamage());
+						if (player.getProjectileList().contains(proj)) {
+							player.setEXP(player.getEXP() + 1);
+						}
+						return true;
 					}
-					return true;
-				}
-			} else if (proj.getType() == Projectile.getBullet()) {
-				Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(), proj.getCurrentY());
-				if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()))) {
-					entity.setHealth(entity.getHealth() - proj.getDamage());
-					if (player.getProjectileList().contains(proj)) {
-						player.setEXP(player.getEXP() + 1);
+				} else if (proj.getType() == Projectile.getBullet()) {
+					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(), proj.getCurrentY());
+					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()))) {
+						entity.setHealth(entity.getHealth() - proj.getDamage());
+						if (player.getProjectileList().contains(proj)) {
+							player.setEXP(player.getEXP() + 1);
+						}
+						return true;
 					}
-					return true;
 				}
 			}
 		}
@@ -446,6 +449,7 @@ public class Physics implements Runnable {
 		data.setPlayerCurrentY(player.getCurrentY());
 		data.setPlayerHealth(player.getHealth());
 		data.setPlayerMana(player.getMana());
+		data.setPlayerEXP(player.getEXP());
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
@@ -461,12 +465,14 @@ public class Physics implements Runnable {
 	
 	public void Load() {
 		try {
+			System.out.println("HEY");
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
+			System.out.println("HEY0");
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -485,9 +491,12 @@ public class Physics implements Runnable {
 		 * Currently we are using this to create enemy mobs, and the player entity.
 		 * 	We also set the player entity to the first index of the mobs ArrayList
 		 */
+		
+		mobs.add(new Mob( 0, 0, 100,50));
+		player = mobs.get(0);
 
 		try {
-			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			Load();
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -502,8 +511,7 @@ public class Physics implements Runnable {
 			mobs.add(new Mob( 100 * x, 0, 50,50));
 		}
 		
-		player = mobs.get(0);
-		ai.AIs(mobs);
+		ai.setMobAIList(mobs);
 		
 	}
 	

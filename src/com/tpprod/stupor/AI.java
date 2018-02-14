@@ -11,8 +11,10 @@ public class AI{
 	
 	private ArrayList<Mob> mobsAi = new ArrayList<Mob>();
 	
-	public void AIs(ArrayList<Mob> mobs){
-		//mobsAi = (ArrayList<Mob>) mobs.subList(1, mobs.size());
+	public void setMobAIList(ArrayList<Mob> mobs){
+		 mobsAi = new ArrayList<Mob>();
+		for (int x = 1; x < mobs.size(); x++)
+			mobsAi.add(mobs.get(x));
 	}
 	
 	public AI() {
@@ -24,9 +26,9 @@ public class AI{
 			Point pointL1 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() + StateMachine.getTileSize());
 			Point pointL2 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY());
 			Point pointL3 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
-			Point pointR1 = new Point(mob.getCurrentX() + StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
-			Point pointR2 = new Point(mob.getCurrentX(), mob.getCurrentY() - StateMachine.getTileSize());
-			Point pointR3 = new Point(mob.getCurrentX() - StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
+			Point pointR1 = new Point(mob.getCurrentX() + StateMachine.getTileSize(), mob.getCurrentY() + StateMachine.getTileSize());
+			Point pointR2 = new Point(mob.getCurrentX() + StateMachine.getTileSize(), mob.getCurrentY());
+			Point pointR3 = new Point(mob.getCurrentX() + StateMachine.getTileSize(), mob.getCurrentY() - StateMachine.getTileSize());
 
 			mob.setL1(PointIntersection(pointL1, world)); 
 			mob.setL2(PointIntersection(pointL2, world)); 
@@ -37,11 +39,27 @@ public class AI{
 			
 			double distanceToPlayer = getDistance(new Point(mob.getCurrentX(), mob.getCurrentY()), new Point (player.getCurrentX(), player.getCurrentY()));
 			
-			if (distanceToPlayer <= StateMachine.getTileSize() * 6) {
+			if (distanceToPlayer <= StateMachine.getTileSize() * 6 && distanceToPlayer >= StateMachine.getTileSize()) {
 				if (player.getCurrentX() > mob.getCurrentX()) {
-					mob.setVelocityX(mob.getSpeed());
+					mob.setVelocityX(mob.getSpeed()/2);
+					if (mob.isR2()) {
+						mob.Jump();
+					}
+				} else if (player.getCurrentX() < mob.getCurrentX()) {
+					mob.setVelocityX(-mob.getSpeed()/2);
+					if (mob.isL2()) {
+						mob.Jump();
+					}
+				} else {
+					mob.setVelocityX(0);
+				}
+				if (mob.getProjectileList().isEmpty()) {
+					double velX = (mob.getCurrentX() - player.getCurrentX()) / 2;
+					double velY = (mob.getCurrentY() - player.getCurrentY() - (Physics.GRAVITY * 2) / 2);
+					mob.Shoot(velX, velY);
 				}
 			}
+			
 		}
 	}
 	
@@ -50,10 +68,11 @@ public class AI{
 	}
 	
 	public boolean PointIntersection (Point point, World world) {
-		
-		if (world.worldGrid.get(point.x / StateMachine.getTileSize()).get(point.y / StateMachine.getTileSize()).getType() != 0) {
-			return true;
-		}
+		try {
+			if (world.worldGrid.get(point.y / StateMachine.getTileSize()).get(point.x / StateMachine.getTileSize()).getType() != 0) {
+				return true;
+			}
+		} catch (Exception e) {}
 		return false;
 	}
 }

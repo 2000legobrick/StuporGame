@@ -7,6 +7,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -29,8 +31,8 @@ public class Mob {
 			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
 	private Inventory inventory = new Inventory();
 	
-	private final int spriteWidth = 10, spriteHeight = 10;
-	private final int rows = 10, cols = 10;
+	private final int spriteWidth = 12, spriteHeight = 32;
+	private final int rows = 1, cols = 5;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
 	private int currentFrame = 0;
 	
@@ -43,24 +45,28 @@ public class Mob {
 		height = tempHeight;
 		width = tempWidth;
 		try {
-			image = ImageIO.read(new File("./Content/Textures/PlayerSpriteSheet.png"));
-			arm = ImageIO.read(new File("./Content/Textures/PlayerArm.png"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
 
-		for (int i = 0; i < cols; i++)
-		{
-		    for (int j = 0; j < rows; j++)
-		    {
-		        sprites[(i * rows) + j] = image.getSubimage(
-		            i * spriteWidth,
-		            j * spriteHeight,
-		            spriteWidth,
-		            spriteHeight
-		        );
-		    }
+			for (int i = 0; i < cols; i++)
+			{
+			    for (int j = 0; j < rows; j++)
+			    {
+			        sprites[(i * rows) + j] = image.getSubimage(
+			            i * spriteWidth,
+			            j * spriteHeight,
+			            spriteWidth,
+			            spriteHeight
+			        );
+			    }
+			}
+		} catch (IOException e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+				
+			}
 		}
 		ResetHealth();
 		ResetMana();
@@ -78,13 +84,6 @@ public class Mob {
 			tx.translate(-image.getWidth(null), 0);
 			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 			image = op.filter(image, null);
-			FacingLeft = false;
-		} else {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
-			FacingLeft = true;
 		}
 	}
 	
@@ -132,6 +131,14 @@ public class Mob {
 				projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
 			} 
 			Mana -= 5;
+		}
+	}
+	
+	public void Shoot(double velX, double velY) {
+		if (Mana >= 10) {
+			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
+					(int) velX, (int) velY, projectileSize));
+			Mana -= 10;
 		}
 	}
 	

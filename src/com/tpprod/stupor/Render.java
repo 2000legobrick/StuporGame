@@ -100,11 +100,8 @@ public class Render {
 					RenderMenu(g, width,height);
 					bgMusic.stop();
 			}else if(CurrentState == PauseState) {
-					
+					RenderPause(g, width, height);
 			}else if(CurrentState == UpgradeState) {
-					RenderBackground(g, width, height, player);
-					RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
-					RenderHUD(g, player, width, height);
 					RenderUpgrade(g, width, height);
 			}else if(CurrentState == DeadState) {
 					
@@ -115,6 +112,48 @@ public class Render {
 		}
 	}
 	
+	private void RenderPause(Graphics g, int width, int height) {
+		/*
+		 * The method RenderPause renders out the pause menu for the game.
+		 */
+
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.setColor(new Color(0,0,0,150));
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.RED);
+
+		ArrayList<Point> menuPoints = new ArrayList<Point> ();
+		
+		for (int x = 0; x < 4; x++) 
+			menuPoints.add(new Point(150, 90 + (100 * x)));
+		
+		currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
+
+		if (currentMenuPos == 0) {
+			g.setColor(Color.RED);
+			g.drawString("Resume", 100, 100);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Resume", 100, 100);
+		}
+
+		if (currentMenuPos == 1) {
+			g.setColor(Color.RED);
+			g.drawString("Save", 100, 200);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Save", 100, 200);
+		}
+
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Main Menu", 100, 300);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 300);
+		}
+	}
+
 	public void RenderBackground(Graphics g, int width, int height, Mob player) {
 		/*
 		 * The method RenderBackground renders out the backdrop of the game.
@@ -151,7 +190,7 @@ public class Render {
 		 */
 
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
-		g.setColor(Color.BLUE);
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 		g.setColor(Color.RED);
 
@@ -166,7 +205,7 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("New Game", 100, 100);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("New Game", 100, 100);
 		}
 
@@ -174,7 +213,7 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("Load Game", 100, 200);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("Load Game", 100, 200);
 		}
 
@@ -182,7 +221,7 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("Settings", 100, 300);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("Settings", 100, 300);
 		}
 		
@@ -190,7 +229,7 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("Exit", 100, 400);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("Exit", 100, 400);
 		}
 	}
@@ -254,11 +293,6 @@ public class Render {
 			// rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width,
 			// rect.rect.height);
 			if (rect.getImage() != null) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-palette.getPlayer().getWidth(null), 0);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-				palette.setPlayer(op.filter(palette.getPlayer(), null));
-		
 				g.drawImage(rect.getImage(), rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2, rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height, null);
 			} else {
 				g.setColor(rect.getColor());

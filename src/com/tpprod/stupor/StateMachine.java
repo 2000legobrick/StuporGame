@@ -39,7 +39,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private static final int PauseState   = 2;
 	private static final int UpgradeState = 3;
 	private static final int DeadState    = 4;
-	private static final int LoadState    = 4;
+	private static final int LoadState    = 5;
 
 	private static int CurrentState = MenuState;
 
@@ -142,7 +142,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
 							physics.stop();
-							NextState = MenuState;
+							NextState = PauseState;
+							CurrentState = PauseState;
 						}
 						if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
 							physics.getPlayer().Jump();
@@ -150,16 +151,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(16) != -1) {
 							if (currentKeys.indexOf(65) != -1) { // A Key
 								physics.mobMove(physics.getPlayer(), 3, physics.getPlayer().getSpeed());
+								physics.getPlayer().FaceLeft();
 							}
 							if (currentKeys.indexOf(68) != -1) { // D Key
 								physics.mobMove(physics.getPlayer(), 4, physics.getPlayer().getSpeed());
+								physics.getPlayer().FaceRight();
 							}
 						} else {
 							if (currentKeys.indexOf(65) != -1) { // A Key
 								physics.mobMove(physics.getPlayer(), 3, physics.getPlayer().getSpeed()*2/3);
+								physics.getPlayer().FaceLeft();
 							}
 							if (currentKeys.indexOf(68) != -1) { // D Key
 								physics.mobMove(physics.getPlayer(), 4, physics.getPlayer().getSpeed()*2/3);
+								physics.getPlayer().FaceRight();
 							}
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
@@ -173,10 +178,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(192) != -1) { // Tilde Key
 							physics.stop();
 							NextState = UpgradeState;
-							CurrentState = UpgradeState;
-							try {
-								Thread.sleep(200);
-							} catch (InterruptedException e) {}
 						}
                         if (currentKeys.indexOf(72) != -1) { // H key
                             if(physics.getPlayer().getInventory().getCurrentItems().size() != 0)
@@ -190,7 +191,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
 							if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
 								physics.getPlayer().setMana(physics.getPlayer().getMana()+1);
+							physics.getPlayer().NextFrame();
 						}
+						break;
 					case MenuState:
 						if (currentKeys.indexOf(87) != -1) { // W Key
 							render.setCurrentMenuPos(render.getCurrentMenuPos()-1);
@@ -221,6 +224,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 								this.stop();
 							}
 						}
+						break;
 					case UpgradeState:
 						if (currentKeys.indexOf(10) != -1) { // EnterKey
 							if (render.getCurrentMenuPos() == 1) {
@@ -252,29 +256,26 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 										Thread.sleep(100);
 									} catch (InterruptedException e) {}
 								}
-								if (render.getCurrentMenuPos() == 1) {
-									if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
-										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-										physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer()-5);
-										currentKeys.remove(currentKeys.indexOf(10));
-										try {
-											Thread.sleep(100);
-										} catch (InterruptedException e) {}
-									}
-								}
-								if (render.getCurrentMenuPos() == 2) {
-									if (physics.getPlayer().getEXP() >= 5) {
-										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-										physics.getPlayer().setMaxHealth(physics.getPlayer().getMaxHealth() + 1);
-										currentKeys.remove(currentKeys.indexOf(10));
-										try {
-											Thread.sleep(100);
-										} catch (InterruptedException e) {}
-									}
-								}
 							}
-							break;
-					}
+						}
+						if (currentKeys.indexOf(27) != -1) { // Escape Key
+							NextState = PauseState;
+							CurrentState = PauseState;
+						}
+						break;
+					case PauseState:
+						if (currentKeys.indexOf(10) != -1) { // EnterKey
+							if (render.getCurrentMenuPos() == 0) {
+								physics.start();
+								CurrentState = GameState;
+								NextState = GameState;
+							} else if (render.getCurrentMenuPos() == 1) {
+								physics.Save();
+							} else if (render.getCurrentMenuPos() == 2) {
+								NextState = MenuState;
+							}
+						}
+						break;
 				}
 
 				// Beautiful ticks are ticking!!!
@@ -483,11 +484,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public void mouseMoved(MouseEvent arg0) {
 		render.setCurrentMouseX(arg0.getX());
 		render.setCurrentMouseY(arg0.getY());
-		if (CurrentState == GameState && arg0.getX() > getWidth() / 2) {
-			physics.getPlayer().FaceRight();
-		} else if (CurrentState == GameState && arg0.getX() <= getWidth() / 2) {
-			physics.getPlayer().FaceLeft();
-		}
 	}
 
 	@Override
@@ -546,6 +542,17 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						Thread.sleep(100);
 					} catch (InterruptedException e) {}
 				}
+			}
+		}
+		if (CurrentState == PauseState && arg0.getButton() == MouseEvent.BUTTON1) {
+			if (render.getCurrentMenuPos() == 0) {
+				physics.start();
+				CurrentState = GameState;
+				NextState = GameState;
+			} else if (render.getCurrentMenuPos() == 1) {
+				physics.Save();
+			} else if (render.getCurrentMenuPos() == 2) {
+				NextState = MenuState;
 			}
 		}
 	}
