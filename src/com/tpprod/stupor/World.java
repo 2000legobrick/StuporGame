@@ -13,9 +13,9 @@ import java.util.Arrays;
 
 public class World {
 
-	public ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
+	private ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
 	 
-	  public Inventory inventory = new Inventory();
+	private Inventory inventory = new Inventory();
 	 
 
 	public World() {
@@ -65,5 +65,13 @@ public class World {
 			}
 		}
 		bR.close();
+	}
+	
+	public Inventory getWorldInventory() {
+		return inventory;
+	}
+	
+	public ArrayList<ArrayList<NewRectangle>> getWorldGrid() {
+		return worldGrid;
 	}
 }

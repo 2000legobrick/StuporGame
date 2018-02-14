@@ -203,7 +203,7 @@ public class Physics implements Runnable {
 		Item closestItem = null;
 		double closestDistance = 100;
 		double tempDistance;
-		for (Item i:world.inventory.getCurrentItems()) {
+		for (Item i:world.getWorldInventory().getCurrentItems()) {
 			tempDistance = getDistanceTo(new Point (entity.getCurrentX(), entity.getCurrentY()), new Point(i.itemX, i.itemY));
 			if (tempDistance < closestDistance) {
 				closestDistance = tempDistance;
@@ -211,8 +211,18 @@ public class Physics implements Runnable {
 			}
 		}
 		if (closestItem != null) {
-			entity.addItem(closestItem);
-			world.inventory.removeInventoryItem(closestItem);
+			try {
+				if (entity.getInventory().getCurrentMobItems().length < 5) {
+					entity.addItem(closestItem);
+					world.getWorldInventory().removeInventoryItem(closestItem);
+				}
+			} catch(Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				} catch (Exception e1) {}
+			}
 		}
 	}
 	
@@ -313,8 +323,8 @@ public class Physics implements Runnable {
 					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
-						if (world.worldGrid.get(y).get(x).getType() == 1) {
-							wallObjects.add(world.worldGrid.get(y).get(x));
+						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
+							wallObjects.add(world.getWorldGrid().get(y).get(x));
 						}
 					}
 				} catch (Exception e) {
@@ -386,8 +396,8 @@ public class Physics implements Runnable {
 					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
-						if (world.worldGrid.get(y).get(x).getType() == 1) {
-							wallObjects.add(world.worldGrid.get(y).get(x));
+						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
+							wallObjects.add(world.getWorldGrid().get(y).get(x));
 						}
 					}
 				} catch (Exception e) {
@@ -522,6 +532,8 @@ public class Physics implements Runnable {
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
+		
+		Load();
 		
 		while (running) {
 			double current = System.nanoTime();
