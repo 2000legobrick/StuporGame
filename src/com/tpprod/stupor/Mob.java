@@ -7,6 +7,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -28,10 +30,14 @@ public class Mob {
 	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
 			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
 	private Inventory inventory = new Inventory();
+	private HealthRegen healthRegen = new HealthRegen();
 	
 	private final int spriteWidth = 10, spriteHeight = 10;
 	private final int rows = 10, cols = 10;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
+	private BufferedImage[] runningSprites = new BufferedImage[10 * 2];
+	private BufferedImage[] walkingSprites = new BufferedImage[10 * 2];
+	private BufferedImage[] idleSprites = new BufferedImage[10 * 2];
 	private int currentFrame = 0;
 	
 	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
@@ -179,23 +185,60 @@ public class Mob {
 
 	public void useItem(Item item) {
 		String itemType = item.name;
-		if (inventory.getCurrentItems().size() != 0) {
-			if (itemType == "health") {
-				healthUp(1);
-				inventory.removeInventoryItem(item);
+		try {
+			if(Health < MaxHealth) {
+				if (itemType == "health") {
+					healthUp(1);
+					inventory.removeMobInventoryItem(item);
+				} else if (itemType == "healthRegen") {
+					healthRegen.start();
+					inventory.removeMobInventoryItem(item);
+				}
+			}
+		} catch(Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {}
+		}
+	}
+	
+	public void useItem(int index) {
+		if (inventory.currentMobItems.length >= index) {
+			try {
+				Item item = inventory.currentMobItems[index];
+				String itemType = item.name;
+				if (itemType == "health") {
+					healthUp(1);
+					inventory.removeMobInventoryItem(item);
+				} else if (itemType == "healthRegen") {
+					healthRegen.start();
+					inventory.removeMobInventoryItem(item);
+				}
+			} catch(Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				} catch (Exception e1) {}
 			}
 		}
 	}
 
 	public void addItem(Item item) {
-		inventory.addInventoryItem(item);
+		inventory.addMobInventoryItem(item);
 	}
 
 	public void removeItem(Item item) {
 		try {
-			inventory.removeInventoryItem(item);
+			inventory.removeMobInventoryItem(item);
 		} catch (Exception e) {
-			e.printStackTrace();
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			} catch (Exception e1) {}
 		}
 	}
 
@@ -203,6 +246,10 @@ public class Mob {
 		return inventory.getCurrentItems();
 	}
 
+	public Item[] readMobItems() {
+		return inventory.getCurrentMobItems();
+	}
+	
 	public boolean getWallSlide() {
 		return wallSlide;
 	}

@@ -51,7 +51,7 @@ public class AI{
 	
 	public boolean PointIntersection (Point point, World world) {
 		
-		if (world.worldGrid.get(point.x / StateMachine.getTileSize()).get(point.y / StateMachine.getTileSize()).getType() != 0) {
+		if (world.getWorldGrid().get(point.x / StateMachine.getTileSize()).get(point.y / StateMachine.getTileSize()).getType() != 0) {
 			return true;
 		}
 		return false;

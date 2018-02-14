@@ -14,6 +14,7 @@ public class AudioFile implements LineListener{
     private Clip clip;
     private FloatControl gainControl;
     private volatile boolean playing;
+    public float audioVolume = -5;
 
     public AudioFile(String fileName) {
         soundFile = new File(fileName);
@@ -39,7 +40,7 @@ public class AudioFile implements LineListener{
     }
 
     public void play(){
-        play(-10);
+        play(audioVolume);
     }
 
     public void play(float volume) {
@@ -53,6 +54,10 @@ public class AudioFile implements LineListener{
         playing = false;
     }
 
+    public boolean isPlaying() {
+        return playing;
+    }
+
     @Override
     public void update(LineEvent event) {
         if(event.getType() == LineEvent.Type.START)
@@ -63,9 +68,5 @@ public class AudioFile implements LineListener{
             clip.setFramePosition(0);
             playing = false;
         }
-    }
-    
-    public boolean isPlaying() {
-        return playing;
     }
 }

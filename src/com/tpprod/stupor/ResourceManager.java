@@ -19,7 +19,6 @@ public class ResourceManager {
 				
 			}
 		}
-		//System.out.println(Paths.get(fileName));
 	}
 
 	public static Object Load(String fileName) throws Exception {

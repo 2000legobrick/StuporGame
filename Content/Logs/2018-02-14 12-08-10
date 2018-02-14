@@ -1,0 +1,15 @@
+2018-02-14 12-08-10
+ Game Start
+2018-02-14 12-08-20
+ Game End
+2018-02-14 12-08-20
+ java.lang.IllegalStateException: Component must have a valid peer
+	at java.awt.Component$FlipBufferStrategy.getBackBuffer(Unknown Source)
+	at java.awt.Component$FlipBufferStrategy.updateInternalBuffers(Unknown Source)
+	at java.awt.Component$FlipBufferStrategy.revalidate(Unknown Source)
+	at java.awt.Component$FlipBufferStrategy.revalidate(Unknown Source)
+	at java.awt.Component$FlipBufferStrategy.getDrawGraphics(Unknown Source)
+	at com.tpprod.stupor.StateMachine.render(StateMachine.java:332)
+	at com.tpprod.stupor.StateMachine.run(StateMachine.java:287)
+	at java.lang.Thread.run(Unknown Source)
+
