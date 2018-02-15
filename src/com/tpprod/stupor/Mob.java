@@ -21,9 +21,12 @@ import javax.imageio.ImageIO;
 public class Mob {
 
 	private ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
+	private BufferedImage runningSpriteSheet = null;
+	private BufferedImage walkingSpriteSheet = null;
+	private BufferedImage idleSpriteSheet = null;
 	private BufferedImage image = null;
 	private BufferedImage arm = null;
-	private boolean wallSlide, Agro, FacingLeft = false;
+	private boolean wallSlide, FacingLeft = false;
 	private boolean L1, L2, L3, R1, R2, R3;
 	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width,
 			EXP;
@@ -33,11 +36,9 @@ public class Mob {
 	private HealthRegen healthRegen = new HealthRegen();
 
 	private final int spriteWidth = 12, spriteHeight = 32;
-	private final int rows = 1, cols = 5;
-	private BufferedImage[] sprites = new BufferedImage[rows * cols];
-	private BufferedImage[] runningSprites = new BufferedImage[10 * 2];
-	private BufferedImage[] walkingSprites = new BufferedImage[10 * 2];
-	private BufferedImage[] idleSprites = new BufferedImage[10 * 2];
+	private BufferedImage[] runningSprites = new BufferedImage[5];
+	private BufferedImage[] walkingSprites = new BufferedImage[10];
+	private BufferedImage[] idleSprites = new BufferedImage[6];
 	private int currentFrame = 0;
 
 	/*
@@ -53,14 +54,30 @@ public class Mob {
 		height = tempHeight;
 		width = tempWidth;
 		try {
-			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
-
-			for (int i = 0; i < cols; i++) {
-				for (int j = 0; j < rows; j++) {
-					sprites[(i * rows) + j] = image.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
+			runningSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
+			walkingSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerWalkingSpriteSheet.png"));
+			idleSpriteSheet    = ImageIO.read(new File("./Content/Textures/PlayerIdleSpriteSheet.png"));
+			
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 1; j++) {
+					runningSprites[(i) + j] = runningSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
 							spriteHeight);
 				}
 			}
+			for (int i = 0; i < 10; i++) {
+				for (int j = 0; j < 1; j++) {
+					walkingSprites[(i) + j] = walkingSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
+							spriteHeight);
+				}
+			}
+			int accIdle = 0;
+			for (int i = 0; i < 2; i++) {
+				for (int x = 0; x < 3; x++) {
+					idleSprites[accIdle] = idleSpriteSheet.getSubimage(i * spriteWidth, 0, spriteWidth, spriteHeight);
+					accIdle++;
+				}
+			}
+			image = idleSprites[0];
 		} catch (IOException e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -78,20 +95,7 @@ public class Mob {
 	 * Gets the next frame of the mob animation from the sprite sheet
 	 */
 	 public void NextFrame(int list) {
-	    if (list == 0) {
-	      if (currentFrame < sprites.length-1) {
-	        currentFrame++;
-	      } else {
-	        currentFrame = 0;
-	      }
-	      image = sprites[currentFrame];
-	      if (FacingLeft) {
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	        tx.translate(-image.getWidth(null), 0);
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	        image = op.filter(image, null);
-	      }
-	    } else if (list == 1) {
+	    if (list == 1) {
 	      if (currentFrame < runningSprites.length - 1) {
 	        currentFrame++;
 	      } else {
@@ -112,11 +116,11 @@ public class Mob {
 	      }
 	      image = walkingSprites[currentFrame];
 	      if (FacingLeft) {
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	        tx.translate(-image.getWidth(null), 0);
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	        image = op.filter(image, null);
-	        }
+		        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		        tx.translate(-image.getWidth(null), 0);
+		        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		        image = op.filter(image, null);
+	      }
 	    } else if (list == 3) {
 	      if (currentFrame < idleSprites.length-1) {
 	        currentFrame++;
@@ -125,10 +129,10 @@ public class Mob {
 	      }
 	      image = idleSprites[currentFrame];
 	      if (FacingLeft) {
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	        tx.translate(-image.getWidth(null), 0);
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	        image = op.filter(image, null);
+		        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		        tx.translate(-image.getWidth(null), 0);
+		        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		        image = op.filter(image, null);
 	      }
 	   }
 	}
@@ -163,10 +167,6 @@ public class Mob {
 	 */
 	public void FaceLeft() {
 		if (!FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
 			FacingLeft = true;
 		}
 	}
@@ -176,10 +176,6 @@ public class Mob {
 	 */
 	public void FaceRight() {
 		if (FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
 			FacingLeft = false;
 		}
 	}

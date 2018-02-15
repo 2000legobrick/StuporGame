@@ -486,19 +486,18 @@ public class Render {
 		Dimension box = new Dimension(125,125);
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
-		for (int x = 0; x < 3; x++) {
-			upgradePoints.add(new Point((int) (middleWidth + distanceFromCenter * Math.cos(Math.toRadians(120 * x))),
-					(int) (middleHeight + distanceFromCenter * Math.sin(Math.toRadians(120 * x)))));
-			g.setColor(Color.BLACK);
-			g2D.fillOval((int) (middleWidth + distanceFromCenter * Math.cos(Math.toRadians(120 * x)) - box.width / 2),
-					(int) (middleHeight + distanceFromCenter * Math.sin(Math.toRadians(120 * x)) - box.height / 2),
-					box.width, box.height);
-			g.setColor(Color.WHITE);
-			g2D.drawOval((int) (middleWidth + distanceFromCenter * Math.cos(Math.toRadians(120 * x)) - box.width / 2),
-					(int) (middleHeight + distanceFromCenter * Math.sin(Math.toRadians(120 * x)) - box.height / 2),
-					box.width, box.height);
+		g.setColor(Color.WHITE);
+		for (int x = -1; x < 2; x++) {
+			g.drawRect(middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height);
+			upgradePoints.add(new Point(middleWidth - (300 * x), middleHeight));
 		}
+		
 		currentMenuPos = getClosestIndex(upgradePoints, new Point(currentMouseX, currentMouseY));
+		
+		g.setColor(Color.RED);
+		if (currentMenuPos != -1)
+			g.drawRect(middleWidth - box.width/2 - (300 * (currentMenuPos - 1)), middleHeight - box.height/2, box.width, box.height);
+		
 	}
 
 	/*

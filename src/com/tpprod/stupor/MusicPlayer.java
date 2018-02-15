@@ -61,7 +61,8 @@ public class MusicPlayer implements Runnable {
 	 */
 	public void changeVolume(float i) {
 		int volume = StateMachine.getRender().getVolume();
-		if (volume + i <= 0 || audioVolume + i * 5 <= MinVolume) {
+		if (volume + i <= 0) {
+		}else if (volume + i <= 0 || audioVolume + i * 5 <= MinVolume) {
 			// volume = 0;
 			audioVolume = MinVolume;
 			try {

@@ -31,9 +31,9 @@ import javax.swing.event.MouseInputListener;
 
 public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener {
 
-	private static final int GameState = 0;
-	private static final int MenuState = 1;
-	private static final int PauseState = 2;
+	private static final int GameState    = 0;
+	private static final int MenuState    = 1;
+	private static final int PauseState   = 2;
 	private static final int UpgradeState = 3;
 	private static final int DeadState    = 4;
 	private static final int OptionState  = 5;
@@ -43,6 +43,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	private static ArrayList<Integer> currentKeys = new ArrayList<Integer>();
 	private JFrame frame = new JFrame();
+	private Animation animate = new Animation();
 	private static MusicPlayer soundEffect = new MusicPlayer(false);
 	private static Physics physics = new Physics();
 	private static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
@@ -219,6 +220,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
 						if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
 							physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
+					}
+					if (tick % 5 == 0) {
+						animate.Animate(physics.getMobs());
 					}
 					break;
 				case MenuState:
@@ -526,7 +530,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			stop();
 		}
-		if (render.getCurrentMenuPos() == 0 && CurrentState == OptionState && arg0.getButton() == MouseEvent.BUTTON1) {
+		if (render.getCurrentMenuPos() == 0 && CurrentState == OptionState 
+				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			render.getBackgroundMusic().changeVolume(-1);
 		} else if (render.getCurrentMenuPos() == 1 && CurrentState == OptionState
 				&& arg0.getButton() == MouseEvent.BUTTON1) {
