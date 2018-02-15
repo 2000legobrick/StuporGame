@@ -8,6 +8,7 @@ public class SaveData implements java.io.Serializable {
 		private int playerEXP = 0;
 		private int playerHealth = 0;
 		private int playerMana = 0;
+		private Item[] playerInventory = new Item[4];
 		
 		public int getPlayerCurrentX() {
 			return playerCurrentX;
@@ -21,9 +22,7 @@ public class SaveData implements java.io.Serializable {
 		public void setPlayerCurrentY(int playerCurrentY) {
 			this.playerCurrentY = playerCurrentY;
 		}
-		public int getPlayerEXP() {
-			return playerEXP;
-		}
+		public int getPlayerEXP() { return playerEXP; }
 		public void setPlayerEXP(int playerEXP) {
 			this.playerEXP = playerEXP;
 		}
@@ -39,5 +38,11 @@ public class SaveData implements java.io.Serializable {
 		public void setPlayerMana(int playerMana) {
 			this.playerMana = playerMana;
 		}
+		public Item[] getPlayerInventory() {
+			return playerInventory;
+		}
+		public void setPlayerInventory(Item[] playerInventory) {
+		this.playerInventory = playerInventory;
+	}
 		
 }

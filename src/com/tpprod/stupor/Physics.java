@@ -460,6 +460,9 @@ public class Physics implements Runnable {
 		data.setPlayerHealth(player.getHealth());
 		data.setPlayerMana(player.getMana());
 		data.setPlayerEXP(player.getEXP());
+		for (int i = 0; i < player.getInventory().getCurrentMobItems().length; i++) {
+			data.getPlayerInventory()[i] = player.getInventory().getCurrentMobItems()[i];
+		}
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
@@ -475,14 +478,15 @@ public class Physics implements Runnable {
 	
 	public void Load() {
 		try {
-			System.out.println("HEY");
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
-			System.out.println("HEY0");
+			for (int i = 0; i < data.getPlayerInventory().length; i++) {
+				player.getInventory().addMobInventoryItem(data.getPlayerInventory()[i]);
+			}
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -505,18 +509,6 @@ public class Physics implements Runnable {
 		mobs.add(new Mob( 0, 0, 100,50));
 		player = mobs.get(0);
 
-		try {
-			Load();
-		} catch (Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {
-				
-			}
-		}
-
 		for (int x = 1; x < 5; x++) {
 			mobs.add(new Mob( 100 * x, 0, 50,50));
 		}
@@ -532,9 +524,11 @@ public class Physics implements Runnable {
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
-		
+
+
 		Load();
-		
+
+
 		while (running) {
 			double current = System.nanoTime();
 			unprocessed += (current - previous) / nsPerTick;
@@ -588,3 +582,4 @@ public class Physics implements Runnable {
 		this.world = world;
 	}
 }
+

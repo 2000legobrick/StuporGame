@@ -16,6 +16,8 @@ public class World {
 	private ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
 	 
 	private Inventory inventory = new Inventory();
+
+	private String worldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile";
 	 
 
 	public World() {
@@ -28,8 +30,7 @@ public class World {
 		 * file.
 		 */
 
-		BufferedReader bR = new BufferedReader(
-				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"));
+		BufferedReader bR = new BufferedReader(new FileReader(worldFilePath));
 		String lineString;
 		ArrayList<String> line;
 		int accY = 0;

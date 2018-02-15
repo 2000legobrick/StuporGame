@@ -44,11 +44,11 @@ public class MusicPlayer implements Runnable {
 
     public void changeVolume(float i) {
         int volume = StateMachine.getRender().getVolume();
-        if (volume + i <= 0 || audioVolume + i*5 <= MinVolume) {
-            //volume = 0;
+        if (volume + i <= 0 || audioVolume + i*3 <= MinVolume) {
+            volume = 0;
             audioVolume = MinVolume;
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (Exception e) {
                 StringWriter error = new StringWriter();
                 e.printStackTrace(new PrintWriter(error));
@@ -56,7 +56,7 @@ public class MusicPlayer implements Runnable {
                     Log.add(error.toString());
                 } catch (Exception e1) {}
             }
-        } else if (volume + i >= 10 || audioVolume + i*5 >= MaxVolume) {
+        } else if (volume + i >= 10 || audioVolume + i*3 >= MaxVolume) {
             volume = 10;
             audioVolume = MaxVolume;
             try {
@@ -71,7 +71,7 @@ public class MusicPlayer implements Runnable {
         } else if (volume + i > 0 && volume == 0 && audioVolume == MinVolume) {
             volume += i;
             audioVolume = -44;
-            audioVolume += i * 5;
+            audioVolume += i * 3;
             try {
                 Thread.sleep(50);
             } catch (Exception e) {
@@ -83,7 +83,7 @@ public class MusicPlayer implements Runnable {
             }
         } else {
             volume += i;
-            audioVolume += i*5;
+            audioVolume += i*3;
         }
         StateMachine.getRender().setVolume(volume);
     }
@@ -132,5 +132,13 @@ public class MusicPlayer implements Runnable {
 
     public void stop() {
         running = false;
+    }
+
+    public float getAudioVolume() {
+        return audioVolume;
+    }
+
+    public void setAudioVolume(float audioVolume) {
+        this.audioVolume = audioVolume;
     }
 }

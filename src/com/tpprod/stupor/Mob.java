@@ -76,19 +76,62 @@ public class Mob {
 		ResetMana();
 	}
 
-	public void NextFrame() {
-		if (currentFrame < sprites.length-1) {
-			currentFrame++;
-		} else {
-			currentFrame = 0;
+	public void NextFrame(int list) {
+		if (list == 0) {
+			if (currentFrame < sprites.length-1) {
+				currentFrame++;
+			} else {
+				currentFrame = 0;
+			}
+			image = sprites[currentFrame];
+			if (FacingLeft) {
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-image.getWidth(null), 0);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+				image = op.filter(image, null);
+			}
+		} else if (list == 1) {
+			if (currentFrame < runningSprites.length - 1) {
+				currentFrame++;
+			} else {
+				currentFrame = 0;
+			}
+			image = runningSprites[currentFrame];
+			if (FacingLeft) {
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-image.getWidth(null), 0);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+				image = op.filter(image, null);
+			}
+		} else if (list == 2) {
+			if (currentFrame < walkingSprites.length-1) {
+				currentFrame++;
+			} else {
+				currentFrame = 0;
+			}
+			image = walkingSprites[currentFrame];
+			if (FacingLeft) {
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-image.getWidth(null), 0);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+				image = op.filter(image, null);
+			}
+		} else if (list == 3) {
+			if (currentFrame < idleSprites.length-1) {
+				currentFrame++;
+			} else {
+				currentFrame = 0;
+			}
+			image = idleSprites[currentFrame];
+			if (FacingLeft) {
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+				tx.translate(-image.getWidth(null), 0);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+				image = op.filter(image, null);
+			}
 		}
-		image = sprites[currentFrame];
-		if (FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
-		}
+
+
 	}
 	
 	public void HurtMob(int damage) {
