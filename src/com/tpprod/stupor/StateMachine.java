@@ -221,7 +221,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
 						if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
 							physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
-						physics.getPlayer().NextFrame();
+						physics.getPlayer().NextFrame(1);
 					}
 					break;
 				case MenuState:

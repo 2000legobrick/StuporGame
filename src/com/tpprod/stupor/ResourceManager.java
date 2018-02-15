@@ -1,5 +1,6 @@
 package com.tpprod.stupor;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -10,6 +11,7 @@ import java.nio.file.Paths;
 
 public class ResourceManager {
 
+	private static boolean hasData;
 	/*
 	 * Saves a serialized file to a given location
 	 */

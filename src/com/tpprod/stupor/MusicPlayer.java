@@ -159,4 +159,15 @@ public class MusicPlayer implements Runnable {
 	public void stop() {
 		running = false;
 	}
+	/*
+	 * Getters and Setters for audio volume
+	 */
+    public float getAudioVolume() {
+        return audioVolume;
+    }
+ 
+    public void setAudioVolume(float audioVolume) {
+        this.audioVolume = audioVolume;
+    }
+ 
 }
