@@ -97,10 +97,9 @@ public class Render {
 				RenderBackground(g, width, height, player);
 				RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
 				RenderHUD(g, player, width, height);
-				bgMusic.start();
 			}else if(CurrentState == MenuState) {
 				RenderMenu(g, width,height);
-				bgMusic.stop();
+				bgMusic.start();
 			} else if (CurrentState == OptionState) {
 				RenderOption(g, width,height);
 				bgMusic.stop();
