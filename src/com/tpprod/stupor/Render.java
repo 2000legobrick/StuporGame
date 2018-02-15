@@ -25,13 +25,13 @@ public class Render {
 	private static final int GameState    =  StateMachine.getGamestate();
 	private static final int MenuState    =  StateMachine.getMenustate();
 	private static final int PauseState   =  StateMachine.getPausestate();
-	private static final int OptionState   =  StateMachine.getOptionstate();
+	private static final int OptionState  =  StateMachine.getOptionstate();
 	private static final int UpgradeState =  StateMachine.getUpgradestate();
 	private static final int DeadState    =  StateMachine.getDeadstate();
 	private static volatile int CurrentState       =  StateMachine.getCurrentState();
 	
 	private World world = new World();
-	private static MusicPlayer bgMusic = new MusicPlayer();
+	private static MusicPlayer bgMusic = new MusicPlayer(true);
 	private ColorSchemes palette = new ColorSchemes();
 	private static int volume = 5;
 	
@@ -55,13 +55,13 @@ public class Render {
 		 */
 	}
 
-	public void InitializeWorld() throws IOException {
+	public void InitializeWorld(Physics physics) throws IOException {
 		/*
 		 * The InitializeWorld method gets the most current version of the world to
 		 * reference.
 		 * 
 		 */
-		world.Initialize();
+		world.Initialize(physics);
 	}
 	
 	public void RenderLoad(Graphics g, int width, int height) {
@@ -107,7 +107,7 @@ public class Render {
 			}else if(CurrentState == PauseState) {
 					RenderPause(g, width, height);
 			}else if(CurrentState == UpgradeState) {
-					RenderUpgrade(g, width, height);
+				RenderUpgrade(g, width, height);
 			}else if(CurrentState == DeadState) {
 					
 			}
@@ -152,10 +152,18 @@ public class Render {
 
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
-			g.drawString("Main Menu", 100, 300);
+			g.drawString("Settings", 100, 300);
 		} else {
 			g.setColor(Color.WHITE);
-			g.drawString("Main Menu", 100, 300);
+			g.drawString("Settings", 100, 300);
+		}
+		
+		if (currentMenuPos == 3) {
+			g.setColor(Color.RED);
+			g.drawString("Main Menu", 100, 400);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 400);
 		}
 	}
 
@@ -184,8 +192,11 @@ public class Render {
 				closestIndex = pointList.indexOf(p1);
 			}
 		}
-		if (closestDistance < 100) 
+		if (closestDistance < 100 ) { 
+			if (currentMenuPos != closestIndex)
+				new AudioFile("Content/Audio/SoundEffects/Menu.wav").play(bgMusic.getAudioVolume()-2);
 			return closestIndex;
+		}
 		return -1;
 	}
 	
@@ -244,19 +255,17 @@ public class Render {
 		 * The method RenderOption renders out the option menu for the game.
 		 */
 		
-		g.setColor(Color.BLUE);
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
-		g.setColor(Color.RED);
-		g.drawString(Integer.toString(currentMouseX) + ", " + Integer.toString(currentMouseY), 500, 500);
 
         Dimension box = new Dimension(50,50);
-        g.setColor(new Color(0,0,0));
+        g.setColor(new Color(20,75,40)); // A Greenish Color
 
         for (int x = 1; x <= 10; x++) {
             g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height/2), box.width, box.height);
         }
         Dimension box1 = new Dimension(40,40);
-        g.setColor(new Color(255,255,255));
+        g.setColor(new Color(255,255,255)); // Pure White
         for (int x = 1; x <= volume; x++) {
             g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height/2), box1.width, box1.height);
         }
@@ -267,15 +276,21 @@ public class Render {
 		ArrayList<Point> optionPoints = new ArrayList<Point> ();
 		
 		optionPoints.add(new Point(350, 115));
-		optionPoints.add(new Point(1250, 115));
+		optionPoints.add(new Point(1150, 115));
 		optionPoints.add(new Point(150, 215));
-		
-		
 		
 		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
 
-		g.setColor(Color.GREEN);
+		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
+		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 225);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Exit", 100, 225);
+		}
 		
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 		
@@ -283,26 +298,16 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("-", 300, 125);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("-", 300, 125);
 		}
 
 		if (currentMenuPos == 1) {
 			g.setColor(Color.RED);
-			g.drawString("+", 1200, 125);
+			g.drawString("+", 1100, 125);
 		} else {
-			g.setColor(Color.GREEN);
-			g.drawString("+", 1200, 125);
-		}
-		
-		g.setFont(new Font("Impact", Font.PLAIN, 40));
-		
-		if (currentMenuPos == 2) {
-			g.setColor(Color.RED);
-			g.drawString("Exit", 100, 225);
-		} else {
-			g.setColor(Color.GREEN);
-			g.drawString("Exit", 100, 225);
+			g.setColor(Color.WHITE);
+			g.drawString("+", 1100, 125);
 		}
 	}
 
@@ -431,6 +436,9 @@ public class Render {
 		int middleHeight = height / 2;
 		int distanceFromCenter = 300;
 
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
 		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
 		
 		Dimension box = new Dimension(125,125);

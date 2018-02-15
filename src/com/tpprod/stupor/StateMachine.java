@@ -39,14 +39,14 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private static final int PauseState   = 2;
 	private static final int UpgradeState = 3;
 	private static final int DeadState    = 4;
-	private static final int OptionState = 5;
-	private static final int LoadState    = 4;
+	private static final int OptionState  = 5;
+	private static final int LoadState    = 6;
 
 	private static int CurrentState = MenuState;
 
 	private static ArrayList<Integer> currentKeys = new ArrayList<Integer>();
 	private JFrame frame = new JFrame();
-	private boolean closeGame = false;
+	private static MusicPlayer soundEffect = new MusicPlayer(false);
 	private static Physics physics = new Physics();
 	private static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -58,7 +58,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private static boolean running = false;
 	public static Render render = new Render();
 	private static int NextState = MenuState;
-	private static SettingsSaveData settingsData ;
+	private static SettingsSaveData settingsData;
 	
 	static GraphicsDevice device = GraphicsEnvironment
 	        .getLocalGraphicsEnvironment().getScreenDevices()[0];
@@ -80,8 +80,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * Possible States: GameState - Actual game is ran in this state MenuState - The
 		 * main menu is displayed (typically at start of game) PauseState - The game
 		 * does not update but instead stops updating until state is changed
-		 * InventoryState - Displays the current inventory, game functions are suspended
-		 * here like PuaseState DeadState - Informs the player on their death and resets
+		 * DeadState - Informs the player on their death and resets
 		 * state to the MenuState
 		 */
 
@@ -90,7 +89,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		try {
 			// tries to initialize the world in render, and updates physics with the same
 			// world
-			render.InitializeWorld();
+			render.InitializeWorld(physics);
 
 			physics.setWorld(render.getWorld());
 		} catch (Exception e) {
@@ -131,7 +130,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		double nsPerTick = 1000000000.0d / tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
-		int fps = 0;
 
 		// If the program is running, we run this chunk of code
 		while (running) {
@@ -190,19 +188,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 						if (currentKeys.indexOf(49) != -1) { // 1 key
 							if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                                physics.getPlayer().useItem(0);
+                                physics.getPlayer().useItem(0, soundEffect.getSoundEffects());
 						}
 						if (currentKeys.indexOf(50) != -1) { // 2 key
 							if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                                physics.getPlayer().useItem(1);
+                                physics.getPlayer().useItem(1,soundEffect.getSoundEffects());
 						}
 						if (currentKeys.indexOf(51) != -1) { // 3 key
 							if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                                physics.getPlayer().useItem(2);
+                                physics.getPlayer().useItem(2, soundEffect.getSoundEffects());
 						}
 						if (currentKeys.indexOf(52) != -1) { // 4 key
 							if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                                physics.getPlayer().useItem(3);
+                                physics.getPlayer().useItem(3, soundEffect.getSoundEffects());
 						}
 						if (currentKeys.indexOf(83) != -1) { // S Key
 						}
@@ -241,11 +239,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						if (currentKeys.indexOf(40) != -1) { // Down Arrow
 							render.setCurrentMenuPos(render.getCurrentMenuPos()+1);
 							currentKeys.remove(currentKeys.indexOf(40));
-						}
-						if (render.getCurrentMenuPos() > 2) {
-							render.setCurrentMenuPos(2);
-						} else if (render.getCurrentMenuPos() < 0) {
-							render.setCurrentMenuPos(0);
 						}
 						if (currentKeys.indexOf(10) != -1) { // Enter Key
 							if (render.getCurrentMenuPos() == 0) {
@@ -290,6 +283,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 							}
 						}
 						if (currentKeys.indexOf(27) != -1) { // Escape Key
+							physics.Save();
 							NextState = PauseState;
 							CurrentState = PauseState;
 						}
@@ -314,7 +308,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				tick();
 				--unprocessed;
 				//draws current frame
-				fps++;
 				render();
 			}
 			try {
@@ -330,12 +323,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
-				//System.out.printf("%d fps, %d tick%n", fps,  tick);
 				tick = 0;
-				fps = 0;
 				timer += 1000;
 				requestFocusInWindow();
-				//System.out.println(currentKeys);
 			}
 		}
 	}
@@ -535,6 +525,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// TODO Auto-generated method stub
 		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
+			CurrentState = GameState;
 			physics.start();
 		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
@@ -593,6 +584,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			} else if (render.getCurrentMenuPos() == 1) {
 				physics.Save();
 			} else if (render.getCurrentMenuPos() == 2) {
+				NextState = PauseState;
+			} else if (render.getCurrentMenuPos() == 3) {
 				NextState = MenuState;
 			}
 		}

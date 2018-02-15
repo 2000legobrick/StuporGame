@@ -60,9 +60,9 @@ public class AudioFile implements LineListener{
 
     @Override
     public void update(LineEvent event) {
-        if(event.getType() == LineEvent.Type.START)
+        if(event.getType() == LineEvent.Type.START) {
             playing = true;
-        else if(event.getType() == LineEvent.Type.STOP) {
+        } else if(event.getType() == LineEvent.Type.STOP) {
             clip.stop();
             clip.flush();
             clip.setFramePosition(0);

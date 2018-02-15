@@ -5,6 +5,8 @@ import java.io.StringWriter;
 
 public class HealthRegen implements Runnable {
 	
+	private AudioFile healthSound = new AudioFile("Content/Audio/SoundEffects/HealthRegen.wav");
+	
 	public void healthRegen(Mob entity, int heal) {
 		if (entity.getHealth() <= entity.getMaxHealth()) {
 			for (int i = 0; i < 10; i++) {
@@ -20,10 +22,12 @@ public class HealthRegen implements Runnable {
 				}
 			}
 		}
+		healthSound.stop();
 	}
 	
 	public void start() {
 		new Thread(this).start();
+		healthSound.play();
 	}
 	
 	@Override

@@ -475,14 +475,12 @@ public class Physics implements Runnable {
 	
 	public void Load() {
 		try {
-			System.out.println("HEY");
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
-			System.out.println("HEY0");
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -516,12 +514,6 @@ public class Physics implements Runnable {
 				
 			}
 		}
-
-		for (int x = 1; x < 5; x++) {
-			mobs.add(new Mob( 100 * x, 0, 50,50));
-		}
-		
-		ai.setMobAIList(mobs);
 		
 	}
 	
@@ -529,6 +521,9 @@ public class Physics implements Runnable {
 	public void run() {
 		
 		// These variables are specific only to the run method
+		int tick = 0;
+		double timer = System.currentTimeMillis();
+		
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
@@ -541,10 +536,19 @@ public class Physics implements Runnable {
 			previous = current;
 			while (unprocessed >= 1) {
 				// Updates game objects
+				ai.setMobAIList(mobs);
 				ai.Move(world, player);
 				Gravity();
 				Movement();
+
+				if (tick % 20 == 0) {
+					for (Mob mob:mobs) {
+						mob.setMana(mob.getMana() + 1);
+						mob.subtractFromWantsToShoot();
+					}
+				}
 				--unprocessed;
+				tick++;
 			}
 			try {
 				Thread.sleep(1);
@@ -556,6 +560,10 @@ public class Physics implements Runnable {
 				}catch (Exception e1) {
 					
 				}
+			}
+			if (System.currentTimeMillis() - timer > 1000) {
+				tick = 0;
+				timer += 1000;
 			}
 		}
 	}

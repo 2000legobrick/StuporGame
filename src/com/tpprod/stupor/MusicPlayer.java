@@ -9,20 +9,30 @@ import java.util.ArrayList;
 
 public class MusicPlayer implements Runnable {
 
+	public static final int HealthRegen = 0;
+	public static final int Menu        = 1;
+	public static final int PickUp      = 2;
+	public static final int Shoot       = 3;
+	public static final int UseItem     = 4;
+	
     private ArrayList<AudioFile> musicFiles;
     private int currentSongIndex = 0;
     private String bgPath = "Content/Audio/BackgroundMusic/";
-    private String sePath = "Content/Audio/Sound/";
+    private String sePath = "Content/Audio/SoundEffects/";
     private boolean running;
-    private ArrayList<AudioFile> bgMusic = new ArrayList<AudioFile>();;
-    private ArrayList<AudioFile> soundEffects;
+    private ArrayList<AudioFile> bgMusic = new ArrayList<AudioFile>();
+    private ArrayList<AudioFile> soundEffects = new ArrayList<AudioFile>();
     public float audioVolume = -19, MaxVolume = 6, MinVolume = -80;
     
     //Creates a playlist of all the songs in the audio folder
-    public MusicPlayer() {
-        File[] bgFiles = new File(bgPath).listFiles();
-        //File[] seFiles = new File(sePath).listFiles();
-    	setPlaylist(bgMusic,bgPath, bgFiles);
+    public MusicPlayer(boolean isForBackgroundMusic) {
+    	if (isForBackgroundMusic) {
+	        File[] bgFiles = new File(bgPath).listFiles();
+	    	setPlaylist(bgMusic,bgPath,bgFiles);
+    	} else {
+    		File[] seFiles = new File(sePath).listFiles();
+	    	setPlaylist(soundEffects,sePath,seFiles);
+    	}
     }
     
     public void setPlaylist(ArrayList<AudioFile> playlist, String pathName, File[] files) {
@@ -39,7 +49,6 @@ public class MusicPlayer implements Runnable {
 
             }
         }
-
     }
 
     public void changeVolume(float i) {
@@ -133,4 +142,12 @@ public class MusicPlayer implements Runnable {
     public void stop() {
         running = false;
     }
+    
+    public ArrayList<AudioFile> getSoundEffects () {
+    	return soundEffects;
+    }
+
+	public float getAudioVolume() {
+		return audioVolume;
+	}
 }
