@@ -21,6 +21,7 @@ public class World {
 
 	private ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
 
+	private String worldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"; 
 	private Inventory inventory = new Inventory();
 
 	public World() {

@@ -22,6 +22,7 @@ public class AudioFile implements LineListener {
 	private Clip clip;
 	private FloatControl gainControl;
 	private volatile boolean playing;
+	private float audioVolume = -5;
 
 	/*
 	 * This is the method that actually does the opening of the file based on a
@@ -52,7 +53,14 @@ public class AudioFile implements LineListener {
 	}
 	
 	/*
-	 * Plays a song based on a given voldume
+	 * Plays a song at a static volume
+	 */
+	public void play () {
+		play(audioVolume);
+	}
+	
+	/*
+	 * Plays a song based on a given volume
 	 */
 	
 	public void play(float volume) {

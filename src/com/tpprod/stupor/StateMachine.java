@@ -187,19 +187,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					}
 					if (currentKeys.indexOf(49) != -1) { // 1 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-							physics.getPlayer().useItem(0);
+							physics.getPlayer().useItem(0, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(50) != -1) { // 2 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-							physics.getPlayer().useItem(1);
+							physics.getPlayer().useItem(1, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(51) != -1) { // 3 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-							physics.getPlayer().useItem(2);
+							physics.getPlayer().useItem(2, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(52) != -1) { // 4 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-							physics.getPlayer().useItem(3);
+							physics.getPlayer().useItem(3, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(83) != -1) { // S Key
 					}
@@ -219,7 +219,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
 						if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
 							physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
-						physics.getPlayer().NextFrame();
 					}
 					break;
 				case MenuState:
@@ -238,11 +237,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (currentKeys.indexOf(40) != -1) { // Down Arrow
 						render.setCurrentMenuPos(render.getCurrentMenuPos() + 1);
 						currentKeys.remove(currentKeys.indexOf(40));
-					}
-					if (render.getCurrentMenuPos() > 2) {
-						render.setCurrentMenuPos(2);
-					} else if (render.getCurrentMenuPos() < 0) {
-						render.setCurrentMenuPos(0);
 					}
 					if (currentKeys.indexOf(10) != -1) { // Enter Key
 						if (render.getCurrentMenuPos() == 0) {
@@ -319,13 +313,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try {
-					Log.add(error.toString());
-				} catch (Exception e1) {
-
-				}
 			}
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {

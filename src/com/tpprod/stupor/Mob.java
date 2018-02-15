@@ -77,14 +77,60 @@ public class Mob {
 	/*
 	 * Gets the next frame of the mob animation from the sprite sheet
 	 */
-	public void NextFrame() {
-		if (currentFrame < sprites.length - 1) {
-			currentFrame++;
-		} else {
-			currentFrame = 0;
-		}
-
-
+	 public void NextFrame(int list) {
+	    if (list == 0) {
+	      if (currentFrame < sprites.length-1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = sprites[currentFrame];
+	      if (FacingLeft) {
+	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+	        tx.translate(-image.getWidth(null), 0);
+	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+	        image = op.filter(image, null);
+	      }
+	    } else if (list == 1) {
+	      if (currentFrame < runningSprites.length - 1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = runningSprites[currentFrame];
+	      if (FacingLeft) {
+	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+	        tx.translate(-image.getWidth(null), 0);
+	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+	        image = op.filter(image, null);
+	      }
+	    } else if (list == 2) {
+	      if (currentFrame < walkingSprites.length-1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = walkingSprites[currentFrame];
+	      if (FacingLeft) {
+	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+	        tx.translate(-image.getWidth(null), 0);
+	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+	        image = op.filter(image, null);
+	        }
+	    } else if (list == 3) {
+	      if (currentFrame < idleSprites.length-1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = idleSprites[currentFrame];
+	      if (FacingLeft) {
+	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+	        tx.translate(-image.getWidth(null), 0);
+	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+	        image = op.filter(image, null);
+	      }
+	   }
 	}
 
 	/*
@@ -241,7 +287,7 @@ public class Mob {
 	/*
 	 * Uses an item based on its index in the mobs inventory
 	 */
-	public void useItem(int index) {
+	public void useItem(int index, ArrayList<AudioFile> soundEffectList) {
 		if (inventory.getCurrentMobItems().length >= index) {
 			try {
 				Item item = inventory.getCurrentMobItems()[index];

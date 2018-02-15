@@ -1,5 +1,6 @@
 package com.tpprod.stupor;
 
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -52,6 +53,7 @@ public class ResourceManager {
 
 	public static boolean hasData(String fileName) {
 		File file = new File("./Content/" + fileName);
+		boolean hasData;
 		if (file.exists())
 			hasData = true;
 		else

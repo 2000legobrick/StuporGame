@@ -25,10 +25,15 @@ public class MusicPlayer implements Runnable {
 	/*
 	 * Creates a playlist of all the songs in the audio folder
 	 */
-	public MusicPlayer() {
-		File[] bgFiles = new File(bgPath).listFiles();
-		// File[] seFiles = new File(sePath).listFiles();
-		setPlaylist(bgMusic, bgPath, bgFiles);
+	public MusicPlayer(boolean isForBackground) {
+		if (isForBackground) {
+			File[] bgFiles = new File(bgPath).listFiles();
+			// File[] seFiles = new File(sePath).listFiles();
+			setPlaylist(bgMusic, bgPath, bgFiles);
+		} else {
+			File[] seFiles = new File(sePath).listFiles();
+			setPlaylist(soundEffects, sePath, seFiles);
+		}
 	}
 
 	/*
@@ -164,5 +169,17 @@ public class MusicPlayer implements Runnable {
 	 */
 	public void stop() {
 		running = false;
+	}
+
+	public float getAudioVolume() {
+		return audioVolume;
+	}
+	
+	public void setAudioVolume(float i) {
+		audioVolume = i;
+	}
+	
+	public ArrayList<AudioFile> getSoundEffect() {
+		return soundEffects;
 	}
 }

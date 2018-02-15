@@ -4,13 +4,15 @@ public class SettingsSaveData extends SaveData {
 	/*
 	 * Saves settings that are changed in options
 	 */
-	private int volumeSetting = 5;
+	 private int renderVolume = 5;
+	 private float musicPlayerVolume = -19;
+	 
 
 	/*
 	 * Getters and setters for SettingsSaveData
 	 */
-	public int getVolumeSetting() {
-		return volumeSetting;
+	public int getRenderVolume() {
+		return renderVolume;
 	}
 
 	public void setRenderVolume(int renderVolume) {

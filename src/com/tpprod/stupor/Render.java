@@ -189,7 +189,10 @@ public class Render {
 			}
 		}
 	}
-	
+
+	/*
+	 * Returns the closes index of a point to given point
+	 */
 	public int getClosestIndex(ArrayList<Point> pointList, Point p2) {
 		int closestIndex = 0, closestDistance = -1, currentDistance;
 		for (Point p1: pointList) {
@@ -551,23 +554,6 @@ public class Render {
 		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 10);
 		g.drawString("JUMP: " + Integer.toString(player.getJumpAmount()), 10, height - 50);
 		g.drawString("MANA REGEN: " + Integer.toString(player.getManaRefreshTimer()), 10, height - 90);
-	}
-
-	/*
-	 * Returns the closes index of a point to given point
-	 */
-	public int getClosestIndex(ArrayList<Point> pointList, Point p2) {
-		int closestIndex = 0, closestDistance = -1, currentDistance;
-		for (Point p1 : pointList) {
-			currentDistance = (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
-			if (closestDistance == -1 || closestDistance > currentDistance) {
-				closestDistance = currentDistance;
-				closestIndex = pointList.indexOf(p1);
-			}
-		}
-		if (closestDistance < 100)
-			return closestIndex;
-		return -1;
 	}
 
 	/*

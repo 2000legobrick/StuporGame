@@ -66,7 +66,7 @@ public class Crash extends Thread {
 			} 
 			error = error.substring(error.lastIndexOf("-")-16, error.length());
 			JLabel label = new JLabel(
-					"<html>An unhandled error has occured in your system: <br><br>" + errorMessage + "<br><br> If you click 'Send' a report will be sent to the developers<br>detailing the problem so that they may attemt to fix it<br> If you hit 'Don' Send' the program will exit</html>");
+					"<html>An unhandled error has occured in your system: <br><br>" + errorMessage + "<br><br> If you click 'Send' a report will be sent to the developers<br>detailing the problem so that they may attemt to fix it<br> If you hit 'Don't Send' the program will exit</html>");
 			label.setFont(new Font("TimesNewRoman", 0, 14));
 			label.setForeground(Color.BLACK);
 
@@ -74,12 +74,12 @@ public class Crash extends Thread {
 
 			JButton b1 = new JButton("Button 1");
 			b1.setBounds(50, 300, 100, 50);
-			b1.setBackground(Color.darkGray);
+			b1.setBackground(new Color(200, 200, 200));
 			b1.setText("Don't Send");
 
 			JButton b2 = new JButton("Button 2");
 			b2.setBounds(250, 300, 100, 50);
-			b2.setBackground(Color.darkGray);
+			b2.setBackground(new Color(200, 200, 200));
 			b2.setText("Send");
 
 			panel.add(b1, BorderLayout.SOUTH);
