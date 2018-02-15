@@ -7,14 +7,20 @@ import java.util.ArrayList;
 
 public class MusicPlayer implements Runnable {
 
-	private ArrayList<AudioFile> musicFiles;
-	private int currentSongIndex = 0;
-	private String bgPath = "Content/Audio/BackgroundMusic/";
-	private String sePath = "Content/Audio/Sound/";
-	private boolean running;
-	private ArrayList<AudioFile> bgMusic = new ArrayList<AudioFile>();;
-	private ArrayList<AudioFile> soundEffects;
-	public float audioVolume = -19, MaxVolume = 6, MinVolume = -80;
+	public static final int HealthRegen = 0;
+	public static final int Menu        = 1;
+	public static final int PickUp      = 2;
+	public static final int Shoot       = 3;
+	public static final int UseItem     = 4;
+	
+    private ArrayList<AudioFile> musicFiles;
+    private int currentSongIndex = 0;
+    private String bgPath = "Content/Audio/BackgroundMusic/";
+    private String sePath = "Content/Audio/SoundEffects/";
+    private boolean running;
+    private ArrayList<AudioFile> bgMusic = new ArrayList<AudioFile>();
+    private ArrayList<AudioFile> soundEffects = new ArrayList<AudioFile>();
+    public float audioVolume = -19, MaxVolume = 6, MinVolume = -80;
 
 	/*
 	 * Creates a playlist of all the songs in the audio folder

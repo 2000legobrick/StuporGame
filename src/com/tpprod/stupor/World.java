@@ -27,7 +27,7 @@ public class World {
 
 	}
 
-	public void Initialize() throws FileNotFoundException, IOException {
+	public void Initialize(Physics physics) throws FileNotFoundException, IOException {
 		/*
 		 * The Initialize method reads a file and separates the numbers within the file
 		 * into an ArrayList of NewRectangles each with a type of that number in the
@@ -54,10 +54,9 @@ public class World {
 										accY * StateMachine.getTileSize() + StateMachine.getTileSize() / 4,
 										Color.MAGENTA, StateMachine.getTileSize() / 2, "healthRegen"));
 					} else if (Integer.parseInt(item) == 5) {
-						inventory.addInventoryItem(
-								new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize() / 4,
-										accY * StateMachine.getTileSize() + StateMachine.getTileSize() / 4,
-										Color.ORANGE, StateMachine.getTileSize() / 2, "health"));
+						inventory.addInventoryItem(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.ORANGE, StateMachine.getTileSize()/2, "health"));
+					} else if (Integer.parseInt(item) == 6) {
+						physics.getMobs().add(new Mob(accX * StateMachine.getTileSize(), accY * StateMachine.getTileSize(), 50, 50));
 					}
 					worldGrid.get(accY)
 							.add(new NewRectangle(Integer.parseInt(item),

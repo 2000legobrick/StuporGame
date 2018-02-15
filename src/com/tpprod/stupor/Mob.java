@@ -28,7 +28,7 @@ public class Mob {
 	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width,
 			EXP;
 	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
+			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20, wantsToShoot = 0;
 	private Inventory inventory = new Inventory();
 	private HealthRegen healthRegen = new HealthRegen();
 
@@ -157,8 +157,9 @@ public class Mob {
 	 */
 	public void Shoot(double velX, double velY) {
 		if (Mana >= 10) {
-			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2, (int) velX,
-					(int) velY, projectileSize));
+			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
+					(int) velY, (int) velX, projectileSize));
+			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
 	}
@@ -185,6 +186,7 @@ public class Mob {
 				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
 						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize));
 			}
+			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
 	}
@@ -247,9 +249,11 @@ public class Mob {
 				if (itemType == "health") {
 					healthUp(1);
 					inventory.removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();;
 				} else if (itemType == "healthRegen") {
 					healthRegen.start();
 					inventory.removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();;
 				}
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
@@ -484,6 +488,19 @@ public class Mob {
 
 	public Inventory getInventory() {
 		return inventory;
+	}
+
+	public int getWantsToShoot() {
+		return wantsToShoot;
+	}
+	
+	public void setWantsToShoot(int i) {
+		wantsToShoot = i;
+	}
+	
+	public void subtractFromWantsToShoot() {
+		if (wantsToShoot > 0)
+			wantsToShoot--;
 	}
 
 }

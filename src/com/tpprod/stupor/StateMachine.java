@@ -35,15 +35,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private static final int MenuState = 1;
 	private static final int PauseState = 2;
 	private static final int UpgradeState = 3;
-	private static final int DeadState = 4;
-	private static final int OptionState = 5;
-	private static final int LoadState = 4;
+	private static final int DeadState    = 4;
+	private static final int OptionState  = 5;
+	private static final int LoadState    = 6;
 
 	private static int CurrentState = MenuState;
 
 	private static ArrayList<Integer> currentKeys = new ArrayList<Integer>();
 	private JFrame frame = new JFrame();
-	private boolean closeGame = false;
+	private static MusicPlayer soundEffect = new MusicPlayer(false);
 	private static Physics physics = new Physics();
 	private static final int WIDTH = Toolkit.getDefaultToolkit().getScreenSize().width,
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -77,8 +77,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * Possible States: GameState - Actual game is ran in this state MenuState - The
 		 * main menu is displayed (typically at start of game) PauseState - The game
 		 * does not update but instead stops updating until state is changed
-		 * InventoryState - Displays the current inventory, game functions are suspended
-		 * here like PuaseState DeadState - Informs the player on their death and resets
+		 * DeadState - Informs the player on their death and resets
 		 * state to the MenuState
 		 */
 
@@ -87,7 +86,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		try {
 			// tries to initialize the world in render, and updates physics with the same
 			// world
-			render.InitializeWorld();
+			render.InitializeWorld(physics);
 
 			physics.setWorld(render.getWorld());
 		} catch (Exception e) {
@@ -130,7 +129,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		double nsPerTick = 1000000000.0d / tickPerSec;
 		double previous = System.nanoTime();
 		double unprocessed = 0;
-		int fps = 0;
 
 		// If the program is running, we run this chunk of code
 		while (running) {
@@ -315,8 +313,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				tick++;
 				tick();
 				--unprocessed;
-				// draws current frame
-				fps++;
+				//draws current frame
 				render();
 			}
 			try {
@@ -332,12 +329,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 			// Print current fps and ticks
 			if (System.currentTimeMillis() - timer > 1000) {
-				// System.out.printf("%d fps, %d tick%n", fps, tick);
 				tick = 0;
-				fps = 0;
 				timer += 1000;
 				requestFocusInWindow();
-				// System.out.println(currentKeys);
 			}
 		}
 	}
@@ -532,6 +526,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// TODO Auto-generated method stub
 		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = GameState;
+			CurrentState = GameState;
 			physics.start();
 		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState
 				&& arg0.getButton() == MouseEvent.BUTTON1) {

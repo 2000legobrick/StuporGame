@@ -19,17 +19,18 @@ import java.util.ArrayList;
  */
 
 public class Render {
-
-	private static final int GameState = StateMachine.getGamestate();
-	private static final int MenuState = StateMachine.getMenustate();
-	private static final int PauseState = StateMachine.getPausestate();
-	private static final int OptionState = StateMachine.getOptionstate();
-	private static final int UpgradeState = StateMachine.getUpgradestate();
-	private static final int DeadState = StateMachine.getDeadstate();
-	private static volatile int CurrentState = StateMachine.getCurrentState();
+	
+	private static final int GameState    =  StateMachine.getGamestate();
+	private static final int MenuState    =  StateMachine.getMenustate();
+	private static final int PauseState   =  StateMachine.getPausestate();
+	private static final int OptionState  =  StateMachine.getOptionstate();
+	private static final int UpgradeState =  StateMachine.getUpgradestate();
+	private static final int DeadState    =  StateMachine.getDeadstate();
+	
+	private static volatile int CurrentState       =  StateMachine.getCurrentState();
 
 	private World world = new World();
-	private static MusicPlayer bgMusic = new MusicPlayer();
+	private static MusicPlayer bgMusic = new MusicPlayer(true);
 	private ColorSchemes palette = new ColorSchemes();
 	private static int volume = 5;
 
@@ -50,12 +51,12 @@ public class Render {
 		 */
 	}
 
-	public void InitializeWorld() throws IOException {
+	public void InitializeWorld(Physics physics) throws IOException {
 		/*
 		 * The InitializeWorld method gets the most current version of the world to
 		 * reference.
 		 */
-		world.Initialize();
+		world.Initialize(physics);
 	}
 
 	/*
@@ -188,6 +189,24 @@ public class Render {
 			}
 		}
 	}
+	
+	public int getClosestIndex(ArrayList<Point> pointList, Point p2) {
+		int closestIndex = 0, closestDistance = -1, currentDistance;
+		for (Point p1: pointList) {
+			currentDistance =  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
+			if (closestDistance == -1 || closestDistance > currentDistance) {
+				closestDistance = currentDistance;
+				closestIndex = pointList.indexOf(p1);
+			}
+		}
+		if (closestDistance < 100 ) { 
+			if (currentMenuPos != closestIndex)
+				new AudioFile("Content/Audio/SoundEffects/Menu.wav").play(bgMusic.getAudioVolume()-2);
+			return closestIndex;
+		}
+		return -1;
+	}
+	
 
 	/*
 	 * Renders the menu screen
@@ -254,21 +273,21 @@ public class Render {
 		/*
 		 * The method RenderOption renders out the option menu for the game.
 		 */
-
-		g.setColor(Color.BLUE);
+		
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 
-		Dimension box = new Dimension(50, 50);
-		g.setColor(new Color(0, 0, 0));
+        Dimension box = new Dimension(50,50);
+        g.setColor(new Color(20,75,40)); // A Greenish Color
 
-		for (int x = 1; x <= 10; x++) {
-			g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height / 2), box.width, box.height);
-		}
-		Dimension box1 = new Dimension(40, 40);
-		g.setColor(new Color(255, 255, 255));
-		for (int x = 1; x <= volume; x++) {
-			g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height / 2), box1.width, box1.height);
-		}
+        for (int x = 1; x <= 10; x++) {
+            g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height/2), box.width, box.height);
+        }
+        Dimension box1 = new Dimension(40,40);
+        g.setColor(new Color(255,255,255)); // Pure White
+        for (int x = 1; x <= volume; x++) {
+            g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height/2), box1.width, box1.height);
+        }
 
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.RED);
@@ -276,14 +295,22 @@ public class Render {
 		ArrayList<Point> optionPoints = new ArrayList<Point>();
 
 		optionPoints.add(new Point(350, 115));
-		optionPoints.add(new Point(1050, 125));
+		optionPoints.add(new Point(1150, 115));
 		optionPoints.add(new Point(150, 215));
-
+		
 		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
 
 		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
-
+		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 225);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Exit", 100, 225);
+		}
+		
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 
 		if (currentMenuPos == 0) {
@@ -296,20 +323,10 @@ public class Render {
 
 		if (currentMenuPos == 1) {
 			g.setColor(Color.RED);
-			g.drawString("+", 1050, 135);
+			g.drawString("+", 1100, 125);
 		} else {
 			g.setColor(Color.WHITE);
-			g.drawString("+", 1050, 135);
-		}
-
-		g.setFont(new Font("Impact", Font.PLAIN, 40));
-
-		if (currentMenuPos == 2) {
-			g.setColor(Color.RED);
-			g.drawString("Main Menu", 100, 225);
-		} else {
-			g.setColor(Color.WHITE);
-			g.drawString("Main Menu", 100, 225);
+			g.drawString("+", 1100, 125);
 		}
 	}
 
@@ -458,9 +475,12 @@ public class Render {
 		int middleHeight = height / 2;
 		int distanceFromCenter = 300;
 
-		ArrayList<Point> upgradePoints = new ArrayList<Point>();
-
-		Dimension box = new Dimension(125, 125);
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
+		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
+		
+		Dimension box = new Dimension(125,125);
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
 		for (int x = 0; x < 3; x++) {

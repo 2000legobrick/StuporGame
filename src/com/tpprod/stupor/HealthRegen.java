@@ -4,6 +4,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class HealthRegen implements Runnable {
+	
+	private AudioFile healthSound = new AudioFile("Content/Audio/SoundEffects/HealthRegen.wav");
+	
 	/*
 	 * This does the actual incrementing of the mobs health waiting in between each
 	 * health increment so that it is not an instantaneous heal
@@ -24,6 +27,7 @@ public class HealthRegen implements Runnable {
 				}
 			}
 		}
+		healthSound.stop();
 	}
 
 	/*
@@ -32,6 +36,7 @@ public class HealthRegen implements Runnable {
 	 */
 	public void start() {
 		new Thread(this).start();
+		healthSound.play();
 	}
 
 	/*
