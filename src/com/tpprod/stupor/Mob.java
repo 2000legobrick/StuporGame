@@ -1,7 +1,6 @@
 package com.tpprod.stupor;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -26,12 +25,13 @@ public class Mob {
 	private BufferedImage arm = null;
 	private boolean wallSlide, Agro, FacingLeft = false;
 	private boolean L1, L2, L3, R1, R2, R3;
-	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
+	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width,
+			EXP;
 	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
 			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
 	private Inventory inventory = new Inventory();
 	private HealthRegen healthRegen = new HealthRegen();
-	
+
 	private final int spriteWidth = 12, spriteHeight = 32;
 	private final int rows = 1, cols = 5;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
@@ -39,8 +39,12 @@ public class Mob {
 	private BufferedImage[] walkingSprites = new BufferedImage[10 * 2];
 	private BufferedImage[] idleSprites = new BufferedImage[10 * 2];
 	private int currentFrame = 0;
-	
-	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
+
+	/*
+	 * General Constructor for a mob, sets up all of the variables needed to be able
+	 * to place the mob in the world
+	 */
+	public Mob(int posX, int posY, int tempHeight, int tempWidth) {
 		/*
 		 * This is a constructor where the position, color, and size can be set.
 		 */
@@ -51,33 +55,30 @@ public class Mob {
 		try {
 			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
 
-			for (int i = 0; i < cols; i++)
-			{
-			    for (int j = 0; j < rows; j++)
-			    {
-			        sprites[(i * rows) + j] = image.getSubimage(
-			            i * spriteWidth,
-			            j * spriteHeight,
-			            spriteWidth,
-			            spriteHeight
-			        );
-			    }
+			for (int i = 0; i < cols; i++) {
+				for (int j = 0; j < rows; j++) {
+					sprites[(i * rows) + j] = image.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
+							spriteHeight);
+				}
 			}
 		} catch (IOException e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {
-				
+			} catch (Exception e1) {
+
 			}
 		}
 		ResetHealth();
 		ResetMana();
 	}
 
+	/*
+	 * Gets the next frame of the mob animation from the sprite sheet
+	 */
 	public void NextFrame() {
-		if (currentFrame < sprites.length-1) {
+		if (currentFrame < sprites.length - 1) {
 			currentFrame++;
 		} else {
 			currentFrame = 0;
@@ -90,7 +91,10 @@ public class Mob {
 			image = op.filter(image, null);
 		}
 	}
-	
+
+	/*
+	 * Increments damage to the mob
+	 */
 	public void HurtMob(int damage) {
 		if (Health - damage <= 0) {
 			Health = 0;
@@ -98,15 +102,24 @@ public class Mob {
 			Health -= damage;
 		}
 	}
-	
+
+	/*
+	 * Resets the mobs health, mainly used on the player for development purposes
+	 */
 	public void ResetHealth() {
 		Health = MaxHealth;
 	}
-	
+
+	/*
+	 * Resets the mobs health, mainly used on the player for development purposes
+	 */
 	public void ResetMana() {
 		Mana = MaxMana;
 	}
-	
+
+	/*
+	 * Changes which way the mob is facing
+	 */
 	public void FaceLeft() {
 		if (!FacingLeft) {
 			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
@@ -117,6 +130,9 @@ public class Mob {
 		}
 	}
 
+	/*
+	 * Changes which way the mob is facing
+	 */
 	public void FaceRight() {
 		if (FacingLeft) {
 			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
@@ -126,26 +142,35 @@ public class Mob {
 			FacingLeft = false;
 		}
 	}
-	
-	public void Attack () {
+
+	/*
+	 * Causes the mob to enter into a physical attack, think sword or fist
+	 */
+	public void Attack() {
 		if (Mana >= 5) {
 			if (FacingLeft) {
-				projectileList.add(new Projectile(currentX - width/2, currentY + height/2, width, 20));
+				projectileList.add(new Projectile(currentX - width / 2, currentY + height / 2, width, 20));
 			} else {
-				projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
-			} 
+				projectileList.add(new Projectile(currentX + width / 2, currentY + height / 2, width, 20));
+			}
 			Mana -= 5;
 		}
 	}
-	
+
+	/*
+	 * Causes the mob to shoot a projective with given velocities
+	 */
 	public void Shoot(double velX, double velY) {
 		if (Mana >= 10) {
-			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-					(int) velX, (int) velY, projectileSize));
+			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2, (int) velX,
+					(int) velY, projectileSize));
 			Mana -= 10;
 		}
 	}
-	
+
+	/*
+	 * Causes the mob to shoot a projective in the direction of the cursor.
+	 */
 	public void Shoot(Point mousePoint, Point middleScreen) {
 		if (Mana >= 10) {
 			double rY = mousePoint.getY() - middleScreen.getY();
@@ -169,17 +194,20 @@ public class Mob {
 		}
 	}
 
+	/*
+	 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
+	 * northern direction) and sets jump to 1 if jump is 0 initially.
+	 */
 	public void Jump() {
-		/*
-		 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
-		 * northern direction) and sets jump to 1 if jump is 0 initially.
-		 */
 		if (jump > 0 && velocityY >= 0) {
 			velocityY = -maxJump;
 			jump--;
 		}
 	}
 
+	/*
+	 * Causes the Mob to heal by a certain amount
+	 */
 	public void healthUp(int heal) {
 		if (Health + heal >= MaxHealth) {
 			Health = MaxHealth;
@@ -188,10 +216,13 @@ public class Mob {
 		}
 	}
 
+	/*
+	 * Uses an item in the mobs Inventory
+	 */
 	public void useItem(Item item) {
 		String itemType = item.name;
 		try {
-			if(Health < MaxHealth) {
+			if (Health < MaxHealth) {
 				if (itemType == "health") {
 					healthUp(1);
 					inventory.removeMobInventoryItem(item);
@@ -200,19 +231,23 @@ public class Mob {
 					inventory.removeMobInventoryItem(item);
 				}
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {}
+			} catch (Exception e1) {
+			}
 		}
 	}
-	
+
+	/*
+	 * Uses an item based on its index in the mobs inventory
+	 */
 	public void useItem(int index) {
-		if (inventory.currentMobItems.length >= index) {
+		if (inventory.getCurrentMobItems().length >= index) {
 			try {
-				Item item = inventory.currentMobItems[index];
+				Item item = inventory.getCurrentMobItems()[index];
 				String itemType = item.name;
 				if (itemType == "health") {
 					healthUp(1);
@@ -221,16 +256,20 @@ public class Mob {
 					healthRegen.start();
 					inventory.removeMobInventoryItem(item);
 				}
-			} catch(Exception e) {
+			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				} catch (Exception e1) {}
+				} catch (Exception e1) {
+				}
 			}
 		}
 	}
 
+	/*
+	 * Getters and setters for objects in Mob that are needed elsewhere
+	 */
 	public void addItem(Item item) {
 		inventory.addMobInventoryItem(item);
 	}
@@ -241,9 +280,10 @@ public class Mob {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			} catch (Exception e1) {}
+			} catch (Exception e1) {
+			}
 		}
 	}
 
@@ -254,11 +294,11 @@ public class Mob {
 	public Item[] readMobItems() {
 		return inventory.getCurrentMobItems();
 	}
-	
+
 	public boolean getWallSlide() {
 		return wallSlide;
 	}
-	
+
 	public int getAccelerationX() {
 		return accelerationX;
 	}
@@ -434,7 +474,7 @@ public class Mob {
 	public int getMaxHealth() {
 		return MaxHealth;
 	}
-	
+
 	public void setMaxHealth(int MaxHealth) {
 		this.MaxHealth = MaxHealth;
 	}

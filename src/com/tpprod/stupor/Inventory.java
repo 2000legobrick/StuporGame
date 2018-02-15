@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Inventory {
-	private ArrayList<Item> currentItems = new ArrayList<Item>(10);
-	public Item[] currentMobItems = new Item[0]; 
-	
+	private ArrayList<Item> currentItems = new ArrayList<Item>();
+	private Item[] currentMobItems = new Item[0];
+
+	/*
+	 * Adds to a mobs inventory, mob inventories have a limited space so the player
+	 * has to choose which items to keep
+	 */
 	public void addMobInventoryItem(Item item) {
 		boolean nullItem = false;
 		if (currentMobItems.length < 4) {
@@ -21,8 +25,8 @@ public class Inventory {
 				}
 			}
 			if (!nullItem) {
-				currentMobItems = Arrays.copyOf(currentMobItems,  currentMobItems.length + 1);
-				currentMobItems[currentMobItems.length-1] = item;
+				currentMobItems = Arrays.copyOf(currentMobItems, currentMobItems.length + 1);
+				currentMobItems[currentMobItems.length - 1] = item;
 			}
 		}
 		if (currentMobItems.length >= 4) {
@@ -37,7 +41,10 @@ public class Inventory {
 			}
 		}
 	}
-	
+
+	/*
+	 * Removes an item from a mobs inventory
+	 */
 	public void removeMobInventoryItem(Item item) {
 		for (Item i : currentMobItems) {
 			if (item == i) {
@@ -48,7 +55,11 @@ public class Inventory {
 			}
 		}
 	}
-	
+
+	/*
+	 * Add and remove methods for an item to an inventory, mainly used in the world
+	 * inventory which is theoretically infinite
+	 */
 	public void addInventoryItem(Item item) {
 		currentItems.add(item);
 	}
@@ -57,10 +68,13 @@ public class Inventory {
 		currentItems.remove(item);
 	}
 
+	/*
+	 * Getters for objects in Inventory that are needed elsewhere
+	 */
 	public ArrayList<Item> getCurrentItems() {
 		return currentItems;
 	}
-	
+
 	public Item[] getCurrentMobItems() {
 		return currentMobItems;
 	}

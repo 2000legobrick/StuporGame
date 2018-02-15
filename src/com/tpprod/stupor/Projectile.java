@@ -1,39 +1,49 @@
 package com.tpprod.stupor;
 
 public class Projectile {
-	
+
 	private static final int BULLET = 0, ARM = 1;
-	private int currentX, currentY, previousX, previousY, timer, type,
-				velocityY, velocityX, accelerationY, bulletSize, width, height;
+	private int currentX, currentY, previousX, previousY, timer, type, velocityY, velocityX, accelerationY, bulletSize,
+			width, height;
 	private int damage = 10;
 	private boolean shown;
-	
-	public Projectile () {
+
+	public Projectile() {
 		shown = false;
 	}
-	
-	public Projectile (int x, int y, int vX, int vY, int s) {
-		currentX   = x;
-		currentY   = y;
-		previousX  = x;
-		previousY  = y;
-		velocityY  = vX;
-		velocityX  = vY;
-		width      = s;
-		height     = s;
-		shown      = true;
-		type       = BULLET;
+
+	/*
+	 * A constructor for bullet projectile
+	 */
+	public Projectile(int x, int y, int vX, int vY, int s) {
+		currentX = x;
+		currentY = y;
+		previousX = x;
+		previousY = y;
+		velocityY = vX;
+		velocityX = vY;
+		width = s;
+		height = s;
+		shown = true;
+		type = BULLET;
 	}
-	
+
+	/*
+	 * A constructor for "arms" which is anything like a sword that that player can
+	 * swing, these are technically considered a projectile
+	 */
 	public Projectile(int x, int y, int tempWidth, int tempHeight) {
 		currentX = x;
 		currentY = y;
-		width    = tempWidth;
-		height   = tempHeight;
-		timer    = 60; // Approximately a second
-		type     = ARM;
+		width = tempWidth;
+		height = tempHeight;
+		timer = 60; // Approximately a second
+		type = ARM;
 	}
 
+	/*
+	 * getters and setters for objects in projectile
+	 */
 	public int getCurrentX() {
 		return currentX;
 	}

@@ -9,6 +9,10 @@ import java.util.ArrayList;
 
 public class AI{
 	
+	/*
+	 * Skipped due to the unfinished nature.
+	 */
+	
 	private ArrayList<Mob> mobsAi = new ArrayList<Mob>();
 	
 	public void setMobAIList(ArrayList<Mob> mobs){
@@ -69,7 +73,7 @@ public class AI{
 	
 	public boolean PointIntersection (Point point, World world) {
 		try {
-			if (world.worldGrid.get(point.y / StateMachine.getTileSize()).get(point.x / StateMachine.getTileSize()).getType() != 0) {
+			if (world.getWorldGrid().get(point.y / StateMachine.getTileSize()).get(point.x / StateMachine.getTileSize()).getType() != 0) {
 				return true;
 			}
 		} catch (Exception e) {}
