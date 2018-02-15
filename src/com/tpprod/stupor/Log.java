@@ -40,7 +40,7 @@ public class Log {
 	 */
 	public static void close() throws IOException {
 		String[] logs = new File("./Content/Logs").list();
-		while(logs.length > 5) {
+		while (logs.length > 10) {
 			new File("./Content/Logs/" + logs[0]).delete();
 			logs = new File("./Content/Logs").list();
 		}

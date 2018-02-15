@@ -43,52 +43,24 @@ public class AI{
 			
 			double distanceToPlayer = getDistance(new Point(mob.getCurrentX(), mob.getCurrentY()), new Point (player.getCurrentX(), player.getCurrentY()));
 			
-			if (distanceToPlayer <= StateMachine.getTileSize() * 5) {
-				if (distanceToPlayer >= StateMachine.getTileSize()) {
-					if (player.getCurrentX() > mob.getCurrentX()) {
-						mob.setVelocityX(mob.getSpeed()/2);
-						mob.FaceRight();
-						if (mob.isR2()) {
-							mob.Jump();
-						}
-					} else if (player.getCurrentX() < mob.getCurrentX()) {
-						mob.setVelocityX(-mob.getSpeed()/2);
-						mob.FaceLeft();
-						if (mob.isL2()) {
-							mob.Jump();
-						}
-					} else {
-						mob.setVelocityX(0);
+			if (distanceToPlayer <= StateMachine.getTileSize() * 6 && distanceToPlayer >= StateMachine.getTileSize()) {
+				if (player.getCurrentX() > mob.getCurrentX()) {
+					mob.setVelocityX(mob.getSpeed()/2);
+					if (mob.isR2()) {
+						mob.Jump();
 					}
-				}
-				if (mob.getProjectileList().isEmpty() && mob.getWantsToShoot() == 0) {
-					double velX = (player.getCurrentX() - mob.getCurrentX())/15;
-					double velY = ((player.getCurrentY() - mob.getCurrentY())/2 - ((double)Physics.GRAVITY / 8) * 2);
-					mob.Shoot(velX + mob.getVelocityX(), -velY);
-					mob.setWantsToShoot(6);
-				}
-			} else {
-				if (mob.isFacingLeft()) {
-					if (!mob.isL2() && mob.isL1()) {
-						mob.setVelocityX(-mob.getSpeed()/3);
-					} else {
-
-						if (!mob.isL1()) {
-							mob.setVelocityX(-mob.getSpeed()/3);
-						} else {
-							mob.FaceRight();
-						}
+				} else if (player.getCurrentX() < mob.getCurrentX()) {
+					mob.setVelocityX(-mob.getSpeed()/2);
+					if (mob.isL2()) {
+						mob.Jump();
 					}
 				} else {
-					if (!mob.isR2() && mob.isR1()) {
-						mob.setVelocityX(mob.getSpeed()/3);
-					} else {
-						if (!mob.isR1()) {
-							mob.setVelocityX(-mob.getSpeed()/3);
-						} else {
-							mob.FaceLeft();
-						}
-					}
+					mob.setVelocityX(0);
+				}
+				if (mob.getProjectileList().isEmpty()) {
+					double velX = (mob.getCurrentX() - player.getCurrentX()) / 2;
+					double velY = (mob.getCurrentY() - player.getCurrentY() - (Physics.GRAVITY * 2) / 2);
+					mob.Shoot(velX, velY);
 				}
 			}
 			

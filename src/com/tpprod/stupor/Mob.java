@@ -28,14 +28,10 @@ public class Mob {
 	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width,
 			EXP;
 	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20, wantsToShoot = 0;
+			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
 	private Inventory inventory = new Inventory();
 	private HealthRegen healthRegen = new HealthRegen();
-<<<<<<< Updated upstream
 
-=======
-	
->>>>>>> Stashed changes
 	private final int spriteWidth = 12, spriteHeight = 32;
 	private final int rows = 1, cols = 5;
 	private BufferedImage[] sprites = new BufferedImage[rows * cols];
@@ -58,49 +54,26 @@ public class Mob {
 		width = tempWidth;
 		try {
 			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
-<<<<<<< Updated upstream
 			
 			for (int i = 0; i < cols; i++) {
 				for (int j = 0; j < rows; j++) {
 					sprites[(i * rows) + j] = image.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
 							spriteHeight);
 				}
-=======
-
-			for (int i = 0; i < cols; i++)
-			{
-			    for (int j = 0; j < rows; j++)
-			    {
-			        sprites[(i * rows) + j] = image.getSubimage(
-			            i * spriteWidth,
-			            j * spriteHeight,
-			            spriteWidth,
-			            spriteHeight
-			        );
-			    }
->>>>>>> Stashed changes
 			}
 		} catch (IOException e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-<<<<<<< Updated upstream
 			try {
 				Log.add(error.toString());
 			} catch (Exception e1) {
 
-=======
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {
-				
->>>>>>> Stashed changes
 			}
 		}
 		ResetHealth();
 		ResetMana();
 	}
 
-<<<<<<< Updated upstream
 	/*
 	 * Gets the next frame of the mob animation from the sprite sheet
 	 */
@@ -215,23 +188,6 @@ public class Mob {
 	/*
 	 * Increments damage to the mob
 	 */
-=======
-	public void NextFrame() {
-		if (currentFrame < sprites.length-1) {
-			currentFrame++;
-		} else {
-			currentFrame = 0;
-		}
-		image = sprites[currentFrame];
-		if (FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
-		}
-	}
-	
->>>>>>> Stashed changes
 	public void HurtMob(int damage) {
 		if (Health - damage <= 0) {
 			Health = 0;
@@ -293,7 +249,6 @@ public class Mob {
 			Mana -= 5;
 		}
 	}
-<<<<<<< Updated upstream
 
 	/*
 	 * Causes the mob to shoot a projective with given velocities
@@ -309,18 +264,6 @@ public class Mob {
 	/*
 	 * Causes the mob to shoot a projective in the direction of the cursor.
 	 */
-=======
-	
-	public void Shoot(double velX, double velY) {
-		if (Mana >= 10) {
-			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-					(int) velY, (int) velX, projectileSize));
-			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
-			Mana -= 10;
-		}
-	}
-	
->>>>>>> Stashed changes
 	public void Shoot(Point mousePoint, Point middleScreen) {
 		if (Mana >= 10) {
 			double rY = mousePoint.getY() - middleScreen.getY();
@@ -340,7 +283,6 @@ public class Mob {
 				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
 						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize));
 			}
-			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
 	}
@@ -373,11 +315,7 @@ public class Mob {
 	public void useItem(Item item) {
 		String itemType = item.name;
 		try {
-<<<<<<< Updated upstream
 			if (Health < MaxHealth) {
-=======
-			if(Health < MaxHealth) {
->>>>>>> Stashed changes
 				if (itemType == "health") {
 					healthUp(1);
 					inventory.removeMobInventoryItem(item);
@@ -386,7 +324,6 @@ public class Mob {
 					inventory.removeMobInventoryItem(item);
 				}
 			}
-<<<<<<< Updated upstream
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -404,26 +341,10 @@ public class Mob {
 		if (inventory.getCurrentMobItems().length >= index) {
 			try {
 				Item item = inventory.getCurrentMobItems()[index];
-=======
-		} catch(Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {}
-		}
-	}
-	
-	public void useItem(int index, ArrayList<AudioFile> soundEffectList) {
-		if (inventory.currentMobItems.length >= index) {
-			try {
-				Item item = inventory.currentMobItems[index];
->>>>>>> Stashed changes
 				String itemType = item.name;
 				if (itemType == "health") {
 					healthUp(1);
 					inventory.removeMobInventoryItem(item);
-<<<<<<< Updated upstream
 				} else if (itemType == "healthRegen") {
 					healthRegen.start();
 					inventory.removeMobInventoryItem(item);
@@ -435,20 +356,6 @@ public class Mob {
 					Log.add(error.toString());
 				} catch (Exception e1) {
 				}
-=======
-					soundEffectList.get(MusicPlayer.UseItem).play();;
-				} else if (itemType == "healthRegen") {
-					healthRegen.start();
-					inventory.removeMobInventoryItem(item);
-					soundEffectList.get(MusicPlayer.UseItem).play();;
-				}
-			} catch(Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try{
-					Log.add(error.toString());
-				} catch (Exception e1) {}
->>>>>>> Stashed changes
 			}
 		}
 	}
@@ -466,16 +373,10 @@ public class Mob {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-<<<<<<< Updated upstream
 			try {
 				Log.add(error.toString());
 			} catch (Exception e1) {
 			}
-=======
-			try{
-				Log.add(error.toString());
-			} catch (Exception e1) {}
->>>>>>> Stashed changes
 		}
 	}
 
@@ -486,11 +387,7 @@ public class Mob {
 	public Item[] readMobItems() {
 		return inventory.getCurrentMobItems();
 	}
-<<<<<<< Updated upstream
 
-=======
-	
->>>>>>> Stashed changes
 	public boolean getWallSlide() {
 		return wallSlide;
 	}
@@ -685,19 +582,6 @@ public class Mob {
 
 	public Inventory getInventory() {
 		return inventory;
-	}
-
-	public int getWantsToShoot() {
-		return wantsToShoot;
-	}
-	
-	public void setWantsToShoot(int i) {
-		wantsToShoot = i;
-	}
-	
-	public void subtractFromWantsToShoot() {
-		if (wantsToShoot > 0)
-			wantsToShoot--;
 	}
 
 }

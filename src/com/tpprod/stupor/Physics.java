@@ -12,15 +12,9 @@ import java.util.ArrayList;
  */
 
 public class Physics implements Runnable {
-<<<<<<< Updated upstream
 
 	public static int GRAVITY = 3;
 
-=======
-	
-	public static int GRAVITY = 3;
-	
->>>>>>> Stashed changes
 	private Mob player = null;
 	private static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	private AI ai = new AI();
@@ -30,12 +24,9 @@ public class Physics implements Runnable {
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
 
-<<<<<<< Updated upstream
 	/*
 	 * Adds gravity to all mobs and projectile
 	 */
-=======
->>>>>>> Stashed changes
 	public void Gravity() {
 		/*
 		 * The Gravity method applies a vertical acceleration to the south that depends
@@ -72,18 +63,11 @@ public class Physics implements Runnable {
 				removeList.add(mobs.indexOf(entity));
 			}
 		}
-<<<<<<< Updated upstream
 		for (Integer i : removeList) {
 			try {
 				mobs.remove((int) i);
 			} catch (Exception e) {
 			}
-=======
-		for (Integer i:removeList) {
-			try {
-				mobs.remove((int) i);
-			} catch(Exception e) {}
->>>>>>> Stashed changes
 		}
 	}
 
@@ -171,11 +155,7 @@ public class Physics implements Runnable {
 			 */
 			try {
 				if (!entity.getProjectileList().isEmpty()) {
-<<<<<<< Updated upstream
 					for (Projectile proj : entity.getProjectileList()) {
-=======
-					for (Projectile proj: entity.getProjectileList()) {
->>>>>>> Stashed changes
 						if (proj.getTimer() == 0) {
 							proj.setPreviousX(proj.getCurrentX());
 							proj.setPreviousY(proj.getCurrentY());
@@ -244,14 +224,9 @@ public class Physics implements Runnable {
 		Item closestItem = null;
 		double closestDistance = 100;
 		double tempDistance;
-<<<<<<< Updated upstream
 		for (Item i : world.getWorldInventory().getCurrentItems()) {
 			tempDistance = getDistanceTo(new Point(entity.getCurrentX(), entity.getCurrentY()),
 					new Point(i.itemX, i.itemY));
-=======
-		for (Item i:world.getWorldInventory().getCurrentItems()) {
-			tempDistance = getDistanceTo(new Point (entity.getCurrentX(), entity.getCurrentY()), new Point(i.itemX, i.itemY));
->>>>>>> Stashed changes
 			if (tempDistance < closestDistance) {
 				closestDistance = tempDistance;
 				closestItem = i;
@@ -263,7 +238,6 @@ public class Physics implements Runnable {
 					entity.addItem(closestItem);
 					world.getWorldInventory().removeInventoryItem(closestItem);
 				}
-<<<<<<< Updated upstream
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -271,14 +245,6 @@ public class Physics implements Runnable {
 					Log.add(error.toString());
 				} catch (Exception e1) {
 				}
-=======
-			} catch(Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try{
-					Log.add(error.toString());
-				} catch (Exception e1) {}
->>>>>>> Stashed changes
 			}
 		}
 	}
@@ -492,7 +458,6 @@ public class Physics implements Runnable {
 		}
 		return false;
 	}
-<<<<<<< Updated upstream
 
 	/*
 	 * Checks if a projectile intersects a mob
@@ -504,15 +469,6 @@ public class Physics implements Runnable {
 					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight())
 							.intersects(new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(),
 									proj.getHeight()))) {
-=======
-	
-	public boolean MobIntersection (Projectile proj, int type) {
-		for (Mob entity:mobs) {
-			if (!entity.getProjectileList().contains(proj)) {
-				if (proj.getType() == Projectile.getArm()) {
-					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()).intersects(
-							new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(), proj.getHeight()))) {
->>>>>>> Stashed changes
 						entity.setHealth(entity.getHealth() - proj.getDamage());
 						if (player.getProjectileList().contains(proj)) {
 							player.setEXP(player.getEXP() + 1);
@@ -520,15 +476,10 @@ public class Physics implements Runnable {
 						return true;
 					}
 				} else if (proj.getType() == Projectile.getBullet()) {
-<<<<<<< Updated upstream
 					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(),
 							proj.getCurrentX(), proj.getCurrentY());
 					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(),
 							entity.getWidth(), entity.getHeight()))) {
-=======
-					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(), proj.getCurrentY());
-					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()))) {
->>>>>>> Stashed changes
 						entity.setHealth(entity.getHealth() - proj.getDamage());
 						if (player.getProjectileList().contains(proj)) {
 							player.setEXP(player.getEXP() + 1);
@@ -551,12 +502,9 @@ public class Physics implements Runnable {
 		data.setPlayerHealth(player.getHealth());
 		data.setPlayerMana(player.getMana());
 		data.setPlayerEXP(player.getEXP());
-<<<<<<< Updated upstream
 		for (int i = 0; i < player.getInventory().getCurrentMobItems().length; i++) {
 			data.getPlayerInventory()[i] = player.getInventory().getCurrentMobItems()[i];
 		}
-=======
->>>>>>> Stashed changes
 		try {
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
@@ -605,9 +553,6 @@ public class Physics implements Runnable {
 		 * Currently we are using this to create enemy mobs, and the player entity. We
 		 * also set the player entity to the first index of the mobs ArrayList
 		 */
-		
-		mobs.add(new Mob( 0, 0, 100,50));
-		player = mobs.get(0);
 
 		mobs.add(new Mob(0, 0, 100, 50));
 		player = mobs.get(0);
@@ -623,7 +568,6 @@ public class Physics implements Runnable {
 
 			}
 		}
-<<<<<<< Updated upstream
 
 		for (int x = 1; x < 5; x++) {
 			mobs.add(new Mob(100 * x, 0, 50, 50));
@@ -631,9 +575,6 @@ public class Physics implements Runnable {
 
 		ai.setMobAIList(mobs);
 
-=======
-		
->>>>>>> Stashed changes
 	}
 
 	/*
@@ -643,40 +584,22 @@ public class Physics implements Runnable {
 	public void run() {
 
 		// These variables are specific only to the run method
-		int tick = 0;
-		double timer = System.currentTimeMillis();
-		
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
-<<<<<<< Updated upstream
 
 		Load();
 
-=======
-		
-		Load();
-		
->>>>>>> Stashed changes
 		while (running) {
 			double current = System.nanoTime();
 			unprocessed += (current - previous) / nsPerTick;
 			previous = current;
 			while (unprocessed >= 1) {
 				// Updates game objects
-				ai.setMobAIList(mobs);
 				ai.Move(world, player);
 				Gravity();
 				Movement();
-
-				if (tick % 20 == 0) {
-					for (Mob mob:mobs) {
-						mob.setMana(mob.getMana() + 1);
-						mob.subtractFromWantsToShoot();
-					}
-				}
 				--unprocessed;
-				tick++;
 			}
 			try {
 				Thread.sleep(1);
@@ -688,10 +611,6 @@ public class Physics implements Runnable {
 				} catch (Exception e1) {
 
 				}
-			}
-			if (System.currentTimeMillis() - timer > 1000) {
-				tick = 0;
-				timer += 1000;
 			}
 		}
 	}
