@@ -1,6 +1,7 @@
 package com.tpprod.stupor;
 
 public class SettingsSaveData extends SaveData {
+<<<<<<< Updated upstream
 	/*
 	 * Saves settings that are changed in options
 	 */
@@ -28,5 +29,15 @@ public class SettingsSaveData extends SaveData {
 
 	public void setMusicPlayerVolume(float musicPlayerVolume) {
 		this.musicPlayerVolume = musicPlayerVolume;
+=======
+	private int volumeSetting = 5;
+
+	public int getVolumeSetting() {
+		return volumeSetting;
+	}
+
+	public void setVolumeSetting(int volumeSetting) {
+		this.volumeSetting = volumeSetting;
+>>>>>>> Stashed changes
 	}
 }

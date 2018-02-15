@@ -61,35 +61,34 @@ public class AudioFile implements LineListener {
 		playing = true;
 	}
 
-	/*
-	 * Stops the current song and updates playing to indicate that
-	 */
-			
-	public void stop() {
-		clip.stop();
-		playing = false;
-	}
+    public void play(){
+        play(audioVolume);
+    }
 
-	/*
-	 * Returns the boolean value of playing, which shows if a song is currently playing
-	 */
-	
-	public boolean isPlaying() {
-		return playing;
-	}
-	
-	/*
-	 * Automatically updates playing if a song starts and resets the clip if a song stops 
-	 */
-	@Override
-	public void update(LineEvent event) {
-		if (event.getType() == LineEvent.Type.START)
-			playing = true;
-		else if (event.getType() == LineEvent.Type.STOP) {
-			clip.stop();
-			clip.flush();
-			clip.setFramePosition(0);
-			playing = false;
-		}
-	}
+    public void play(float volume) {
+        gainControl.setValue(volume);
+        clip.start();
+        playing = true;
+    }
+
+    public void stop() {
+        clip.stop();
+        playing = false;
+    }
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    @Override
+    public void update(LineEvent event) {
+        if(event.getType() == LineEvent.Type.START) {
+            playing = true;
+        } else if(event.getType() == LineEvent.Type.STOP) {
+            clip.stop();
+            clip.flush();
+            clip.setFramePosition(0);
+            playing = false;
+        }
+    }
 }

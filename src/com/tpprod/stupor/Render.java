@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 
 public class Render {
+<<<<<<< Updated upstream
 
 	private static final int GameState = StateMachine.getGamestate();
 	private static final int MenuState = StateMachine.getMenustate();
@@ -33,6 +34,22 @@ public class Render {
 	private ColorSchemes palette = new ColorSchemes();
 	private static int volume = 5;
 
+=======
+	
+	private static final int GameState    =  StateMachine.getGamestate();
+	private static final int MenuState    =  StateMachine.getMenustate();
+	private static final int PauseState   =  StateMachine.getPausestate();
+	private static final int OptionState  =  StateMachine.getOptionstate();
+	private static final int UpgradeState =  StateMachine.getUpgradestate();
+	private static final int DeadState    =  StateMachine.getDeadstate();
+	private static volatile int CurrentState       =  StateMachine.getCurrentState();
+	
+	private World world = new World();
+	private static MusicPlayer bgMusic = new MusicPlayer(true);
+	private ColorSchemes palette = new ColorSchemes();
+	private static int volume = 5;
+	
+>>>>>>> Stashed changes
 	private static int fogOfWar = 7;
 
 	private boolean loading = false;
@@ -50,12 +67,12 @@ public class Render {
 		 */
 	}
 
-	public void InitializeWorld() throws IOException {
+	public void InitializeWorld(Physics physics) throws IOException {
 		/*
 		 * The InitializeWorld method gets the most current version of the world to
 		 * reference.
 		 */
-		world.Initialize();
+		world.Initialize(physics);
 	}
 
 	/*
@@ -117,6 +134,7 @@ public class Render {
 		}
 	}
 
+<<<<<<< Updated upstream
 	/*
 	 * Renders the pause screen
 	 */
@@ -140,6 +158,30 @@ public class Render {
 		if (currentMenuPos == 0) {
 			g.setColor(Color.RED);
 			g.drawString("Resume", 100, 100);
+=======
+	public void RenderState(Graphics g, int width, int height, int state, Mob player, int NextState) {
+		CurrentState = state;
+		// renders a state based on what state is passed through the constructor
+		if (NextState == state) {
+			if(CurrentState == GameState) {
+					RenderBackground(g, width, height, player);
+					RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
+					RenderHUD(g, player, width, height);
+					bgMusic.start();
+			}else if(CurrentState == MenuState) {
+					RenderMenu(g, width,height);
+					bgMusic.stop();
+			} else if (CurrentState == OptionState) {
+				RenderOption(g, width,height);
+				bgMusic.stop();
+			}else if(CurrentState == PauseState) {
+					RenderPause(g, width, height);
+			}else if(CurrentState == UpgradeState) {
+				RenderUpgrade(g, width, height);
+			}else if(CurrentState == DeadState) {
+					
+			}
+>>>>>>> Stashed changes
 		} else {
 			g.setColor(Color.WHITE);
 			g.drawString("Resume", 100, 100);
@@ -169,10 +211,64 @@ public class Render {
 			g.drawString("Main Menu", 100, 400);
 		}
 	}
+<<<<<<< Updated upstream
 
 	/*
 	 * Renders the background for the game
 	 */
+=======
+	
+	private void RenderPause(Graphics g, int width, int height) {
+		/*
+		 * The method RenderPause renders out the pause menu for the game.
+		 */
+
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.setColor(new Color(0,0,0,150));
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.RED);
+
+		ArrayList<Point> menuPoints = new ArrayList<Point> ();
+		
+		for (int x = 0; x < 4; x++) 
+			menuPoints.add(new Point(150, 90 + (100 * x)));
+		
+		currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
+
+		if (currentMenuPos == 0) {
+			g.setColor(Color.RED);
+			g.drawString("Resume", 100, 100);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Resume", 100, 100);
+		}
+
+		if (currentMenuPos == 1) {
+			g.setColor(Color.RED);
+			g.drawString("Save", 100, 200);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Save", 100, 200);
+		}
+
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Settings", 100, 300);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Settings", 100, 300);
+		}
+		
+		if (currentMenuPos == 3) {
+			g.setColor(Color.RED);
+			g.drawString("Main Menu", 100, 400);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 400);
+		}
+	}
+
+>>>>>>> Stashed changes
 	public void RenderBackground(Graphics g, int width, int height, Mob player) {
 		/*
 		 * The method RenderBackground renders out the backdrop of the game.
@@ -188,10 +284,31 @@ public class Render {
 			}
 		}
 	}
+<<<<<<< Updated upstream
 
 	/*
 	 * Renders the menu screen
 	 */
+=======
+	
+	public int getClosestIndex(ArrayList<Point> pointList, Point p2) {
+		int closestIndex = 0, closestDistance = -1, currentDistance;
+		for (Point p1: pointList) {
+			currentDistance =  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
+			if (closestDistance == -1 || closestDistance > currentDistance) {
+				closestDistance = currentDistance;
+				closestIndex = pointList.indexOf(p1);
+			}
+		}
+		if (closestDistance < 100 ) { 
+			if (currentMenuPos != closestIndex)
+				new AudioFile("Content/Audio/SoundEffects/Menu.wav").play(bgMusic.getAudioVolume()-2);
+			return closestIndex;
+		}
+		return -1;
+	}
+	
+>>>>>>> Stashed changes
 	public void RenderMenu(Graphics g, int width, int height) {
 		/*
 		 * The method RenderMenu renders out the menu for the game.
@@ -226,7 +343,11 @@ public class Render {
 				g.drawString("Load Game", 100, 200);
 			}
 		} else {
+<<<<<<< Updated upstream
 			g.setColor(Color.GRAY);
+=======
+			g.setColor(Color.WHITE);
+>>>>>>> Stashed changes
 			g.drawString("Load Game", 100, 200);
 		}
 
@@ -244,6 +365,67 @@ public class Render {
 		} else {
 			g.setColor(Color.WHITE);
 			g.drawString("Exit", 100, 400);
+		}
+	}
+	
+	public void RenderOption(Graphics g, int width, int height) {
+		/*
+		 * The method RenderOption renders out the option menu for the game.
+		 */
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+
+        Dimension box = new Dimension(50,50);
+        g.setColor(new Color(20,75,40)); // A Greenish Color
+
+        for (int x = 1; x <= 10; x++) {
+            g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height/2), box.width, box.height);
+        }
+        Dimension box1 = new Dimension(40,40);
+        g.setColor(new Color(255,255,255)); // Pure White
+        for (int x = 1; x <= volume; x++) {
+            g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height/2), box1.width, box1.height);
+        }
+
+        g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.setColor(Color.RED);
+
+		ArrayList<Point> optionPoints = new ArrayList<Point> ();
+		
+		optionPoints.add(new Point(350, 115));
+		optionPoints.add(new Point(1150, 115));
+		optionPoints.add(new Point(150, 215));
+		
+		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
+
+		g.setColor(Color.WHITE);
+		g.drawString("Volume", 100, 125);
+		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 225);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Exit", 100, 225);
+		}
+		
+		g.setFont(new Font("Impact", Font.PLAIN, 80));
+		
+		if (currentMenuPos == 0) {
+			g.setColor(Color.RED);
+			g.drawString("-", 300, 125);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("-", 300, 125);
+		}
+
+		if (currentMenuPos == 1) {
+			g.setColor(Color.RED);
+			g.drawString("+", 1100, 125);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("+", 1100, 125);
 		}
 	}
 
@@ -358,6 +540,7 @@ public class Render {
 			}
 		}
 
+<<<<<<< Updated upstream
 		for (Item item : world.getWorldInventory().getCurrentItems()) {
 			if (item.itemX + tileSize > player.getCurrentX() - tileSize * fogOfWar
 					&& item.itemX < player.getCurrentX() + tileSize * fogOfWar) {
@@ -365,6 +548,12 @@ public class Render {
 						&& item.itemY < player.getCurrentY() + tileSize * fogOfWar) {
 					DisplayedItems.add(new NewRectangle(item.itemColor,
 							new Rectangle(item.itemX, item.itemY, item.itemSize, item.itemSize)));
+=======
+		for (Item item: world.getWorldInventory().getCurrentItems()) {
+			if (item.itemX + tileSize > player.getCurrentX() - tileSize*fogOfWar && item.itemX < player.getCurrentX() + tileSize*fogOfWar) {
+				if (item.itemY + tileSize > player.getCurrentY() - tileSize*fogOfWar && item.itemY < player.getCurrentY() + tileSize*fogOfWar) {
+					DisplayedItems.add(new NewRectangle(item.itemColor, new Rectangle(item.itemX, item.itemY, item.itemSize, item.itemSize)));
+>>>>>>> Stashed changes
 				}
 			}
 		}
@@ -378,10 +567,14 @@ public class Render {
 			// rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width,
 			// rect.rect.height);
 			if (rect.getImage() != null) {
+<<<<<<< Updated upstream
 				g.drawImage(rect.getImage(),
 						rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
 						rect.getRect().y - player.getCurrentY() - player.getHeight() / 2 + height / 2,
 						rect.getRect().width, rect.getRect().height, null);
+=======
+				g.drawImage(rect.getImage(), rect.getRect().x - player.getCurrentX() - player.getWidth()/2 + width / 2, rect.getRect().y - player.getCurrentY() - player.getHeight()/2 + height/2, rect.getRect().width, rect.getRect().height, null);
+>>>>>>> Stashed changes
 			} else {
 				g.setColor(rect.getColor());
 				g.fillRect(rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
@@ -458,9 +651,18 @@ public class Render {
 		int middleHeight = height / 2;
 		int distanceFromCenter = 300;
 
+<<<<<<< Updated upstream
 		ArrayList<Point> upgradePoints = new ArrayList<Point>();
 
 		Dimension box = new Dimension(125, 125);
+=======
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		
+		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
+		
+		Dimension box = new Dimension(125,125);
+>>>>>>> Stashed changes
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
 		for (int x = 0; x < 3; x++) {
@@ -513,6 +715,7 @@ public class Render {
 		// Render Item
 		for (int i = 0; i < 4; i++) {
 			try {
+<<<<<<< Updated upstream
 				g.setColor(player.getInventory().getCurrentMobItems()[i].itemColor);
 				g.fillRect(middleWidth + 5 + (box.width + 10) * (i - 2) + box.width / 4,
 						height - (box.height + 20) + box.height / 4, box.width / 2, box.height / 2);
@@ -523,6 +726,17 @@ public class Render {
 					Log.add(error.toString());
 				} catch (Exception e1) {
 
+=======
+				g.setColor(player.getInventory().currentMobItems[i].itemColor);
+				g.fillRect(middleWidth + 5 + (box.width + 10) * (i-2) + box.width/4, height - (box.height + 20) + box.height/4, box.width/2, box.height/2);
+			} catch(Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try{
+					Log.add(error.toString());
+				}catch (Exception e1) {
+							
+>>>>>>> Stashed changes
 				}
 			}
 		}
@@ -579,6 +793,18 @@ public class Render {
 
 	public World getWorld() {
 		return world;
+	}
+	
+	public static MusicPlayer getBackgroundMusic() {
+		return bgMusic;
+	}
+	
+	public static int getVolume() {
+		return volume;
+	}
+	
+	public void setVolume(int v) {
+		volume = v;
 	}
 
 	public static MusicPlayer getBackgroundMusic() {
