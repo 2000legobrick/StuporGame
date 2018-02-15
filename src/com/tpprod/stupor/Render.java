@@ -155,10 +155,18 @@ public class Render {
 
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
-			g.drawString("Main Menu", 100, 300);
+			g.drawString("Options", 100, 300);
 		} else {
 			g.setColor(Color.WHITE);
-			g.drawString("Main Menu", 100, 300);
+			g.drawString("Options", 100, 300);
+		}
+
+		if (currentMenuPos == 3) {
+			g.setColor(Color.RED);
+			g.drawString("Main Menu", 100, 400);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 400);
 		}
 	}
 
@@ -209,11 +217,16 @@ public class Render {
 			g.drawString("New Game", 100, 100);
 		}
 
-		if (currentMenuPos == 1) {
-			g.setColor(Color.RED);
-			g.drawString("Load Game", 100, 200);
+		if (ResourceManager.hasData("SaveData")) {
+			if (currentMenuPos == 1) {
+				g.setColor(Color.RED);
+				g.drawString("Load Game", 100, 200);
+			} else {
+				g.setColor(Color.WHITE);
+				g.drawString("Load Game", 100, 200);
+			}
 		} else {
-			g.setColor(Color.WHITE);
+			g.setColor(Color.GRAY);
 			g.drawString("Load Game", 100, 200);
 		}
 
@@ -244,8 +257,6 @@ public class Render {
 
 		g.setColor(Color.BLUE);
 		g.fillRect(0, 0, width, height);
-		g.setColor(Color.RED);
-		g.drawString(Integer.toString(currentMouseX) + ", " + Integer.toString(currentMouseY), 500, 500);
 
 		Dimension box = new Dimension(50, 50);
 		g.setColor(new Color(0, 0, 0));
@@ -265,12 +276,12 @@ public class Render {
 		ArrayList<Point> optionPoints = new ArrayList<Point>();
 
 		optionPoints.add(new Point(350, 115));
-		optionPoints.add(new Point(1250, 115));
+		optionPoints.add(new Point(1050, 125));
 		optionPoints.add(new Point(150, 215));
 
 		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
 
-		g.setColor(Color.GREEN);
+		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
 
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
@@ -279,26 +290,26 @@ public class Render {
 			g.setColor(Color.RED);
 			g.drawString("-", 300, 125);
 		} else {
-			g.setColor(Color.GREEN);
+			g.setColor(Color.WHITE);
 			g.drawString("-", 300, 125);
 		}
 
 		if (currentMenuPos == 1) {
 			g.setColor(Color.RED);
-			g.drawString("+", 1200, 125);
+			g.drawString("+", 1050, 135);
 		} else {
-			g.setColor(Color.GREEN);
-			g.drawString("+", 1200, 125);
+			g.setColor(Color.WHITE);
+			g.drawString("+", 1050, 135);
 		}
 
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
-			g.drawString("Exit", 100, 225);
+			g.drawString("Main Menu", 100, 225);
 		} else {
-			g.setColor(Color.GREEN);
-			g.drawString("Exit", 100, 225);
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 225);
 		}
 	}
 

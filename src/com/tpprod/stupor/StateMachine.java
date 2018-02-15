@@ -103,7 +103,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 		try {
 			settingsData = (SettingsSaveData) ResourceManager.Load("SettingsSaveData");
-			StateMachine.getRender().setVolume(settingsData.getVolumeSetting());
+			render.setVolume(settingsData.getRenderVolume());
+			render.getBackgroundMusic().setAudioVolume(settingsData.getMusicPlayerVolume());
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -428,7 +429,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		 * finish and finally reach the end of the run method
 		 */
 		SettingsSaveData settingsData = new SettingsSaveData();
-		settingsData.setVolumeSetting(render.getVolume());
+		settingsData.setRenderVolume(render.getVolume());
+		settingsData.setMusicPlayerVolume(render.getBackgroundMusic().getAudioVolume());
 		try {
 			ResourceManager.Save(settingsData, "SettingsSaveData");
 		} catch (Exception e) {
@@ -596,7 +598,21 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			} else if (render.getCurrentMenuPos() == 1) {
 				physics.Save();
 			} else if (render.getCurrentMenuPos() == 2) {
+				physics.stop();
+				NextState = OptionState;
+			} else if (render.getCurrentMenuPos() == 3) {
+				physics.stop();
 				NextState = MenuState;
+			}
+		}
+		if (CurrentState == OptionState && arg0.getButton() == MouseEvent.BUTTON1) {
+			if (render.getCurrentMenuPos() == 0) {
+				render.getBackgroundMusic().changeVolume(-1);
+			} else if (render.getCurrentMenuPos() == 1) {
+				render.getBackgroundMusic().changeVolume(1);
+			} else if (render.getCurrentMenuPos() == 2) {
+				NextState = MenuState;
+				physics.stop();
 			}
 		}
 	}

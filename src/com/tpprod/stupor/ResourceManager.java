@@ -37,4 +37,26 @@ public class ResourceManager {
 		}
 	}
 
+	public static void deleteSave(String fileName) throws Exception {
+		try {
+			File file = new File("./Content/" + fileName);
+			file.delete();
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {}
+	}
+	}
+
+	public static boolean hasData(String fileName) {
+		File file = new File("./Content/" + fileName);
+		if (file.exists())
+			hasData = true;
+		else
+			hasData = false;
+
+		return hasData;
+	}
 }

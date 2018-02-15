@@ -78,4 +78,8 @@ public class Inventory {
 	public Item[] getCurrentMobItems() {
 		return currentMobItems;
 	}
+
+	public void setCurrentMobItems(Item[] currentMobItems) {
+		this.currentMobItems = currentMobItems;
+	}
 }

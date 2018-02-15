@@ -13,7 +13,15 @@ public class SettingsSaveData extends SaveData {
 		return volumeSetting;
 	}
 
-	public void setVolumeSetting(int volumeSetting) {
-		this.volumeSetting = volumeSetting;
+	public void setRenderVolume(int renderVolume) {
+		this.renderVolume = renderVolume;
+	}
+
+	public float getMusicPlayerVolume() {
+		return musicPlayerVolume;
+	}
+
+	public void setMusicPlayerVolume(float musicPlayerVolume) {
+		this.musicPlayerVolume = musicPlayerVolume;
 	}
 }

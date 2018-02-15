@@ -83,13 +83,8 @@ public class Mob {
 		} else {
 			currentFrame = 0;
 		}
-		image = sprites[currentFrame];
-		if (FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
-		}
+
+
 	}
 
 	/*

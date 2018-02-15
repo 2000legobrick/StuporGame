@@ -34,8 +34,7 @@ public class World {
 		 * file.
 		 */
 
-		BufferedReader bR = new BufferedReader(
-				new FileReader(Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"));
+		BufferedReader bR = new BufferedReader(new FileReader(worldFilePath));
 		String lineString;
 		ArrayList<String> line;
 		int accY = 0;
