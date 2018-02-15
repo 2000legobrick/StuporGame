@@ -482,7 +482,6 @@ public class Render {
 	 * renders the HUD of the player, items, health, mana, etc
 	 */
 	public void RenderHUD(Graphics g, Mob player, int width, int height) {
-		try {
 		int middleWidth = width / 2;
 		int middleHeight = height / 2;
 		Dimension box = new Dimension(100, 100);
@@ -501,7 +500,7 @@ public class Render {
 		}
 		// Render Health
 		double average = (double) player.getHealth() / player.getMaxHealth();
-		
+		;
 		g.setColor(new Color(255, 0, 0, 200));
 		g.fillArc(middleWidth - box.width - (box.width + 10) * 2, height - (box.height + 20), box.width, box.height, 90,
 				(int) (360 * average));
@@ -532,9 +531,6 @@ public class Render {
 		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 10);
 		g.drawString("JUMP: " + Integer.toString(player.getJumpAmount()), 10, height - 50);
 		g.drawString("MANA REGEN: " + Integer.toString(player.getManaRefreshTimer()), 10, height - 90);
-		}catch (Exception e) {
-			
-		}
 	}
 
 	/*

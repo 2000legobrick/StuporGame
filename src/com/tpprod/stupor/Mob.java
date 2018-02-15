@@ -54,7 +54,7 @@ public class Mob {
 		width = tempWidth;
 		try {
 			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
-			
+
 			for (int i = 0; i < cols; i++) {
 				for (int j = 0; j < rows; j++) {
 					sprites[(i * rows) + j] = image.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
@@ -77,112 +77,14 @@ public class Mob {
 	/*
 	 * Gets the next frame of the mob animation from the sprite sheet
 	 */
-	public void NextFrame(int list) {
-		 
-	    if (list == 0) {
-	 
-	      if (currentFrame < sprites.length-1) {
-	 
-	        currentFrame++;
-	 
-	      } else {
-	 
-	        currentFrame = 0;
-	 
-	      }
-	 
-	      image = sprites[currentFrame];
-	 
-	      if (FacingLeft) {
-	 
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	 
-	        tx.translate(-image.getWidth(null), 0);
-	 
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	 
-	        image = op.filter(image, null);
-	 
-	      }
-	 
-	    } else if (list == 1) {
-	 
-	      if (currentFrame < runningSprites.length - 1) {
-	 
-	        currentFrame++;
-	 
-	      } else {
-	 
-	        currentFrame = 0;
-	 
-	      }
-	 
-	      image = runningSprites[currentFrame];
-	 
-	      if (FacingLeft) {
-	 
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	 
-	        tx.translate(-image.getWidth(null), 0);
-	 
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	 
-	        image = op.filter(image, null);
-	 
-	      }
-	 
-	    } else if (list == 2) {
-	 
-	      if (currentFrame < walkingSprites.length-1) {
-	 
-	        currentFrame++;
-	 
-	      } else {
-	 
-	        currentFrame = 0;
-	 
-	      }
-	 
-	      image = walkingSprites[currentFrame];
-	 
-	      if (FacingLeft) {
-	 
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	 
-	        tx.translate(-image.getWidth(null), 0);
-	 
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	 
-	        image = op.filter(image, null);
-	 
-	      }
-	 
-	    } else if (list == 3) {
-	 
-	      if (currentFrame < idleSprites.length-1) {
-	 
-	        currentFrame++;
-	 
-	      } else {
-	 
-	        currentFrame = 0;
-	 
-	      }
-	 
-	      image = idleSprites[currentFrame];
-	 
-	      if (FacingLeft) {
-	 
-	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-	 
-	        tx.translate(-image.getWidth(null), 0);
-	 
-	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-	 
-	        image = op.filter(image, null);
-	 
-	      }    
-	   }
+	public void NextFrame() {
+		if (currentFrame < sprites.length - 1) {
+			currentFrame++;
+		} else {
+			currentFrame = 0;
+		}
+
+
 	}
 
 	/*

@@ -11,20 +11,10 @@ public class SaveData implements java.io.Serializable {
 	private int playerEXP = 0;
 	private int playerHealth = 0;
 	private int playerMana = 0;
-    private Item[] playerInventory = new Item[4];
- 
 
 	/*
 	 * Getters and setters for SaveData
 	 */
-    public Item[] getPlayerInventory() {
-        return playerInventory;
-    }
-   
-    public void setPlayerInventory(Item[] playerInventory) {
-        this.playerInventory = playerInventory;
-    }
-   
 	public int getPlayerCurrentX() {
 		return playerCurrentX;
 	}

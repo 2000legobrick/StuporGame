@@ -23,9 +23,6 @@ public class World {
 
 	private Inventory inventory = new Inventory();
 
-	private String worldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile";
-	 
-	
 	public World() {
 
 	}
