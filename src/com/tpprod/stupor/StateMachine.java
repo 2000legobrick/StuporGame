@@ -215,6 +215,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
 						for (Mob entity : physics.getMobs()) {
 							physics.Dampening(entity);
+						if (currentKeys.indexOf(70) != -1) { // F Key
+                            physics.pickUpItem(physics.getPlayer());
 						}
 					}
 					if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
@@ -547,6 +549,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			try {
 				ResourceManager.deleteSave("SaveData");
+				ResourceManager.deleteSave("CurrentWorldFile");
 			} catch(Exception e){
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));

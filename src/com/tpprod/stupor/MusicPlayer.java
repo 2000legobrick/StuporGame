@@ -1,5 +1,7 @@
 package com.tpprod.stupor;
 
+
+import javax.swing.plaf.nimbus.State;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;

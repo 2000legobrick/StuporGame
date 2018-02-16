@@ -14,6 +14,7 @@ public class ResourceManager {
 	/*
 	 * Saves a serialized file to a given location
 	 */
+	private static boolean hasData;
 	public static void Save(Serializable data, String fileName) throws Exception {
 		try (ObjectOutputStream oos = new ObjectOutputStream(
 				Files.newOutputStream(Paths.get("./Content/" + fileName)))) {

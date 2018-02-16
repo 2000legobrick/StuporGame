@@ -243,9 +243,9 @@ public class Physics implements Runnable {
 				}
 				if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
 					entity.addItem(closestItem);
-					world.getWorldInventory().removeInventoryItem(closestItem);
-				}
-			} catch (Exception e) {
+					world.getWorldInventory().removeWorldInventoryItem(closestItem);
+				} 
+			} catch(Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
 				try {
@@ -254,7 +254,6 @@ public class Physics implements Runnable {
 				}
 			}
 		}
-		System.out.println("Inventory After to PickUpItem: " + player.getInventory().getCurrentMobItems());
 	}
 
 	/*
@@ -523,6 +522,7 @@ public class Physics implements Runnable {
 	 */
 	public void Save() {
 		SaveData data = new SaveData();
+		SaveWorldData worldData = new SaveWorldData();
 		try {
 			data.setPlayerCurrentX(player.getCurrentX());
 			data.setPlayerCurrentY(player.getCurrentY());
@@ -588,8 +588,6 @@ public class Physics implements Runnable {
 	 */
 	public void Load() {
 		try {
-			//SaveData data = new SaveData();
-			System.out.println("Inventory Prior to Load: " + player.getInventory().getCurrentMobItems());
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());

@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -335,10 +337,20 @@ public class Render {
 
 		if (currentMenuPos == 1) {
 			g.setColor(Color.RED);
-			g.drawString("+", 1100, 125);
+			g.drawString("+", 1050, 135);
 		} else {
 			g.setColor(Color.WHITE);
-			g.drawString("+", 1100, 125);
+			g.drawString("+", 1050, 135);
+		}
+		
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Main Menu", 100, 225);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Main Menu", 100, 225);
 		}
 	}
 

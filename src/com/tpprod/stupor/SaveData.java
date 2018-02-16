@@ -13,7 +13,7 @@ public class SaveData implements java.io.Serializable {
 	private int playerEXP = 0;
 	private int playerHealth = 0;
 	private int playerMana = 0;
-	private Item[] playerInventory = new Item[4];
+	public Item[] playerInv = new Item[4];
 	private Item item1 = null, item2=null, item3=null, item4=null;
 	 
 
