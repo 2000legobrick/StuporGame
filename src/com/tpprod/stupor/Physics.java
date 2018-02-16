@@ -222,6 +222,7 @@ public class Physics implements Runnable {
 	 * Removes an item from the world and gives it to a mob
 	 */
 	public void pickUpItem(Mob entity) {
+		System.out.println("Inventory Prior to PickUpItem: " + player.getInventory().getCurrentMobItems());
 		Item closestItem = null;
 		double closestDistance = 100;
 		double tempDistance;
@@ -253,6 +254,7 @@ public class Physics implements Runnable {
 				}
 			}
 		}
+		System.out.println("Inventory After to PickUpItem: " + player.getInventory().getCurrentMobItems());
 	}
 
 	/*
@@ -586,6 +588,8 @@ public class Physics implements Runnable {
 	 */
 	public void Load() {
 		try {
+			//SaveData data = new SaveData();
+			System.out.println("Inventory Prior to Load: " + player.getInventory().getCurrentMobItems());
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());

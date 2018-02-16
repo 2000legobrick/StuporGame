@@ -226,7 +226,7 @@ public class Render {
 		/*
 		 * The method RenderMenu renders out the menu for the game.
 		 */
-
+		bgMusic.start();
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
