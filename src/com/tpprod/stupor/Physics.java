@@ -682,7 +682,7 @@ public class Physics implements Runnable {
 		if (!running) {
 			running = true;
 			mobs = new ArrayList<>();
-			mobs.add(new Mob( 0, 0, 100,50));
+			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
 			player = mobs.get(0);
 			Load();
 			for (int x = 1; x < 5; x++) {

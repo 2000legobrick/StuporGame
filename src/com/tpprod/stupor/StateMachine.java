@@ -567,16 +567,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			render.stopBackgroundMusic();
 			stop();
 		}
-		if (render.getCurrentMenuPos() == 0 && CurrentState == OptionState 
-				&& arg0.getButton() == MouseEvent.BUTTON1) {
-			render.getBackgroundMusic().changeVolume(-1);
-		} else if (render.getCurrentMenuPos() == 1 && CurrentState == OptionState
-				&& arg0.getButton() == MouseEvent.BUTTON1) {
-			render.getBackgroundMusic().changeVolume(1);
-		} else if (render.getCurrentMenuPos() == 2 && CurrentState == OptionState
-				&& arg0.getButton() == MouseEvent.BUTTON1) {
-			NextState = MenuState;
-		}
 		if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON1) {
 			physics.getPlayer().Shoot(arg0.getPoint(), new Point(getWidth() / 2, getHeight() / 2));
 		} else if (CurrentState == GameState && arg0.getButton() == MouseEvent.BUTTON3) {
