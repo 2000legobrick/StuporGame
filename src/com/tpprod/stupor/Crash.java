@@ -47,7 +47,7 @@ public class Crash extends Thread {
 			 * the error that caused the crash. Below is the creation of that panel.
 			 */
 			JPanel panel = new JPanel();
-			panel.setBounds(0, 0, 600, 400);
+			panel.setBounds(0, 0, 500, 400);
 			panel.setBackground(Color.GRAY);
 
 			Crash.setLayout(new GridLayout());
@@ -58,9 +58,7 @@ public class Crash extends Thread {
 			try {
 				errorMessage = new Scanner(new File("./Content/Logs/" + error)).useDelimiter("\\Z").next();
 				errorMessage = errorMessage.substring(errorMessage.lastIndexOf("-")-16, errorMessage.length());
-				System.out.println(errorMessage);
 				errorMessage = errorMessage.replace("\t", "<br>");
-				System.out.println(errorMessage);
 			} catch (Exception e) {
 				
 			} 
@@ -107,7 +105,7 @@ public class Crash extends Thread {
 			Crash.add(panel);
 			Crash.setResizable(false);
 			Crash.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			Crash.setSize(600, 400);
+			Crash.setSize(500, 400);
 			Crash.setLayout(null);
 			Crash.setVisible(true);
 		}

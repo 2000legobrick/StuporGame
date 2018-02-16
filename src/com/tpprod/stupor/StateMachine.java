@@ -469,7 +469,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 		}
 
-		new Crash().run();
+		//new Crash().run();
 		frame.setVisible(false);
 		frame.dispose();
 		physics.stop();
