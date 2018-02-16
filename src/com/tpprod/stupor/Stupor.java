@@ -9,15 +9,21 @@ public class Stupor {
 		 * and printed to respectively.
 		 */
 
-		// This first chunk of code creates the canvas that the object "render" will
-		// print to later.
-
+		/*
+		 * Starts a new State Machine to start the game
+		 */
 		StateMachine game = new StateMachine();
 		game.start();
 		
+		/*
+		 * Starts the log
+		 */
 		Log.start();
 		Log.add("Game Start");
 		
+		/*
+		 * Creates a shutDownHook for error reporting
+		 */
 		Runtime.getRuntime().addShutdownHook(new Crash());
 	}
 }

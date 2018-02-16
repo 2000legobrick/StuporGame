@@ -9,44 +9,51 @@ import java.awt.image.BufferedImage;
  */
 
 public class NewRectangle {
-	
+
 	private int type = 3;
 	private Color color;
 	private Rectangle rect;
 	private BufferedImage image;
-	
+
+	/*
+	 * makes a new rectangle based on arguments
+	 */
 	public NewRectangle(BufferedImage tempImage, Rectangle tempRectangle) {
 		/*
-		 * This is a constructor where the type is not important,
-		 * 	but the color and the size needs to be set when the 
-		 * 	object is created.
+		 * This is a constructor where the type is not important, but the color and the
+		 * size needs to be set when the object is created.
 		 */
-		
+
 		rect = tempRectangle;
 		image = tempImage;
 	}
-	
+
+	/*
+	 * makes a new rectangle based on arguments
+	 */
 	public NewRectangle(Color tempColor, Rectangle tempRectangle) {
 		/*
-		 * This is a constructor where the type is not important,
-		 * 	but the color and the size needs to be set when the 
-		 * 	object is created.
+		 * This is a constructor where the type is not important, but the color and the
+		 * size needs to be set when the object is created.
 		 */
-		
+
 		rect = tempRectangle;
 		color = tempColor;
 	}
-	
-	public NewRectangle (int tempType, Rectangle tempRectangle) {
+
+	/*
+	 * makes a new rectangle based on arguments
+	 */
+	public NewRectangle(int tempType, Rectangle tempRectangle) {
 		/*
-		 * This is another constructor where the the type and size are
-		 * 	set when the object is created.
+		 * This is another constructor where the the type and size are set when the
+		 * object is created.
 		 */
-		
+
 		type = tempType;
 		rect = tempRectangle;
-		
-		if (type == 0) { 		// This is a CYAN empty tile
+
+		if (type == 0) { // This is a CYAN empty tile
 			color = null;
 		} else if (type == 1) { // This is a wall tile
 			color = new Color(51, 63, 72);
@@ -57,6 +64,9 @@ public class NewRectangle {
 		}
 	}
 
+	/*
+	 * Getters for variables needed outside of newRectangle
+	 */
 	public int getType() {
 		return type;
 	}

@@ -1,7 +1,6 @@
 package com.tpprod.stupor;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -23,25 +22,31 @@ import javax.imageio.ImageIO;
 public class Mob {
 
 	private ArrayList<Projectile> projectileList = new ArrayList<Projectile>();
+	private BufferedImage runningSpriteSheet = null;
+	private BufferedImage walkingSpriteSheet = null;
+	private BufferedImage idleSpriteSheet = null;
 	private BufferedImage image = null;
 	private BufferedImage arm = null;
-	private boolean wallSlide, Agro, FacingLeft = false;
+	private boolean wallSlide, FacingLeft = false;
 	private boolean L1, L2, L3, R1, R2, R3;
-	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width, EXP;
+	private int accelerationX, accelerationY, currentX, currentY, velocityX, velocityY, Health, Mana, height, width,
+			EXP;
 	private int MaxHealth = 30, MaxMana = 30, jump = 0, speed = 20, maxVelocity = 20, shootingVelocity = 60,
-			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20;
+			projectileSize = 10, maxJump = 36, jumpAmount = 2, dampening = 1, ManaRefreshTimer = 20, wantsToShoot = 0;
 	private Inventory inventory = new Inventory();
 	private HealthRegen healthRegen = new HealthRegen();
-	
+
 	private final int spriteWidth = 12, spriteHeight = 32;
-	private final int rows = 1, cols = 5;
-	private BufferedImage[] sprites = new BufferedImage[rows * cols];
-	private BufferedImage[] runningSprites = new BufferedImage[10 * 2];
-	private BufferedImage[] walkingSprites = new BufferedImage[10 * 2];
-	private BufferedImage[] idleSprites = new BufferedImage[10 * 2];
+	private BufferedImage[] runningSprites = new BufferedImage[5];
+	private BufferedImage[] walkingSprites = new BufferedImage[10];
+	private BufferedImage[] idleSprites = new BufferedImage[6];
 	private int currentFrame = 0;
-	
-	public Mob (int posX, int posY, int tempHeight, int tempWidth) {
+
+	/*
+	 * General Constructor for a mob, sets up all of the variables needed to be able
+	 * to place the mob in the world
+	 */
+	public Mob(int posX, int posY, int tempHeight, int tempWidth) {
 		/*
 		 * This is a constructor where the position, color, and size can be set.
 		 */
@@ -50,91 +55,92 @@ public class Mob {
 		height = tempHeight;
 		width = tempWidth;
 		try {
-			image = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
-
-			for (int i = 0; i < cols; i++)
-			{
-			    for (int j = 0; j < rows; j++)
-			    {
-			        sprites[(i * rows) + j] = image.getSubimage(
-			            i * spriteWidth,
-			            j * spriteHeight,
-			            spriteWidth,
-			            spriteHeight
-			        );
-			    }
+			runningSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
+			walkingSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerWalkingSpriteSheet.png"));
+			idleSpriteSheet    = ImageIO.read(new File("./Content/Textures/PlayerIdleSpriteSheet.png"));
+			
+			for (int i = 0; i < 5; i++) {
+				for (int j = 0; j < 1; j++) {
+					runningSprites[(i) + j] = runningSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
+							spriteHeight);
+				}
 			}
+			for (int i = 0; i < 10; i++) {
+				for (int j = 0; j < 1; j++) {
+					walkingSprites[(i) + j] = walkingSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
+							spriteHeight);
+				}
+			}
+			int accIdle = 0;
+			for (int i = 0; i < 2; i++) {
+				for (int x = 0; x < 3; x++) {
+					idleSprites[accIdle] = idleSpriteSheet.getSubimage(i * spriteWidth, 0, spriteWidth, spriteHeight);
+					accIdle++;
+				}
+			}
+			image = idleSprites[0];
 		} catch (IOException e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {
-				
+			} catch (Exception e1) {
+
 			}
 		}
 		ResetHealth();
 		ResetMana();
 	}
 
-	public void NextFrame(int list) {
-		if (list == 0) {
-			if (currentFrame < sprites.length-1) {
-				currentFrame++;
-			} else {
-				currentFrame = 0;
-			}
-			image = sprites[currentFrame];
-			if (FacingLeft) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-image.getWidth(null), 0);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-				image = op.filter(image, null);
-			}
-		} else if (list == 1) {
-			if (currentFrame < runningSprites.length - 1) {
-				currentFrame++;
-			} else {
-				currentFrame = 0;
-			}
-			image = runningSprites[currentFrame];
-			if (FacingLeft) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-image.getWidth(null), 0);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-				image = op.filter(image, null);
-			}
-		} else if (list == 2) {
-			if (currentFrame < walkingSprites.length-1) {
-				currentFrame++;
-			} else {
-				currentFrame = 0;
-			}
-			image = walkingSprites[currentFrame];
-			if (FacingLeft) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-image.getWidth(null), 0);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-				image = op.filter(image, null);
-			}
-		} else if (list == 3) {
-			if (currentFrame < idleSprites.length-1) {
-				currentFrame++;
-			} else {
-				currentFrame = 0;
-			}
-			image = idleSprites[currentFrame];
-			if (FacingLeft) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-image.getWidth(null), 0);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-				image = op.filter(image, null);
-			}
-		}
-
-
+	/*
+	 * Gets the next frame of the mob animation from the sprite sheet
+	 */
+	 public void NextFrame(int list) {
+	    if (list == 1) {
+	      if (currentFrame < runningSprites.length - 1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = runningSprites[currentFrame];
+	      if (FacingLeft) {
+	        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+	        tx.translate(-image.getWidth(null), 0);
+	        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+	        image = op.filter(image, null);
+	      }
+	    } else if (list == 2) {
+	      if (currentFrame < walkingSprites.length-1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = walkingSprites[currentFrame];
+	      if (FacingLeft) {
+		        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		        tx.translate(-image.getWidth(null), 0);
+		        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		        image = op.filter(image, null);
+	      }
+	    } else if (list == 3) {
+	      if (currentFrame < idleSprites.length-1) {
+	        currentFrame++;
+	      } else {
+	        currentFrame = 0;
+	      }
+	      image = idleSprites[currentFrame];
+	      if (FacingLeft) {
+		        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		        tx.translate(-image.getWidth(null), 0);
+		        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		        image = op.filter(image, null);
+	      }
+	   }
 	}
-	
+
+	/*
+	 * Increments damage to the mob
+	 */
 	public void HurtMob(int damage) {
 		if (Health - damage <= 0) {
 			Health = 0;
@@ -142,54 +148,68 @@ public class Mob {
 			Health -= damage;
 		}
 	}
-	
+
+	/*
+	 * Resets the mobs health, mainly used on the player for development purposes
+	 */
 	public void ResetHealth() {
 		Health = MaxHealth;
 	}
-	
+
+	/*
+	 * Resets the mobs health, mainly used on the player for development purposes
+	 */
 	public void ResetMana() {
 		Mana = MaxMana;
 	}
-	
+
+	/*
+	 * Changes which way the mob is facing
+	 */
 	public void FaceLeft() {
 		if (!FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
 			FacingLeft = true;
 		}
 	}
 
+	/*
+	 * Changes which way the mob is facing
+	 */
 	public void FaceRight() {
 		if (FacingLeft) {
-			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-			tx.translate(-image.getWidth(null), 0);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			image = op.filter(image, null);
 			FacingLeft = false;
 		}
 	}
-	
-	public void Attack () {
+
+	/*
+	 * Causes the mob to enter into a physical attack, think sword or fist
+	 */
+	public void Attack() {
 		if (Mana >= 5) {
 			if (FacingLeft) {
-				projectileList.add(new Projectile(currentX - width/2, currentY + height/2, width, 20));
+				projectileList.add(new Projectile(currentX - width / 2, currentY + height / 2, width, 20));
 			} else {
-				projectileList.add(new Projectile(currentX + width/2, currentY + height/2, width, 20));
-			} 
+				projectileList.add(new Projectile(currentX + width / 2, currentY + height / 2, width, 20));
+			}
 			Mana -= 5;
 		}
 	}
-	
+
+	/*
+	 * Causes the mob to shoot a projective with given velocities
+	 */
 	public void Shoot(double velX, double velY) {
 		if (Mana >= 10) {
 			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-					(int) velX, (int) velY, projectileSize));
+					(int) velY, (int) velX, projectileSize));
+			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
 	}
-	
+
+	/*
+	 * Causes the mob to shoot a projective in the direction of the cursor.
+	 */
 	public void Shoot(Point mousePoint, Point middleScreen) {
 		if (Mana >= 10) {
 			double rY = mousePoint.getY() - middleScreen.getY();
@@ -209,21 +229,25 @@ public class Mob {
 				projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
 						(int) (magnitude * Math.sin(theta)), (int) (-magnitude * Math.cos(theta)), projectileSize));
 			}
+			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
 	}
 
+	/*
+	 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
+	 * northern direction) and sets jump to 1 if jump is 0 initially.
+	 */
 	public void Jump() {
-		/*
-		 * The Jump method sets the Mobs velocity to a negative maxJump (this is in the
-		 * northern direction) and sets jump to 1 if jump is 0 initially.
-		 */
 		if (jump > 0 && velocityY >= 0) {
 			velocityY = -maxJump;
 			jump--;
 		}
 	}
 
+	/*
+	 * Causes the Mob to heal by a certain amount
+	 */
 	public void healthUp(int heal) {
 		if (Health + heal >= MaxHealth) {
 			Health = MaxHealth;
@@ -242,9 +266,10 @@ public class Mob {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			} catch (Exception e1) {}
+			} catch (Exception e1) {
+			}
 		}
 	}
 	
@@ -264,11 +289,11 @@ public class Mob {
 	public Item[] readMobItems() {
 		return inventory.getCurrentMobItems();
 	}
-	
+
 	public boolean getWallSlide() {
 		return wallSlide;
 	}
-	
+
 	public int getAccelerationX() {
 		return accelerationX;
 	}
@@ -444,7 +469,7 @@ public class Mob {
 	public int getMaxHealth() {
 		return MaxHealth;
 	}
-	
+
 	public void setMaxHealth(int MaxHealth) {
 		this.MaxHealth = MaxHealth;
 	}
@@ -459,6 +484,19 @@ public class Mob {
 
 	public Inventory getInventory() {
 		return inventory;
+	}
+
+	public int getWantsToShoot() {
+		return wantsToShoot;
+	}
+	
+	public void setWantsToShoot(int i) {
+		wantsToShoot = i;
+	}
+	
+	public void subtractFromWantsToShoot() {
+		if (wantsToShoot > 0)
+			wantsToShoot--;
 	}
 
 	public HealthRegen getHealthRegen() {

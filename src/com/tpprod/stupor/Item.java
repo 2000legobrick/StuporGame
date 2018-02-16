@@ -1,6 +1,6 @@
 package com.tpprod.stupor;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Item implements java.io.Serializable{
 	private static final long serialVersionUID = 1L;
@@ -10,9 +10,16 @@ public class Item implements java.io.Serializable{
 	Color itemColor = Color.GREEN;
 	int itemSize = 25;
 
+	/*
+	 * Default constructor
+	 */
 	public Item() {
 
 	}
+
+	/*
+	 * Overrides the default for special items
+	 */
 	public Item(int x, int y, Color color, int size, String n) {
 		itemX = x;
 		itemY = y;
