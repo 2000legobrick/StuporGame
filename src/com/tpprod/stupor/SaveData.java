@@ -61,7 +61,7 @@ public class SaveData implements java.io.Serializable {
 	}
 
 	public Item[] getPlayerInventory() {
-		return playerInventory;
+		return playerInv;
 	}
 	
 	public Item getItem1() {

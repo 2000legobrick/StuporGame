@@ -227,6 +227,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						animate.Animate(physics.getMobs());
 					}
 					break;
+				}
+				
 				case MenuState:
 					if (currentKeys.indexOf(87) != -1) { // W Key
 						render.setCurrentMenuPos(render.getCurrentMenuPos() - 1);
