@@ -6,6 +6,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.Serializable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -231,49 +232,6 @@ public class Mob {
 		}
 	}
 
-	public void useItem(Item item) {
-		String itemType = item.name;
-		try {
-			if(Health < MaxHealth) {
-				if (itemType == "health") {
-					healthUp(1);
-					inventory.removeMobInventoryItem(item);
-				} else if (itemType == "healthRegen") {
-					healthRegen.start();
-					inventory.removeMobInventoryItem(item);
-				}
-			}
-		} catch(Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {}
-		}
-	}
-	
-	public void useItem(int index) {
-		if (inventory.currentMobItems.length >= index) {
-			try {
-				Item item = inventory.currentMobItems[index];
-				String itemType = item.name;
-				if (itemType == "health") {
-					healthUp(1);
-					inventory.removeMobInventoryItem(item);
-				} else if (itemType == "healthRegen") {
-					healthRegen.start();
-					inventory.removeMobInventoryItem(item);
-				}
-			} catch(Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try{
-					Log.add(error.toString());
-				} catch (Exception e1) {}
-			}
-		}
-	}
-
 	public void addItem(Item item) {
 		inventory.addMobInventoryItem(item);
 	}
@@ -289,7 +247,16 @@ public class Mob {
 			} catch (Exception e1) {}
 		}
 	}
+	
+	public void resetInventory() {
+		for (Item i: inventory.getCurrentMobItems()) {
+			inventory.removeMobInventoryItem(i);
+		}
+		inventory.setCurrentMobItems(new Item[0]);
+	}
+	
 
+	
 	public ArrayList<Item> readItems() {
 		return inventory.getCurrentItems();
 	}
@@ -492,6 +459,14 @@ public class Mob {
 
 	public Inventory getInventory() {
 		return inventory;
+	}
+
+	public HealthRegen getHealthRegen() {
+		return healthRegen;
+	}
+
+	public void setHealthRegen(HealthRegen healthRegen) {
+		this.healthRegen = healthRegen;
 	}
 
 }

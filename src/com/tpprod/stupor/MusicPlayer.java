@@ -21,8 +21,7 @@ public class MusicPlayer implements Runnable {
     //Creates a playlist of all the songs in the audio folder
     public MusicPlayer() {
         File[] bgFiles = new File(bgPath).listFiles();
-        //File[] seFiles = new File(sePath).listFiles();
-    	setPlaylist(bgMusic,bgPath, bgFiles);
+        setPlaylist(bgMusic,bgPath, bgFiles);
     }
     
     public void setPlaylist(ArrayList<AudioFile> playlist, String pathName, File[] files) {

@@ -55,6 +55,14 @@ public class Render {
 		 */
 	}
 
+	public void stopBackgroundMusic() {
+		bgMusic.stop();
+	}
+
+	public void startBackgroundMusic() {
+		bgMusic.start();
+	}
+
 	public void InitializeWorld() throws IOException {
 		/*
 		 * The InitializeWorld method gets the most current version of the world to
@@ -99,16 +107,14 @@ public class Render {
 				RenderHUD(g, player, width, height);
 			}else if(CurrentState == MenuState) {
 				RenderMenu(g, width,height);
-				bgMusic.start();
 			} else if (CurrentState == OptionState) {
 				RenderOption(g, width,height);
-				bgMusic.stop();
 			}else if(CurrentState == PauseState) {
-					RenderPause(g, width, height);
+				RenderPause(g, width, height);
 			}else if(CurrentState == UpgradeState) {
-					RenderUpgrade(g, width, height);
+				RenderUpgrade(g, width, height);
 			}else if(CurrentState == DeadState) {
-					
+
 			}
 		} else {
 			loading = true;
@@ -255,7 +261,8 @@ public class Render {
 		/*
 		 * The method RenderOption renders out the option menu for the game.
 		 */
-		
+		bgMusic.stop();
+
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 

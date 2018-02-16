@@ -1,5 +1,6 @@
 package com.tpprod.stupor;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Line2D;
@@ -212,10 +213,15 @@ public class Physics implements Runnable {
 		}
 		if (closestItem != null) {
 			try {
-				if (entity.getInventory().getCurrentMobItems().length < 5) {
+				int nullCount = 0;
+				for (Item i : entity.getInventory().getCurrentMobItems()) {
+					if (i == null)
+						nullCount++;
+				}
+				if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
 					entity.addItem(closestItem);
 					world.getWorldInventory().removeInventoryItem(closestItem);
-				}
+				} 
 			} catch(Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -453,17 +459,32 @@ public class Physics implements Runnable {
 		return false;
 	}
 	
+	public void useItem(int index) {
+		if (player.getInventory().getCurrentMobItems().length >= index) {
+			if (player.getInventory().getCurrentMobItems()[index] != null) {
+				Item[] playerInventory = player.getInventory().getCurrentMobItems();
+				Item item = playerInventory[index];
+				String itemType = item.getName();
+				if (itemType.equals("health")) {
+					player.healthUp(1);
+					player.getInventory().removeMobInventoryItem(item);
+				} else if (itemType.equals("healthRegen")) {
+					player.getHealthRegen().start();
+					player.getInventory().removeMobInventoryItem(item);
+				}
+			}
+		}
+	}
+	
 	public void Save() {
 		SaveData data = new SaveData();
-		data.setPlayerCurrentX(player.getCurrentX());
-		data.setPlayerCurrentY(player.getCurrentY());
-		data.setPlayerHealth(player.getHealth());
-		data.setPlayerMana(player.getMana());
-		data.setPlayerEXP(player.getEXP());
-		for (int i = 0; i < player.getInventory().getCurrentMobItems().length; i++) {
-			data.getPlayerInventory()[i] = player.getInventory().getCurrentMobItems()[i];
-		}
 		try {
+			data.setPlayerCurrentX(player.getCurrentX());
+			data.setPlayerCurrentY(player.getCurrentY());
+			data.setPlayerHealth(player.getHealth());
+			data.setPlayerMana(player.getMana());
+			data.setPlayerEXP(player.getEXP());
+			savePlayerInv(data);
 			ResourceManager.Save(data, "SaveData");
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
@@ -476,6 +497,46 @@ public class Physics implements Runnable {
 		}
 	}
 	
+	public void savePlayerInv(SaveData data) {
+		Item i = null;
+		if (player.getInventory().getCurrentMobItems().length >= 1) {
+			Item item1 = player.getInventory().getCurrentMobItems()[0];
+			if (item1 != null)
+				data.setItem1(item1.getItemX(),item1.getItemY(),item1.getItemColor(),item1.getItemSize(),item1.getName());
+			else if (item1 == null)
+				data.setItem1(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 2) {
+			Item item2 = player.getInventory().getCurrentMobItems()[1];
+			if (item2 != null)
+				data.setItem2(item2.getItemX(),item2.getItemY(),item2.getItemColor(),item2.getItemSize(),item2.getName());
+			else if (item2 == null)
+				data.setItem2(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 3) {
+			Item item3 = player.getInventory().getCurrentMobItems()[2];
+			if (item3 != null)
+				data.setItem3(item3.getItemX(),item3.getItemY(),item3.getItemColor(),item3.getItemSize(),item3.getName());
+			else if (item3 == null)
+				data.setItem3(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 4) {
+			Item item4 = player.getInventory().getCurrentMobItems()[3];
+			if (item4 != null)
+				data.setItem4(item4.getItemX(),item4.getItemY(),item4.getItemColor(),item4.getItemSize(),item4.getName());
+			else if (item4 == null)
+				data.setItem4(i);
+		}
+	}
+
+	public void loadPlayerInv(SaveData data) {
+		player.resetInventory();
+		player.getInventory().addMobInventoryItem(data.getItem1());
+		player.getInventory().addMobInventoryItem(data.getItem2());
+		player.getInventory().addMobInventoryItem(data.getItem3());
+		player.getInventory().addMobInventoryItem(data.getItem4());
+	}
+	
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
@@ -484,10 +545,8 @@ public class Physics implements Runnable {
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
-			for (int i = 0; i < data.getPlayerInventory().length; i++) {
-				player.getInventory().addMobInventoryItem(data.getPlayerInventory()[i]);
-			}
-		} catch (Exception e) {
+			loadPlayerInv(data);
+			} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
 			try{
@@ -506,14 +565,6 @@ public class Physics implements Runnable {
 		 * 	We also set the player entity to the first index of the mobs ArrayList
 		 */
 		
-		mobs.add(new Mob( 0, 0, 100,50));
-		player = mobs.get(0);
-
-		for (int x = 1; x < 5; x++) {
-			mobs.add(new Mob( 100 * x, 0, 50,50));
-		}
-		
-		ai.setMobAIList(mobs);
 		
 	}
 	
@@ -524,10 +575,6 @@ public class Physics implements Runnable {
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
-
-
-		Load();
-
 
 		while (running) {
 			double current = System.nanoTime();
@@ -555,14 +602,26 @@ public class Physics implements Runnable {
 	}
 	
 	public void start() {
+		
 		if (!running) {
 			running = true;
+			mobs = new ArrayList<>();
+			mobs.add(new Mob( 0, 0, 100,50));
+			player = mobs.get(0);
+			Load();
+			for (int x = 1; x < 5; x++) {
+				mobs.add(new Mob( 100 * x, 0, 50,50));
+			}
+			
+			ai.setMobAIList(mobs);
+			
 			new Thread(this).start();
 		}
 	}
 	
 	public void stop() {
 		Save();
+		
 		running = false;
 	}
 

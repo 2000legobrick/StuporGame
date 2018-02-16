@@ -2,7 +2,8 @@ package com.tpprod.stupor;
 
 import java.awt.*;
 
-public class Item {
+public class Item implements java.io.Serializable{
+	private static final long serialVersionUID = 1L;
 	int itemX = 0;
 	int itemY = 0;
 	String name = "";
@@ -19,4 +20,36 @@ public class Item {
 		itemSize = size;
 		name = n;
 	}
+	public int getItemX() {
+		return itemX;
+	}
+	public void setItemX(int itemX) {
+		this.itemX = itemX;
+	}
+	public int getItemY() {
+		return itemY;
+	}
+	public void setItemY(int itemY) {
+		this.itemY = itemY;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public Color getItemColor() {
+		return itemColor;
+	}
+	public void setItemColor(Color itemColor) {
+		this.itemColor = itemColor;
+	}
+	public int getItemSize() {
+		return itemSize;
+	}
+	public void setItemSize(int itemSize) {
+		this.itemSize = itemSize;
+	}
+	
+	
 }

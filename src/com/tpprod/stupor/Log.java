@@ -9,7 +9,7 @@ import java.util.Calendar;
 
 public class Log {
 	private static BufferedWriter bw;
-	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh-mm-ss");
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
 	private static String date = sdf.format(Calendar.getInstance().getTime());
 	public static void start() throws IOException{
 		File file = new File("./Content/Logs/" + date);
