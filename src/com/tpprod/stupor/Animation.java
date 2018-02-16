@@ -3,19 +3,14 @@ package com.tpprod.stupor;
 import java.util.ArrayList;
 
 public class Animation {
-    private ArrayList<Mob> mobs = new ArrayList<Mob>();
-
-    public void Animate() {
-        mobs = StateMachine.getPhysics().getMobs();
+    public void Animate(ArrayList<Mob> mobs) {
         for (Mob entity : mobs) {
-            if (entity.getVelocityX() > 12 || entity.getVelocityX() < -12) {
+            if (entity.getVelocityX() > entity.getSpeed() - 5 || entity.getVelocityX() < -entity.getSpeed() + 5) {
                 entity.NextFrame(1);
-            } else if (entity.getVelocityX() != 0 && entity.getVelocityX() > -12 && entity.getVelocityX() < 12) {
+            } else if (entity.getVelocityX() != 0) {
                 entity.NextFrame(2);
-            } else if (entity.getVelocityX() == 0) {
-                entity.NextFrame(3);
             } else {
-                entity.NextFrame(0);
+                entity.NextFrame(3);
             }
         }
     }

@@ -1,13 +1,19 @@
 package com.tpprod.stupor;
 
-import java.io.*;
+import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ResourceManager {
 
-	private static boolean hasData;
-
+	/*
+	 * Saves a serialized file to a given location
+	 */
 	public static void Save(Serializable data, String fileName) throws Exception {
 		try (ObjectOutputStream oos = new ObjectOutputStream(
 				Files.newOutputStream(Paths.get("./Content/" + fileName)))) {
@@ -15,12 +21,17 @@ public class ResourceManager {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {}
+			} catch (Exception e1) {
+
+			}
 		}
 	}
 
+	/*
+	 * Opens a serialized file
+	 */
 	public static Object Load(String fileName) throws Exception {
 		try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(Paths.get("./Content/" + fileName)))) {
 			return ois.readObject();
@@ -42,6 +53,7 @@ public class ResourceManager {
 
 	public static boolean hasData(String fileName) {
 		File file = new File("./Content/" + fileName);
+		boolean hasData;
 		if (file.exists())
 			hasData = true;
 		else

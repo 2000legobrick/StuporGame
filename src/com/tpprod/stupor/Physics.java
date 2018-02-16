@@ -13,9 +13,9 @@ import java.util.ArrayList;
  */
 
 public class Physics implements Runnable {
-	
+
 	public static int GRAVITY = 3;
-	
+
 	private Mob player = null;
 	private static ArrayList<Mob> mobs = new ArrayList<Mob>();
 	private AI ai = new AI();
@@ -25,67 +25,70 @@ public class Physics implements Runnable {
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
 
+	/*
+	 * Adds gravity to all mobs and projectile
+	 */
 	public void Gravity() {
 		/*
 		 * The Gravity method applies a vertical acceleration to the south that depends
 		 * on is the mobs is wall sliding.
 		 */
 		for (Mob entity : mobs) {
-			if (entity.getWallSlide()){
+			if (entity.getWallSlide()) {
 				entity.setAccelerationY(GRAVITY / 2);
 			} else {
 				entity.setAccelerationY(GRAVITY);
 			}
 			try {
-				for (Projectile proj: entity.getProjectileList())
+				for (Projectile proj : entity.getProjectileList())
 					proj.setAccelerationY(GRAVITY);
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				}catch (Exception e1) {
-					
+				} catch (Exception e1) {
+
 				}
 			}
 		}
 	}
-	
+
+	/*
+	 * Checks if a mob is dead, if so it removes it
+	 */
 	public void CheckForDead() {
 		ArrayList<Integer> removeList = new ArrayList<Integer>();
-		for (Mob entity:mobs) {
-			if (entity.getHealth() <= 0)  {
+		for (Mob entity : mobs) {
+			if (entity.getHealth() <= 0) {
 				removeList.add(mobs.indexOf(entity));
 			}
 		}
-		for (Integer i:removeList) {
+		for (Integer i : removeList) {
 			try {
 				mobs.remove((int) i);
-			} catch(Exception e) {}
+			} catch (Exception e) {
+			}
 		}
 	}
 
+	/*
+	 * The Movement method iterates through each of the mobs within the ArrayList
+	 * mobs and changes their velocity based off their acceleration and their
+	 * position based off their velocities.
+	 */
 	public void Movement() {
-		/*
-		 * The Movement method iterates through each of the mobs within the 
-		 * 	ArrayList mobs and changes their velocity based off their acceleration
-		 * 	and their position based off their velocities.
-		 */
 
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
-		
 		CheckForDead();
-		
+
 		for (Mob entity : mobs) {
 			// Changing velocity by acceleration
 			entity.setVelocityY(entity.getVelocityY() + entity.getAccelerationY());
 			entity.setVelocityX(entity.getVelocityX() + entity.getAccelerationX());
-			
+
 			if (entity.getVelocityY() < 0) {
-				// If the vertical velocity is less than zero (moving north) and the object won't
+				// If the vertical velocity is less than zero (moving north) and the object
+				// won't
 				// intersect with another object, move it by the amount of velocityY
 				// else call move to wall
 				if (Intersection(entity, 1, Math.abs(entity.getVelocityY()), world) == 1) {
@@ -99,7 +102,8 @@ public class Physics implements Runnable {
 					entity.setVelocityY(entity.getMaxVelocity());
 				}
 
-				// If the object won't intersect with another object, move it by the amount of velocityY
+				// If the object won't intersect with another object, move it by the amount of
+				// velocityY
 				// else call move to wall
 				if (Intersection(entity, 2, Math.abs(entity.getVelocityY()), world) == 2) {
 					entity.setCurrentY(entity.getCurrentY() + entity.getVelocityY());
@@ -113,7 +117,8 @@ public class Physics implements Runnable {
 			}
 
 			if (entity.getVelocityX() < 0) {
-				// If horizontal velocity is less than 0 (moving west) check if there is an intersection
+				// If horizontal velocity is less than 0 (moving west) check if there is an
+				// intersection
 				// with its next move and if not then move the object
 				// else call move to wall to the west
 				if (Intersection(entity, 3, Math.abs(entity.getVelocityX()), world) == 3) {
@@ -133,25 +138,29 @@ public class Physics implements Runnable {
 
 			// Applies dampening to to horizontal acceleration
 			if (entity.getAccelerationX() > 0) {
-				entity.setAccelerationX(entity.getAccelerationX()-entity.getDampening());
+				entity.setAccelerationX(entity.getAccelerationX() - entity.getDampening());
 				if (entity.getAccelerationX() < 0) {
 					entity.setAccelerationX(0);
 				}
 			} else if (entity.getAccelerationX() < 0) {
-				entity.setAccelerationX(entity.getAccelerationX()-entity.getDampening());
+				entity.setAccelerationX(entity.getAccelerationX() - entity.getDampening());
 				if (entity.getAccelerationX() > 0) {
 					entity.setAccelerationX(0);
 				}
 			}
-			
+
 			ArrayList<Integer> removeIndex = new ArrayList<Integer>();
+			/*
+			 * Iterates through all of the projectiles and runs their needed physics
+			 * calculations and decides if the projectile needs to be removed
+			 */
 			try {
 				if (!entity.getProjectileList().isEmpty()) {
-					for (Projectile proj: entity.getProjectileList()) {
+					for (Projectile proj : entity.getProjectileList()) {
 						if (proj.getTimer() == 0) {
 							proj.setPreviousX(proj.getCurrentX());
 							proj.setPreviousY(proj.getCurrentY());
-							proj.setVelocityY(proj.getVelocityY()-proj.getAccelerationY());
+							proj.setVelocityY(proj.getVelocityY() - proj.getAccelerationY());
 							if (MobIntersection(proj, proj.getType())) {
 								removeIndex.add(entity.getProjectileList().indexOf(proj));
 							} else if (!ProjectileIntersection(proj)) {
@@ -160,7 +169,8 @@ public class Physics implements Runnable {
 							} else {
 								removeIndex.add(entity.getProjectileList().indexOf(proj));
 							}
-							if (getDistance(new Point(proj.getCurrentX(), proj.getCurrentY()), new Point(entity.getCurrentX(), entity.getCurrentY())) > 5000) {
+							if (getDistance(new Point(proj.getCurrentX(), proj.getCurrentY()),
+									new Point(entity.getCurrentX(), entity.getCurrentY())) > 5000) {
 								removeIndex.add(entity.getProjectileList().indexOf(proj));
 							}
 						} else {
@@ -168,44 +178,56 @@ public class Physics implements Runnable {
 								removeIndex.add(entity.getProjectileList().indexOf(proj));
 							}
 							if (entity.isFacingLeft()) {
-								proj.setCurrentX(entity.getCurrentX() - entity.getWidth()/2);
+								proj.setCurrentX(entity.getCurrentX() - entity.getWidth() / 2);
 							} else {
-								proj.setCurrentX(entity.getCurrentX() + entity.getWidth()/2);
+								proj.setCurrentX(entity.getCurrentX() + entity.getWidth() / 2);
 							}
-							proj.setCurrentY(entity.getCurrentY() + entity.getHeight()/2);
-							proj.setTimer(proj.getTimer()-1);
+							proj.setCurrentY(entity.getCurrentY() + entity.getHeight() / 2);
+							proj.setTimer(proj.getTimer() - 1);
 							if (proj.getTimer() == 1) {
 								removeIndex.add(entity.getProjectileList().indexOf(proj));
 							}
 						}
 					}
-					for (int i: removeIndex) {
+					/*
+					 * Removes all projectiles that have intersected something or existed too too
+					 * long.
+					 */
+					for (int i : removeIndex) {
 						entity.getProjectileList().remove(i);
 					}
 				}
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				}catch (Exception e1) {
-					
+				} catch (Exception e1) {
+
 				}
 			}
 		}
 	}
 
+	/*
+	 * Using the pythagorean theorem to determine the distance between two points
+	 */
 	public double getDistanceTo(Point point1, Point point2) {
-		double distance = Math.sqrt(Math.pow(point1.getX() - point2.getX(), 2) + Math.pow(point1.getY() - point2.getY(), 2));
+		double distance = Math
+				.sqrt(Math.pow(point1.getX() - point2.getX(), 2) + Math.pow(point1.getY() - point2.getY(), 2));
 		return distance;
 	}
 
+	/*
+	 * Removes an item from the world and gives it to a mob
+	 */
 	public void pickUpItem(Mob entity) {
 		Item closestItem = null;
 		double closestDistance = 100;
 		double tempDistance;
-		for (Item i:world.getWorldInventory().getCurrentItems()) {
-			tempDistance = getDistanceTo(new Point (entity.getCurrentX(), entity.getCurrentY()), new Point(i.itemX, i.itemY));
+		for (Item i : world.getWorldInventory().getCurrentItems()) {
+			tempDistance = getDistanceTo(new Point(entity.getCurrentX(), entity.getCurrentY()),
+					new Point(i.itemX, i.itemY));
 			if (tempDistance < closestDistance) {
 				closestDistance = tempDistance;
 				closestItem = i;
@@ -221,26 +243,31 @@ public class Physics implements Runnable {
 				if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
 					entity.addItem(closestItem);
 					world.getWorldInventory().removeInventoryItem(closestItem);
-				} 
-			} catch(Exception e) {
+				}
+			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				} catch (Exception e1) {}
+				} catch (Exception e1) {
+				}
 			}
 		}
 	}
-	
+
+	/*
+	 * Using the pythagorean theorem to determine the distance between two points,
+	 * and returns it as an int
+	 */
 	public int getDistance(Point p1, Point p2) {
-		return  (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)+ Math.pow(p2.getY() - p1.getY(), 2));
+		return (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
 	}
-	
+
+	/*
+	 * The mobMove method sets the velocity of a certain mob to a specified
+	 * magnitude in the direction specified.
+	 */
 	public void mobMove(Mob entity, int direction, int magnitude) {
-		/*
-		 * The mobMove method sets the velocity of a certain mob to a specified magnitude
-		 * 	in the direction specified.
-		 */
 
 		// 1: North
 		// 2: South
@@ -259,11 +286,11 @@ public class Physics implements Runnable {
 
 	}
 
+	/*
+	 * The MoveToWall method is used to take a specific mob and move it in the
+	 * specified direction until it hits a wall.
+	 */
 	public void MoveToWall(Mob entity, int direction) {
-		/*
-		 * The MoveToWall method is used to take a specific mob and move it in the specified direction
-		 * 	until it hits a wall.
-		 */
 
 		// 1: North
 		// 2: South
@@ -272,28 +299,28 @@ public class Physics implements Runnable {
 
 		if (direction == 1) {
 			while (Intersection(entity, direction, 1, world) == 1) {
-				entity.setCurrentY(entity.getCurrentY() -1 );
+				entity.setCurrentY(entity.getCurrentY() - 1);
 			}
 		} else if (direction == 2) {
 			while (Intersection(entity, direction, 1, world) == 2) {
-				entity.setCurrentY(entity.getCurrentY() +1 );
+				entity.setCurrentY(entity.getCurrentY() + 1);
 			}
 		} else if (direction == 3) {
 			while (Intersection(entity, direction, 1, world) == 3) {
-				entity.setCurrentX(entity.getCurrentX() -1 );
+				entity.setCurrentX(entity.getCurrentX() - 1);
 			}
 		} else if (direction == 4) {
 			while (Intersection(entity, direction, 1, world) == 4) {
-				entity.setCurrentX(entity.getCurrentX() +1 );
+				entity.setCurrentX(entity.getCurrentX() + 1);
 			}
 		}
 	}
 
+	/*
+	 * The Dampening method is used to bring the specified mob's horizontal velocity
+	 * back to zero.
+	 */
 	public void Dampening(Mob entity) {
-		/*
-		 * The Dampening method is used to bring the specified mob's horizontal
-		 * 	velocity back to zero.
-		 */
 
 		if (entity.getVelocityX() < 0) {
 			entity.setVelocityX(entity.getVelocityX() + entity.getDampening());
@@ -308,11 +335,12 @@ public class Physics implements Runnable {
 		}
 	}
 
+	/*
+	 * The Intersection method checks if in the next movement of the entity will be
+	 * intersecting with another block. If it does intersect the speed and
+	 * acceleration are set to 0.
+	 */
 	public int Intersection(Mob entity, int direction, int magnitude, World world) {
-		/*
-    	 * The Intersection method checks if in the next movement of the entity will be intersecting with
-    	 * 	another block. If it does intersect the speed and acceleration are set to 0.
-		 */
 
 		// 1: North
 		// 2: South
@@ -324,9 +352,11 @@ public class Physics implements Runnable {
 		// and adds the blocks that impede movement
 		wallObjects = new ArrayList<NewRectangle>();
 		for (int y = (int) (entity.getCurrentY() / StateMachine.getTileSize())
-				- physicsFogOfWar; y <= (int) (entity.getCurrentY() / StateMachine.getTileSize()) + physicsFogOfWar; y++) {
+				- physicsFogOfWar; y <= (int) (entity.getCurrentY() / StateMachine.getTileSize())
+						+ physicsFogOfWar; y++) {
 			for (int x = (int) (entity.getCurrentX() / StateMachine.getTileSize())
-					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
+					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize())
+							+ physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
 						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
@@ -344,16 +374,16 @@ public class Physics implements Runnable {
 		// any of the NewRectangles
 		for (NewRectangle rect : wallObjects) {
 			if (direction == 1) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() - magnitude, entity.getWidth(),
-						entity.getHeight());
+				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() - magnitude,
+						entity.getWidth(), entity.getHeight());
 				if (tempRect.intersects(rect.getRect())) {
 					entity.setAccelerationY(0);
 					entity.setVelocityY(0);
 					return 0;
 				}
 			} else if (direction == 2) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() + magnitude, entity.getWidth(),
-						entity.getHeight());
+				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() + magnitude,
+						entity.getWidth(), entity.getHeight());
 				if (tempRect.intersects(rect.getRect())) {
 					entity.setAccelerationY(0);
 					entity.setVelocityY(0);
@@ -361,16 +391,16 @@ public class Physics implements Runnable {
 					return 0;
 				}
 			} else if (direction == 3) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX() - magnitude, entity.getCurrentY(), entity.getWidth(),
-						entity.getHeight());
+				Rectangle tempRect = new Rectangle(entity.getCurrentX() - magnitude, entity.getCurrentY(),
+						entity.getWidth(), entity.getHeight());
 				if (tempRect.intersects(rect.getRect())) {
 					entity.setAccelerationX(0);
 					entity.setVelocityX(0);
 					return 0;
 				}
 			} else if (direction == 4) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX() + magnitude, entity.getCurrentY(), entity.getWidth(),
-						entity.getHeight());
+				Rectangle tempRect = new Rectangle(entity.getCurrentX() + magnitude, entity.getCurrentY(),
+						entity.getWidth(), entity.getHeight());
 				if (tempRect.intersects(rect.getRect())) {
 					entity.setAccelerationX(0);
 					entity.setVelocityX(0);
@@ -381,11 +411,12 @@ public class Physics implements Runnable {
 		return direction;
 	}
 
+	/*
+	 * The Intersection method checks if in the next movement of the proj will be
+	 * intersecting with another block. If it does intersect the speed and
+	 * acceleration are set to 0.
+	 */
 	public boolean ProjectileIntersection(Projectile proj) {
-		/*
-    	 * The Intersection method checks if in the next movement of the proj will be intersecting with
-    	 * 	another block. If it does intersect the speed and acceleration are set to 0.
-		 */
 
 		// 1: North
 		// 2: South
@@ -397,9 +428,11 @@ public class Physics implements Runnable {
 		// and adds the blocks that impede movement
 		wallObjects = new ArrayList<NewRectangle>();
 		for (int y = (int) (proj.getCurrentY() / StateMachine.getTileSize())
-				- physicsFogOfWar; y <= (int) (proj.getCurrentY() / StateMachine.getTileSize()) + physicsFogOfWar; y++) {
+				- physicsFogOfWar; y <= (int) (proj.getCurrentY() / StateMachine.getTileSize())
+						+ physicsFogOfWar; y++) {
 			for (int x = (int) (proj.getCurrentX() / StateMachine.getTileSize())
-					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize()) + physicsFogOfWar; x++) {
+					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize())
+							+ physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
 						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
@@ -409,17 +442,17 @@ public class Physics implements Runnable {
 				} catch (Exception e) {
 					StringWriter error = new StringWriter();
 					e.printStackTrace(new PrintWriter(error));
-					try{
+					try {
 						Log.add(error.toString());
-					}catch (Exception e1) {
-						
+					} catch (Exception e1) {
+
 					}
 				}
 			}
 		}
 
-		Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(),
-				proj.getCurrentX(), proj.getCurrentY());
+		Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(),
+				proj.getCurrentY());
 
 		// Iterates through the ArrayList wallObjects and checks if the next players
 		// movement will intersect with
@@ -431,13 +464,17 @@ public class Physics implements Runnable {
 		}
 		return false;
 	}
-	
-	public boolean MobIntersection (Projectile proj, int type) {
-		for (Mob entity:mobs) {
+
+	/*
+	 * Checks if a projectile intersects a mob
+	 */
+	public boolean MobIntersection(Projectile proj, int type) {
+		for (Mob entity : mobs) {
 			if (!entity.getProjectileList().contains(proj)) {
 				if (proj.getType() == Projectile.getArm()) {
-					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()).intersects(
-							new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(), proj.getHeight()))) {
+					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight())
+							.intersects(new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(),
+									proj.getHeight()))) {
 						entity.setHealth(entity.getHealth() - proj.getDamage());
 						if (player.getProjectileList().contains(proj)) {
 							player.setEXP(player.getEXP() + 1);
@@ -445,8 +482,10 @@ public class Physics implements Runnable {
 						return true;
 					}
 				} else if (proj.getType() == Projectile.getBullet()) {
-					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(), proj.getCurrentY());
-					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight()))) {
+					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(),
+							proj.getCurrentX(), proj.getCurrentY());
+					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(),
+							entity.getWidth(), entity.getHeight()))) {
 						entity.setHealth(entity.getHealth() - proj.getDamage());
 						if (player.getProjectileList().contains(proj)) {
 							player.setEXP(player.getEXP() + 1);
@@ -476,6 +515,10 @@ public class Physics implements Runnable {
 		}
 	}
 	
+
+	/*
+	 * Saves all relevant data to physics
+	 */
 	public void Save() {
 		SaveData data = new SaveData();
 		try {
@@ -489,10 +532,10 @@ public class Physics implements Runnable {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {
-				
+			} catch (Exception e1) {
+
 			}
 		}
 	}
@@ -537,6 +580,10 @@ public class Physics implements Runnable {
 		player.getInventory().addMobInventoryItem(data.getItem4());
 	}
 	
+
+	/*
+	 * Loads all relevant data to physics
+	 */
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
@@ -549,29 +596,38 @@ public class Physics implements Runnable {
 			} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {
-				
+			} catch (Exception e1) {
+
 			}
 		}
 	}
 
+	/*
+	 * Sets up physics by creating mobs and loading data
+	 */
 	public Physics() {
 		/*
 		 * This is the constructor for the Physics class.
 		 * 
-		 * Currently we are using this to create enemy mobs, and the player entity.
-		 * 	We also set the player entity to the first index of the mobs ArrayList
+		 * Currently we are using this to create enemy mobs, and the player entity. We
+		 * also set the player entity to the first index of the mobs ArrayList
 		 */
 		
 		
 	}
-	
+
+	/*
+	 * makes physics multithreaded
+	 */
 	@Override
 	public void run() {
-		
+
 		// These variables are specific only to the run method
+		int tick = 0;
+		double timer = System.currentTimeMillis();
+		
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
@@ -582,25 +638,41 @@ public class Physics implements Runnable {
 			previous = current;
 			while (unprocessed >= 1) {
 				// Updates game objects
+				ai.setMobAIList(mobs);
 				ai.Move(world, player);
 				Gravity();
 				Movement();
+
+				if (tick % 20 == 0) {
+					for (Mob mob:mobs) {
+						mob.setMana(mob.getMana() + 1);
+						mob.subtractFromWantsToShoot();
+					}
+				}
 				--unprocessed;
+				tick++;
 			}
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				}catch (Exception e1) {
-					
+				} catch (Exception e1) {
+
 				}
+			}
+			if (System.currentTimeMillis() - timer > 1000) {
+				tick = 0;
+				timer += 1000;
 			}
 		}
 	}
-	
+
+	/*
+	 * Starts physics
+	 */
 	public void start() {
 		
 		if (!running) {
@@ -618,13 +690,19 @@ public class Physics implements Runnable {
 			new Thread(this).start();
 		}
 	}
-	
+
+	/*
+	 * Stops physics
+	 */
 	public void stop() {
 		Save();
 		
 		running = false;
 	}
 
+	/*
+	 * Getters and setters for objects in physics
+	 */
 	public Mob getPlayer() {
 		return player;
 	}

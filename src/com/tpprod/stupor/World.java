@@ -1,7 +1,13 @@
 package com.tpprod.stupor;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,16 +20,15 @@ import java.util.Arrays;
 public class World {
 
 	private ArrayList<ArrayList<NewRectangle>> worldGrid = new ArrayList<ArrayList<NewRectangle>>();
-	 
+
+	private String worldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile"; 
 	private Inventory inventory = new Inventory();
 
-	private String worldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/WorldFile";
-	 
-
 	public World() {
+
 	}
 
-	public void Initialize() throws FileNotFoundException, IOException {
+	public void Initialize(Physics physics) throws FileNotFoundException, IOException {
 		/*
 		 * The Initialize method reads a file and separates the numbers within the file
 		 * into an ArrayList of NewRectangles each with a type of that number in the
@@ -45,13 +50,19 @@ public class World {
 				int accX = 0;
 				for (String item : line) {
 					if (Integer.parseInt(item) == 4) {
-						inventory.addInventoryItem(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.MAGENTA, StateMachine.getTileSize()/2, "healthRegen"));
+						inventory.addInventoryItem(
+								new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize() / 4,
+										accY * StateMachine.getTileSize() + StateMachine.getTileSize() / 4,
+										Color.MAGENTA, StateMachine.getTileSize() / 2, "healthRegen"));
 					} else if (Integer.parseInt(item) == 5) {
 						inventory.addInventoryItem(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.ORANGE, StateMachine.getTileSize()/2, "health"));
+					} else if (Integer.parseInt(item) == 6) {
+						physics.getMobs().add(new Mob(accX * StateMachine.getTileSize(), accY * StateMachine.getTileSize(), 50, 50));
 					}
 					worldGrid.get(accY)
-							.add(new NewRectangle(Integer.parseInt(item), new Rectangle(accX * StateMachine.getTileSize(),
-									accY * StateMachine.getTileSize(), StateMachine.getTileSize(), StateMachine.getTileSize())));
+							.add(new NewRectangle(Integer.parseInt(item),
+									new Rectangle(accX * StateMachine.getTileSize(), accY * StateMachine.getTileSize(),
+											StateMachine.getTileSize(), StateMachine.getTileSize())));
 					accX++;
 				}
 				accY++;
@@ -59,19 +70,22 @@ public class World {
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try{
+			try {
 				Log.add(error.toString());
-			}catch (Exception e1) {
-				
+			} catch (Exception e1) {
+
 			}
 		}
 		bR.close();
 	}
-	
+
+	/*
+	 * Getters and setters for world
+	 */
 	public Inventory getWorldInventory() {
 		return inventory;
 	}
-	
+
 	public ArrayList<ArrayList<NewRectangle>> getWorldGrid() {
 		return worldGrid;
 	}
