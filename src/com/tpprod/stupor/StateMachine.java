@@ -87,7 +87,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		try {
 			// tries to initialize the world in render, and updates physics with the same
 			// world
-			render.InitializeWorld(physics);
+			render.InitializeWorld();
 
 			physics.setWorld(render.getWorld());
 		} catch (Exception e) {
@@ -316,7 +316,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						NextState = PauseState;
 						CurrentState = PauseState;
 					}
+				}
+			}
 					break;
+					
 				case PauseState:
 					if (currentKeys.indexOf(10) != -1) { // EnterKey
 						if (render.getCurrentMenuPos() == 0) {

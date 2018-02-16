@@ -14,7 +14,8 @@ public class SaveData implements java.io.Serializable {
 	private int playerHealth = 0;
 	private int playerMana = 0;
 	private Item[] playerInventory = new Item[4];
- 
+	private Item item1 = null, item2=null, item3=null, item4=null;
+	 
 
 	/*
 	 * Getters and setters for SaveData
@@ -63,36 +64,6 @@ public class SaveData implements java.io.Serializable {
 		return playerInventory;
 	}
 	
-	private Item item1 = null, item2=null, item3=null, item4=null;
-	public int getPlayerCurrentX() {
-		return playerCurrentX;
-	
-	}
-	public void setPlayerCurrentX(int playerCurrentX) {
-		this.playerCurrentX = playerCurrentX;
-	}
-	public int getPlayerCurrentY() {
-		return playerCurrentY;
-	}
-	public void setPlayerCurrentY(int playerCurrentY) {
-		this.playerCurrentY = playerCurrentY;
-	}
-	public int getPlayerEXP() { return playerEXP; }
-	public void setPlayerEXP(int playerEXP) {
-		this.playerEXP = playerEXP;
-	}
-	public int getPlayerHealth() {
-		return playerHealth;
-	}
-	public void setPlayerHealth(int playerHealth) {
-		this.playerHealth = playerHealth;
-	}
-	public int getPlayerMana() {
-		return playerMana;
-	}
-	public void setPlayerMana(int playerMana) {
-		this.playerMana = playerMana;
-	}
 	public Item getItem1() {
 		return item1;
 	}

@@ -5,7 +5,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.Serializable;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -57,18 +56,18 @@ public class Mob {
 		try {
 			runningSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
 			walkingSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerWalkingSpriteSheet.png"));
-			idleSpriteSheet    = ImageIO.read(new File("./Content/Textures/PlayerIdleSpriteSheet.png"));
-			
+			idleSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerIdleSpriteSheet.png"));
+
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 1; j++) {
-					runningSprites[(i) + j] = runningSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
-							spriteHeight);
+					runningSprites[(i) + j] = runningSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight,
+							spriteWidth, spriteHeight);
 				}
 			}
 			for (int i = 0; i < 10; i++) {
 				for (int j = 0; j < 1; j++) {
-					walkingSprites[(i) + j] = walkingSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight, spriteWidth,
-							spriteHeight);
+					walkingSprites[(i) + j] = walkingSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight,
+							spriteWidth, spriteHeight);
 				}
 			}
 			int accIdle = 0;
@@ -200,8 +199,8 @@ public class Mob {
 	 */
 	public void Shoot(double velX, double velY) {
 		if (Mana >= 10) {
-			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2,
-					(int) velY, (int) velX, projectileSize));
+			projectileList.add(new Projectile((int) (currentX) + width / 2, (int) (currentY) + height / 2, (int) velY,
+					(int) velX, projectileSize));
 			new AudioFile("Content/Audio/SoundEffects/Shoot.wav").play();
 			Mana -= 10;
 		}
@@ -272,16 +271,69 @@ public class Mob {
 			}
 		}
 	}
-	
+
 	public void resetInventory() {
-		for (Item i: inventory.getCurrentMobItems()) {
+		for (Item i : inventory.getCurrentMobItems()) {
 			inventory.removeMobInventoryItem(i);
 		}
 		inventory.setCurrentMobItems(new Item[0]);
 	}
-	
 
-	
+	/*
+	 * Uses an item in the mobs Inventory
+	 */
+	public void useItem(Item item) {
+		String itemType = item.name;
+		try {
+			if (Health < MaxHealth) {
+				if (itemType == "health") {
+					healthUp(1);
+					inventory.removeMobInventoryItem(item);
+				} else if (itemType == "healthRegen") {
+					healthRegen.start();
+					inventory.removeMobInventoryItem(item);
+				}
+			}
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try {
+				Log.add(error.toString());
+			} catch (Exception e1) {
+			}
+		}
+	}
+
+	/*
+	 * Uses an item based on its index in the mobs inventory
+	 */
+	public void useItem(int index, ArrayList<AudioFile> soundEffectList) {
+		if (inventory.getCurrentMobItems().length >= index) {
+			try {
+				Item item = inventory.getCurrentMobItems()[index];
+				String itemType = item.name;
+				if (itemType == "health") {
+					healthUp(1);
+					inventory.removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();
+					;
+				} else if (itemType == "healthRegen") {
+					healthRegen.start();
+					inventory.removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();
+					;
+				}
+			} catch (Exception e) {
+				StringWriter error = new StringWriter();
+				e.printStackTrace(new PrintWriter(error));
+				try {
+					Log.add(error.toString());
+				} catch (Exception e1) {
+				}
+			}
+		}
+	}
+
 	public ArrayList<Item> readItems() {
 		return inventory.getCurrentItems();
 	}
@@ -489,11 +541,11 @@ public class Mob {
 	public int getWantsToShoot() {
 		return wantsToShoot;
 	}
-	
+
 	public void setWantsToShoot(int i) {
 		wantsToShoot = i;
 	}
-	
+
 	public void subtractFromWantsToShoot() {
 		if (wantsToShoot > 0)
 			wantsToShoot--;

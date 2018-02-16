@@ -64,7 +64,7 @@ public class Render {
 		 * The InitializeWorld method gets the most current version of the world to
 		 * reference.
 		 */
-		world.Initialize(physics);
+		world.Initialize(StateMachine.getPhysics());
 	}
 
 	/*
