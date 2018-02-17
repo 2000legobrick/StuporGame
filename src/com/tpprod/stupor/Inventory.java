@@ -125,6 +125,7 @@ public class Inventory {
 	 * Getters for objects in Inventory that are needed elsewhere
 	 */
 	public ArrayList<Item> getCurrentItems() {
+
 		return currentItems;
 	}
 
