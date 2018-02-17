@@ -346,13 +346,18 @@ public class Render {
 
 		optionPoints.add(new Point(350, 115));
 		optionPoints.add(new Point(1150, 115));
-		optionPoints.add(new Point(150, 215));
+		optionPoints.add(new Point(150, 425));
 		
 		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
 
 		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
-		
+		if (System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0) {
+			g.drawString("There is a currently known problem with Java 9 and macOS that causes the Kay Listner to get confused, as ", 100, 175);
+			g.drawString("you hold a your mac tries to give you other options in place of a like å and this interrupts key listener, ", 100, 225);
+			g.drawString("please enter the following into your terminal to temporarly fix this and remove it when your finished:  ",100,275);
+			g.drawString("defaults write -g ApplePressAndHoldEnabled -bool false", 100,325);
+		}
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 
 		if (currentMenuPos == 0) {
@@ -375,10 +380,10 @@ public class Render {
 		
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
-			g.drawString("Main Menu", 100, 225);
+			g.drawString("Main Menu", 100, 425);
 		} else {
 			g.setColor(Color.WHITE);
-			g.drawString("Main Menu", 100, 225);
+			g.drawString("Main Menu", 100, 425);
 		}
 	}
 
