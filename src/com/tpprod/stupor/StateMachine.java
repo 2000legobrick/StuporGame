@@ -339,6 +339,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 					}
 					break;
+				case TutorialState:
+					if (currentKeys.indexOf(render.getCurrentTutorialKey()) != -1) {
+						if (!render.nextTutorialScreen()) {
+							NextState = GameState;
+							physics.start();
+						}
+					}
 
 				}
 
@@ -566,8 +573,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				} catch (Exception e1) {
 				}
 			}
-			NextState = GameState;
-			physics.start();
+			NextState = TutorialState;
 		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState
 				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			if (ResourceManager.hasData("SaveData")) {
@@ -647,6 +653,12 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				NextState = MenuState;
 				physics.stop();
 			}
+		}
+		if (CurrentState == TutorialState) {
+			if (render.getCurrentTutorialKey() == -2 && arg0.getButton() == MouseEvent.BUTTON1)
+				render.nextTutorialScreen();
+			if (render.getCurrentTutorialKey() == -3 && arg0.getButton() == MouseEvent.BUTTON3)
+				render.nextTutorialScreen();
 		}
 		if (CurrentState == DeadState && arg0.getButton() == MouseEvent.BUTTON1) {
 			if (physics.getData().getPlayerLives() > 0) {

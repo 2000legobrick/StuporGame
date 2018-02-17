@@ -48,15 +48,15 @@ public class Render {
 	private ArrayList<NewRectangle> DisplayedItems = new ArrayList<NewRectangle>();
 	private int percentLoad = 0;
 	private int[] tutorialKeyList = {
+			-2, // Left Mouse Click
+			-3, // Right Mouse Click
 			87, // W key
 			65, // A key
 			68, // D key
 			16, // Shift Key
 			70, // F Key
 			49, // 1 Key
-			192,// Tilde Key
-			-2, // Left Mouse Click
-			-3  // Right Mouse Click
+			192 // Tilde Key
 	};
 	private int tutorialKeyIndex = 0;
 	private int currentTutorialKey = tutorialKeyList[tutorialKeyIndex];
@@ -212,7 +212,12 @@ public class Render {
 			DisplayedText.add("");
 			DisplayedText.add("Please Right Click");
 		} 
-		//192tilde
+		int acc = 0;
+		for (String x:DisplayedText) {
+			g.drawString(x, StartX, StartY + (50 * acc));
+			acc++;
+		}
+			
 	}
 
 	/*
@@ -765,6 +770,7 @@ public class Render {
 	}
 	
 	public boolean nextTutorialScreen() {
+		tutorialKeyIndex++;
 		try {
 			currentTutorialKey = tutorialKeyList[tutorialKeyIndex];
 			return true;
