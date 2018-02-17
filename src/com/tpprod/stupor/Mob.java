@@ -59,7 +59,7 @@ public class Mob {
 			runningSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerRunningSpriteSheet.png"));
 			walkingSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerWalkingSpriteSheet.png"));
 			idleSpriteSheet = ImageIO.read(new File("./Content/Textures/PlayerIdleSpriteSheet.png"));
-
+			arm = ImageIO.read(new File("./Content/Textures/Sword.png"));
 			for (int i = 0; i < 5; i++) {
 				for (int j = 0; j < 1; j++) {
 					runningSprites[(i) + j] = runningSpriteSheet.getSubimage(i * spriteWidth, j * spriteHeight,
@@ -170,6 +170,15 @@ public class Mob {
 	public void FaceLeft() {
 		if (!FacingLeft) {
 			FacingLeft = true;
+			for (Projectile proj: projectileList) {
+				if (proj.getType() == Projectile.getArm()) {
+					AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+			        tx.translate(-arm.getWidth(null), 0);
+			        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+			        BufferedImage tempArm = op.filter(arm, null);
+					proj.setImage(tempArm);
+				}
+			}
 		}
 	}
 
@@ -179,6 +188,11 @@ public class Mob {
 	public void FaceRight() {
 		if (FacingLeft) {
 			FacingLeft = false;
+			for (Projectile proj: projectileList) {
+				if (proj.getType() == Projectile.getArm()) {
+					proj.setImage(arm);
+				}
+			}
 		}
 	}
 
@@ -188,9 +202,13 @@ public class Mob {
 	public void Attack() {
 		if (Mana >= 5) {
 			if (FacingLeft) {
-				projectileList.add(new Projectile(currentX - width / 2, currentY + height / 2, width, 20));
+				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		        tx.translate(-arm.getWidth(null), 0);
+		        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+		        BufferedImage tempArm = op.filter(arm, null);
+				projectileList.add(new Projectile(tempArm, currentX - width / 2, currentY + height / 2, width, 20));
 			} else {
-				projectileList.add(new Projectile(currentX + width / 2, currentY + height / 2, width, 20));
+				projectileList.add(new Projectile(arm, currentX + width / 2, currentY + height / 2, width, 20));
 			}
 			Mana -= 5;
 		}

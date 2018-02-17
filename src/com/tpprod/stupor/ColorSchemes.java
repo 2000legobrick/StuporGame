@@ -16,6 +16,16 @@ public class ColorSchemes {
 
 	private BufferedImage GroundTile = null;
 	private BufferedImage Background = null;
+	private BufferedImage SplashScreen1 = null;
+	private BufferedImage SplashScreen2 = null;
+	private BufferedImage ItemHealth = null;
+	private BufferedImage ItemRegen = null;
+	private BufferedImage UpgradeHealth = null;
+	private BufferedImage UpgradeHealthNot = null;
+	private BufferedImage UpgradeJump = null;
+	private BufferedImage UpgradeJumpNot = null;
+	private BufferedImage UpgradeMana = null;
+	private BufferedImage UpgradeManaNot = null;
 
 	/*
 	 * The base of the ColorSchemes class, this method sets up the pictures for all
@@ -24,8 +34,18 @@ public class ColorSchemes {
 	public ColorSchemes() {
 
 		try {
-			GroundTile = ImageIO.read(new File("./Content/Textures/brickFloor.jpg"));
-			Background = ImageIO.read(new File("./Content/Textures/Plains.png"));
+			GroundTile = ImageIO.read(new File("./Content/Textures/Ground.jpg"));
+			Background = ImageIO.read(new File("./Content/Textures/TreeBackground.png"));
+			SplashScreen1 = ImageIO.read(new File("./Content/Textures/LogoCognitiveThought.png"));
+			SplashScreen2 = ImageIO.read(new File("./Content/Textures/LogoThunderPunch.png"));
+			ItemHealth = ImageIO.read(new File("./Content/Textures/HealthPotion.png"));
+			ItemRegen = ImageIO.read(new File("./Content/Textures/HealthRegen.png"));
+			UpgradeHealth =  ImageIO.read(new File("./Content/Textures/UpgradeHealth.png"));
+			UpgradeHealthNot =  ImageIO.read(new File("./Content/Textures/UpgradeHealthNot.png"));
+			UpgradeJump =  ImageIO.read(new File("./Content/Textures/UpgradeJump.png"));
+			UpgradeJumpNot =  ImageIO.read(new File("./Content/Textures/UpgradeJumpNot.png"));
+			UpgradeMana =  ImageIO.read(new File("./Content/Textures/UpgradeMana.png"));
+			UpgradeManaNot =  ImageIO.read(new File("./Content/Textures/UpgradeManaNot.png"));
 		} catch (IOException e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -63,5 +83,45 @@ public class ColorSchemes {
 
 	public BufferedImage getBackground() {
 		return Background;
+	}
+
+	public BufferedImage getSplashScreen1() {
+		return SplashScreen1;
+	}
+
+	public BufferedImage getSplashScreen2 () {
+		return SplashScreen2;
+	}
+
+	public BufferedImage getItemRegen () {
+		return ItemRegen;
+	}
+
+	public BufferedImage getItemHealth() {
+		return ItemHealth;
+	}
+	
+	public BufferedImage getUpgradeHealth() {
+		return UpgradeHealth;
+	}
+	
+	public BufferedImage getUpgradeHealthNot() {
+		return UpgradeHealthNot;
+	}
+	
+	public BufferedImage getUpgradeJump() {
+		return UpgradeJump;
+	}
+	
+	public BufferedImage getUpgradeJumpNot() {
+		return UpgradeJumpNot;
+	}
+	
+	public BufferedImage getUpgradeMana() {
+		return UpgradeMana;
+	}
+	
+	public BufferedImage getUpgradeManaNot() {
+		return UpgradeManaNot;
 	}
 }

@@ -502,20 +502,30 @@ public class Physics implements Runnable {
 	 * Uses an item in the players Inventory
 	 */
 	public void useItem(int index,  ArrayList<AudioFile> soundEffectList) {
-		if (player.getInventory().getCurrentMobItems().length >= index) {
-			if (player.getInventory().getCurrentMobItems()[index] != null) {
-				Item[] playerInventory = player.getInventory().getCurrentMobItems();
-				Item item = playerInventory[index];
-				String itemType = item.getName();
-				if (itemType.equals("health")) {
-					player.healthUp(1);
-					player.getInventory().removeMobInventoryItem(item);
-					soundEffectList.get(MusicPlayer.UseItem).play();
-				} else if (itemType.equals("healthRegen")) {
-					player.getHealthRegen().start();
-					player.getInventory().removeMobInventoryItem(item);
-					soundEffectList.get(MusicPlayer.UseItem).play();
+		try {
+			if (player.getInventory().getCurrentMobItems().length >= index) {
+				if (player.getInventory().getCurrentMobItems()[index] != null) {
+					Item[] playerInventory = player.getInventory().getCurrentMobItems();
+					Item item = playerInventory[index];
+					String itemType = item.getName();
+					if (itemType.equals("health")) {
+						player.healthUp(10);
+						player.getInventory().removeMobInventoryItem(item);
+						soundEffectList.get(MusicPlayer.UseItem).play();
+					} else if (itemType.equals("healthRegen")) {
+						player.getHealthRegen().start();
+						player.getInventory().removeMobInventoryItem(item);
+						soundEffectList.get(MusicPlayer.UseItem).play();
+					}
 				}
+			} 
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
+
 			}
 		}
 	}
@@ -528,14 +538,15 @@ public class Physics implements Runnable {
 		SaveData data = new SaveData();
 		SaveWorldData worldData = new SaveWorldData();
 		
-		data.setPlayerCurrentX(player.getCurrentX());
-		data.setPlayerCurrentY(player.getCurrentY());
-		data.setPlayerHealth(player.getHealth());
-		data.setPlayerMana(player.getMana());
-		data.setPlayerEXP(player.getEXP());
-		savePlayerInv(data);
-		worldData.setWorldInv(world.getWorldInventory().getCurrentItems());
-
+		try {
+			data.setPlayerCurrentX(player.getCurrentX());
+			data.setPlayerCurrentY(player.getCurrentY());
+			data.setPlayerHealth(player.getHealth());
+			data.setPlayerMana(player.getMana());
+			data.setPlayerEXP(player.getEXP());
+			savePlayerInv(data);
+			worldData.setWorldInv(world.getWorldInventory().getCurrentItems());
+		} catch(Exception e) {}
 		try {
 			ResourceManager.Save(data, "SaveData");
 			world.saveWorldData(worldData);
@@ -668,17 +679,7 @@ public class Physics implements Runnable {
 				--unprocessed;
 				tick++;
 			}
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try {
-					Log.add(error.toString());
-				} catch (Exception e1) {
-
-				}
-			}
+			
 			if (System.currentTimeMillis() - timer > 1000) {
 				tick = 0;
 				timer += 1000;
@@ -690,20 +691,12 @@ public class Physics implements Runnable {
 	 * Starts physics
 	 */
 	public void start() {
-		mobs = new ArrayList<>();
-		mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
-		player = mobs.get(0);
-		Load();
 		if (!running) {
-
-			running = true;
-
-			for (int x = 1; x < 5; x++) {
-				mobs.add(new Mob( 100 * x, 0, 50,50));
-			}
-			
-			ai.setMobAIList(mobs);
-			
+			mobs = new ArrayList<>();
+			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
+			player = mobs.get(0);
+			Load();
+			running = true;			
 			new Thread(this).start();
 		}
 	}

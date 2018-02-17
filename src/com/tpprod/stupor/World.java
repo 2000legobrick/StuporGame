@@ -25,7 +25,7 @@ public class World {
 	 
 	private Inventory inventory = new Inventory();
 
-	private String currentWorldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/CurrentWorldFile";
+	private String currentWorldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/OldWorldFile";
 	private String defaultWorldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/DefaultWorldFile";
 	private BufferedWriter bW = null;
 	private BufferedReader bR;
