@@ -8,8 +8,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -92,7 +90,7 @@ public class Render {
 			} else if (CurrentState == UpgradeState) {
 				RenderUpgrade(g, width, height);
 			} else if (CurrentState == DeadState) {
-
+				RenderDead(g, width, height, StateMachine.getPhysics().getData().getPlayerLives());
 			}
 		} else {
 			loading = true;
@@ -100,6 +98,49 @@ public class Render {
 		}
 	}
 
+	/*
+	 * Renders the loading screen
+	 */
+	public void RenderDead(Graphics g, int width, int height, int lives) {
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.setColor(Color.WHITE);
+		if(lives > 0) {
+			if(lives > 1) {
+				g.drawString("They got you! you have to be careful out there, lucky for you you have this life and " + (lives - 1) + " remaning.", 150, 150);
+			} else {
+				g.drawString("You are on your last life, be careful!", 150, 150);
+			}
+
+			ArrayList<Point> menuPoints = new ArrayList<Point>();
+			menuPoints.add(new Point(300, 300));
+			currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
+			
+			if (currentMenuPos == 0) {
+				g.setColor(Color.RED);
+				g.drawString("Resume From Last Save", 150, 300);
+			} else {
+				g.setColor(Color.WHITE);
+				g.drawString("Resume From Last Save", 150, 300);
+			}
+			
+		}else {
+			g.drawString("They got you in a Stupor! Better luck next time!", 150, 150);
+			
+			ArrayList<Point> menuPoints = new ArrayList<Point>();
+			menuPoints.add(new Point(150, 200));
+			currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
+			
+			if (currentMenuPos == 0) {
+				g.setColor(Color.RED);
+				g.drawString("Return To Menu", 150, 300);
+			} else {
+				g.setColor(Color.WHITE);
+				g.drawString("Return To Menu", 150, 300);
+			}
+		}
+	}
 	/*
 	 * Renders the loading screen
 	 */
@@ -228,7 +269,7 @@ public class Render {
 		/*
 		 * The method RenderMenu renders out the menu for the game.
 		 */
-
+		//bgMusic.start();
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
@@ -317,6 +358,14 @@ public class Render {
 		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
 		
+		if (currentMenuPos == 2) {
+			g.setColor(Color.RED);
+			g.drawString("Exit", 100, 225);
+		} else {
+			g.setColor(Color.WHITE);
+			g.drawString("Exit", 100, 225);
+		}
+		
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 
 		if (currentMenuPos == 0) {
@@ -355,11 +404,7 @@ public class Render {
 		 * The RenderForeground method takes the blocks on screen and actually prints
 		 * them to the canvas, allowing the player to see the world.
 		 */
-		try {
-			InitializeWorld();
-		} catch(Exception e) {
-			//NON FATAL ERROR
-		}
+
 		DisplayedObjects = new ArrayList<NewRectangle>();
 		DisplayedMobs = new ArrayList<NewRectangle>();
 		DisplayedItems = new ArrayList<NewRectangle>();
@@ -410,6 +455,10 @@ public class Render {
 		// the players current position
 		// which is located at the center of the screen
 		for (NewRectangle rect : DisplayedMobs) {
+			// g.setColor(rect.color);
+			// g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,
+			// rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width,
+			// rect.rect.height);
 			if (rect.getImage() != null) {
 				g.drawImage(rect.getImage(),
 						rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
@@ -560,12 +609,13 @@ public class Render {
 				}
 			}
 		}
-		// Render EXP
+		// Render Text
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
-		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 10);
-		g.drawString("JUMP: " + Integer.toString(player.getJumpAmount()), 10, height - 50);
-		g.drawString("MANA REGEN: " + Integer.toString(player.getManaRefreshTimer()), 10, height - 90);
+		g.drawString("Lives: " + Integer.toString(StateMachine.getPhysics().getData().getPlayerLives() - 1), 10, height - 10);
+		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 50);
+		g.drawString("JUMP: " + Integer.toString(player.getJumpAmount()), 10, height - 90);
+		g.drawString("MANA REGEN: " + Integer.toString(player.getManaRefreshTimer()), 10, height - 130);
 	}
 
 	/*
@@ -606,5 +656,6 @@ public class Render {
 	public void setVolume(int v) {
 		volume = v;
 	}
+
 
 }
