@@ -1,5 +1,8 @@
 package com.tpprod.stupor;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+
 public class Projectile {
 
 	private static final int BULLET = 0, ARM = 1;
@@ -7,6 +10,7 @@ public class Projectile {
 			width, height;
 	private int damage = 10;
 	private boolean shown;
+	private BufferedImage image;
 
 	public Projectile() {
 		shown = false;
@@ -32,7 +36,8 @@ public class Projectile {
 	 * A constructor for "arms" which is anything like a sword that that player can
 	 * swing, these are technically considered a projectile
 	 */
-	public Projectile(int x, int y, int tempWidth, int tempHeight) {
+	public Projectile(BufferedImage tempImg,int x, int y, int tempWidth, int tempHeight) {
+		image = tempImg;
 		currentX = x;
 		currentY = y;
 		width = tempWidth;
@@ -134,5 +139,13 @@ public class Projectile {
 
 	public static int getArm() {
 		return ARM;
+	}
+
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public void setImage(BufferedImage tempArm) {
+		image = tempArm;
 	}
 }

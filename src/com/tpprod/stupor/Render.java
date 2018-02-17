@@ -22,12 +22,13 @@ import java.util.ArrayList;
 
 public class Render {
 	
-	private static final int GameState    =  StateMachine.getGamestate();
-	private static final int MenuState    =  StateMachine.getMenustate();
-	private static final int PauseState   =  StateMachine.getPausestate();
-	private static final int OptionState  =  StateMachine.getOptionstate();
-	private static final int UpgradeState =  StateMachine.getUpgradestate();
-	private static final int DeadState    =  StateMachine.getDeadstate();
+	private static final int GameState     =  StateMachine.getGamestate();
+	private static final int MenuState     =  StateMachine.getMenustate();
+	private static final int PauseState    =  StateMachine.getPausestate();
+	private static final int OptionState   =  StateMachine.getOptionstate();
+	private static final int UpgradeState  =  StateMachine.getUpgradestate();
+	private static final int DeadState     =  StateMachine.getDeadstate();
+	private static final int TutorialState =  StateMachine.getTutorialstate();
 	
 	private static volatile int CurrentState       =  StateMachine.getCurrentState();
 
@@ -46,6 +47,19 @@ public class Render {
 	private ArrayList<NewRectangle> DisplayedMobs = new ArrayList<NewRectangle>();
 	private ArrayList<NewRectangle> DisplayedItems = new ArrayList<NewRectangle>();
 	private int percentLoad = 0;
+	private int[] tutorialKeyList = {
+			87, // W key
+			65, // A key
+			68, // D key
+			16, // Shift Key
+			70, // F Key
+			49, // 1 Key
+			192,// Tilde Key
+			-2, // Left Mouse Click
+			-3  // Right Mouse Click
+	};
+	private int tutorialKeyIndex = 0;
+	private int currentTutorialKey = tutorialKeyList[tutorialKeyIndex];
 
 	public Render() {
 		/*
@@ -75,7 +89,7 @@ public class Render {
 	public void RenderState(Graphics g, int width, int height, int state, Mob player, int NextState) {
 		CurrentState = state;
 		// renders a state based on what state is passed through the constructor
-		if (NextState == state) {
+		if (NextState == CurrentState) {
 			if (CurrentState == GameState) {
 				RenderBackground(g, width, height, player);
 				RenderForeground(g, width, height, StateMachine.getTileSize(), Physics.getMobs(), player, world);
@@ -90,12 +104,17 @@ public class Render {
 			} else if (CurrentState == PauseState) {
 				RenderPause(g, width, height);
 			} else if (CurrentState == UpgradeState) {
-				RenderUpgrade(g, width, height);
+				RenderUpgrade(g, width, height, player);
 			} else if (CurrentState == DeadState) {
 				RenderDead(g, width, height, StateMachine.getPhysics().getData().getPlayerLives());
+			} else if (CurrentState == TutorialState) { 
+				RenderTutorial(g, width, height);
 			}
 		} else {
 			loading = true;
+			if (NextState == TutorialState) {
+				tutorialKeyIndex = 0;
+			}
 			RenderLoad(g, width, height);
 		}
 	}
@@ -136,6 +155,66 @@ public class Render {
 	    }	 
 	  }
 	 
+	/*
+	 * Renders the tutorial for the game
+	 */
+	private void RenderTutorial(Graphics g, int width, int height) {
+		int StartX = 100, StartY = 100;
+		
+		currentTutorialKey = tutorialKeyList[tutorialKeyIndex];
+		
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.WHITE);
+		ArrayList<String> DisplayedText = new ArrayList<String>();
+		
+		if (currentTutorialKey == 87) { 
+			DisplayedText.add("The W key makes the player jump");
+			DisplayedText.add("");
+			DisplayedText.add("Press W");
+		} else if (currentTutorialKey == 65) { 
+			DisplayedText.add("The A key makes the player walk Left");
+			DisplayedText.add("");
+			DisplayedText.add("Press A");
+		} else if (currentTutorialKey == 68) { 
+			DisplayedText.add("The D key makes the player walk right");
+			DisplayedText.add("");
+			DisplayedText.add("Press D");
+		} else if (currentTutorialKey == 16) { 
+			DisplayedText.add("The Left Shift key makes the player Rrun");
+			DisplayedText.add("");
+			DisplayedText.add("Press Left Shift");
+		} else if (currentTutorialKey == 87) { 
+			DisplayedText.add("The W key makes the player jump");
+			DisplayedText.add("");
+			DisplayedText.add("Press W");
+		} else if (currentTutorialKey == 70) { 
+			DisplayedText.add("The F key makes the player pick up items");
+			DisplayedText.add("");
+			DisplayedText.add("Press F");
+		} else if (currentTutorialKey == 49) { 
+			DisplayedText.add("The 1-4 Number keys make the player use an item");
+			DisplayedText.add("The 1-4 number keys are located above the Q W E R kers");
+			DisplayedText.add("");
+			DisplayedText.add("Press W");
+		} else if (currentTutorialKey == 192) { 
+			DisplayedText.add("The Tilde key opens the player Upgrade Menu");
+			DisplayedText.add("The Tilde Key is found above the Tab Button");
+			DisplayedText.add("");
+			DisplayedText.add("Press Tilde");
+		} else if (currentTutorialKey == -2) { 
+			DisplayedText.add("Left Clicking makes the player Shoot");
+			DisplayedText.add("");
+			DisplayedText.add("Please Left Click");
+		} else if (currentTutorialKey == -3) { 
+			DisplayedText.add("Right Clicking makes the player Attack");
+			DisplayedText.add("");
+			DisplayedText.add("Please Right Click");
+		} 
+		//192tilde
+	}
+
 	/*
 	 * Renders the loading screen
 	 */
@@ -427,7 +506,7 @@ public class Render {
 				}
 			}
 			for (Projectile proj : entity.getProjectileList()) {
-				DisplayedMobs.add(new NewRectangle(Color.WHITE,
+				DisplayedMobs.add(new NewRectangle(proj.getImage(),
 						new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(), proj.getHeight())));
 			}
 		}
@@ -462,10 +541,16 @@ public class Render {
 
 		for (NewRectangle rect : DisplayedItems) {
 			try {
-				g.setColor(rect.getColor());
-				g.fillRect(rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
-						rect.getRect().y - player.getCurrentY() - player.getHeight() / 2 + height / 2,
-						rect.getRect().width, rect.getRect().height);
+				if (rect.getColor().equals(Color.MAGENTA)) {
+					g.drawImage(palette.getItemRegen(), rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
+							rect.getRect().y - player.getCurrentY() - player.getHeight() / 2 + height / 2,
+							rect.getRect().width, rect.getRect().height, null);
+				}
+				if (rect.getColor().equals(Color.ORANGE)) {
+					g.drawImage(palette.getItemHealth(), rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,
+							rect.getRect().y - player.getCurrentY() - player.getHeight() / 2 + height / 2,
+							rect.getRect().width, rect.getRect().height, null);
+				}
 			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -523,12 +608,13 @@ public class Render {
 	/*
 	 * Renders the upgrade state of the game
 	 */
-	public void RenderUpgrade(Graphics g, int width, int height) {
+	public void RenderUpgrade(Graphics g, int width, int height, Mob player) {
 		int middleWidth = width / 2;
 		int middleHeight = height / 2;
 		int distanceFromCenter = 300;
 
 		g.setColor(Color.BLACK);
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.fillRect(0, 0, width, height);
 		
 		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
@@ -537,16 +623,40 @@ public class Render {
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
 		g.setColor(Color.WHITE);
+		g.drawString("EXP: " + Integer.toString(player.getEXP()), 10, height - 10);
+
 		for (int x = -1; x < 2; x++) {
-			g.drawRect(middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height);
 			upgradePoints.add(new Point(middleWidth - (300 * x), middleHeight));
 		}
-		
 		currentMenuPos = getClosestIndex(upgradePoints, new Point(currentMouseX, currentMouseY));
 		
-		g.setColor(Color.RED);
-		if (currentMenuPos != -1)
-			g.drawRect(middleWidth - box.width/2 - (300 * (currentMenuPos - 1)), middleHeight - box.height/2, box.width, box.height);
+		for (int x = -1; x < 2; x++) {
+			if (x == -1) {
+				if (currentMenuPos == 0) {
+					g.drawImage(palette.getUpgradeJump(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				} else {
+					g.drawImage(palette.getUpgradeJumpNot(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				}
+			} else if (x == 0) {
+				if (currentMenuPos == 1) {
+					g.drawImage(palette.getUpgradeMana(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				} else {
+					g.drawImage(palette.getUpgradeManaNot(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				}
+			} else if (x == 1) {
+				if (currentMenuPos == 2) {
+					g.drawImage(palette.getUpgradeHealth(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				} else {
+					g.drawImage(palette.getUpgradeHealthNot(), middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height, null);
+				}
+			}
+		}
+	}
+
+	/*
+	 * renders the splash screens at the start of the game
+	 */
+	public void RenderSplashScreen(int i) {
 		
 	}
 
@@ -584,18 +694,15 @@ public class Render {
 		// Render Item
 		for (int i = 0; i < 4; i++) {
 			try {
-				g.setColor(player.getInventory().getCurrentMobItems()[i].itemColor);
-				g.fillRect(middleWidth + 5 + (box.width + 10) * (i - 2) + box.width / 4,
-						height - (box.height + 20) + box.height / 4, box.width / 2, box.height / 2);
-			} catch (Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try {
-					Log.add(error.toString());
-				} catch (Exception e1) {
-
+				if (player.getInventory().getCurrentMobItems()[i].itemColor.equals(Color.MAGENTA)) {
+					g.drawImage(palette.getItemRegen(), middleWidth + 5 + (box.width + 10) * (i - 2) + box.width / 4,
+						height - (box.height + 20) + box.height / 4, box.width / 2, box.height / 2, null);
 				}
-			}
+				if (player.getInventory().getCurrentMobItems()[i].itemColor.equals(Color.ORANGE)) {
+					g.drawImage(palette.getItemHealth(), middleWidth + 5 + (box.width + 10) * (i - 2) + box.width / 4,
+						height - (box.height + 20) + box.height / 4, box.width / 2, box.height / 2, null);
+				}
+			} catch (Exception e) {}
 		}
 		// Render EXP
 		g.setColor(Color.WHITE);
@@ -643,5 +750,17 @@ public class Render {
 	public void setVolume(int v) {
 		volume = v;
 	}
-
+	
+	public int getCurrentTutorialKey() {
+		return currentTutorialKey;
+	}
+	
+	public boolean nextTutorialScreen() {
+		try {
+			currentTutorialKey = tutorialKeyList[tutorialKeyIndex];
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

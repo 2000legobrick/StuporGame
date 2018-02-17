@@ -475,61 +475,103 @@ public class Physics implements Runnable {
         return false;
     }
 
-    /*
-     * Checks if a projectile intersects a mob
-     */
-    public boolean MobIntersection(Projectile proj, int type) {
-        for (Mob entity : mobs) {
-            if (!entity.getProjectileList().contains(proj)) {
-                if (proj.getType() == Projectile.getArm()) {
-                    if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight())
-                            .intersects(new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(),
-                                    proj.getHeight()))) {
-                        entity.setHealth(entity.getHealth() - proj.getDamage());
-                        if (player.getProjectileList().contains(proj)) {
-                            player.setEXP(player.getEXP() + 1);
-                        }
-                        return true;
-                    }
-                } else if (proj.getType() == Projectile.getBullet()) {
-                    Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(),
-                            proj.getCurrentX(), proj.getCurrentY());
-                    if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(),
-                            entity.getWidth(), entity.getHeight()))) {
-                        entity.setHealth(entity.getHealth() - proj.getDamage());
-                        if (player.getProjectileList().contains(proj)) {
-                            player.setEXP(player.getEXP() + 1);
-                        }
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+	/*
+	 * Checks if a projectile intersects a mob
+	 */
+	public boolean MobIntersection(Projectile proj, int type) {
+		for (Mob entity : mobs) {
+			if (!entity.getProjectileList().contains(proj)) {
+				if (proj.getType() == Projectile.getArm()) {
+					if (new Rectangle(entity.getCurrentX(), entity.getCurrentY(), entity.getWidth(), entity.getHeight())
+							.intersects(new Rectangle(proj.getCurrentX(), proj.getCurrentY(), proj.getWidth(),
+									proj.getHeight()))) {
+						entity.setHealth(entity.getHealth() - proj.getDamage());
+						if (player.getProjectileList().contains(proj)) {
+							player.setEXP(player.getEXP() + 1);
+						}
+						return true;
+					}
+				} else if (proj.getType() == Projectile.getBullet()) {
+					Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(),
+							proj.getCurrentX(), proj.getCurrentY());
+					if (projectedLine.intersects(new Rectangle(entity.getCurrentX(), entity.getCurrentY(),
+							entity.getWidth(), entity.getHeight()))) {
+						entity.setHealth(entity.getHealth() - proj.getDamage());
+						if (player.getProjectileList().contains(proj)) {
+							player.setEXP(player.getEXP() + 1);
+						}
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	/*
+	 * Uses an item in the players Inventory
+	 */
+	public void useItem(int index,  ArrayList<AudioFile> soundEffectList) {
+		try {
+			if (player.getInventory().getCurrentMobItems().length >= index) {
+				if (player.getInventory().getCurrentMobItems()[index] != null) {
+					Item[] playerInventory = player.getInventory().getCurrentMobItems();
+					Item item = playerInventory[index];
+					String itemType = item.getName();
+					if (itemType.equals("health")) {
+						player.healthUp(10);
+						player.getInventory().removeMobInventoryItem(item);
+						soundEffectList.get(MusicPlayer.UseItem).play();
+					} else if (itemType.equals("healthRegen")) {
+						player.getHealthRegen().start();
+						player.getInventory().removeMobInventoryItem(item);
+						soundEffectList.get(MusicPlayer.UseItem).play();
+					}
+				}
+			} 
+		} catch (Exception e) {
+			StringWriter error = new StringWriter();
+			e.printStackTrace(new PrintWriter(error));
+			try{
+				Log.add(error.toString());
+			}catch (Exception e1) {
 
-    /*
-     * Uses an item in the players Inventory
-     */
-    public void useItem(int index,  ArrayList<AudioFile> soundEffectList) {
-        if (player.getInventory().getCurrentMobItems().length >= index) {
-            if (player.getInventory().getCurrentMobItems()[index] != null) {
-                Item[] playerInventory = player.getInventory().getCurrentMobItems();
-                Item item = playerInventory[index];
-                String itemType = item.getName();
-                if (itemType.equals("health")) {
-                    player.healthUp(1);
-                    player.getInventory().removeMobInventoryItem(item);
-                    soundEffectList.get(MusicPlayer.UseItem).play();
-                } else if (itemType.equals("healthRegen")) {
-                    player.getHealthRegen().start();
-                    player.getInventory().removeMobInventoryItem(item);
-                    soundEffectList.get(MusicPlayer.UseItem).play();
-                }
-            }
-        }
-    }
+			}
+		}
+	}
+	
 
+	public void savePlayerInv(SaveData data) {
+		Item i = null;
+		if (player.getInventory().getCurrentMobItems().length >= 1) {
+			Item item1 = player.getInventory().getCurrentMobItems()[0];
+			if (item1 != null)
+				data.setItem1(item1.getItemX(),item1.getItemY(),item1.getItemColor(),item1.getItemSize(),item1.getName());
+			else if (item1 == null)
+				data.setItem1(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 2) {
+			Item item2 = player.getInventory().getCurrentMobItems()[1];
+			if (item2 != null)
+				data.setItem2(item2.getItemX(),item2.getItemY(),item2.getItemColor(),item2.getItemSize(),item2.getName());
+			else if (item2 == null)
+				data.setItem2(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 3) {
+			Item item3 = player.getInventory().getCurrentMobItems()[2];
+			if (item3 != null)
+				data.setItem3(item3.getItemX(),item3.getItemY(),item3.getItemColor(),item3.getItemSize(),item3.getName());
+			else if (item3 == null)
+				data.setItem3(i);
+		}
+		if (player.getInventory().getCurrentMobItems().length >= 4) {
+			Item item4 = player.getInventory().getCurrentMobItems()[3];
+			if (item4 != null)
+				data.setItem4(item4.getItemX(),item4.getItemY(),item4.getItemColor(),item4.getItemSize(),item4.getName());
+			else if (item4 == null)
+				data.setItem4(i);
+		}
+	}
 
     /*
      * Saves all relevant data to physics
@@ -601,46 +643,21 @@ public class Physics implements Runnable {
         player.getInventory().addMobInventoryItem(data.getItem4());
     }
 
+			
 
-    /*
-     * Loads all relevant data to physics
-     */
-    public void Load() {
-        try {
-            SaveData data = (SaveData) ResourceManager.Load("SaveData");
-            player.setCurrentX(data.getPlayerCurrentX());
-            player.setCurrentY(data.getPlayerCurrentY());
-            player.setHealth(data.getPlayerHealth());
-            player.setMana(data.getPlayerMana());
-            player.setEXP(data.getPlayerEXP());
-            loadPlayerInv(data);
-            if(ResourceManager.hasData("SaveWorldData")) {
-                SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
-                world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
-                world.loadWorldData(worldData);
-            }
-        } catch (Exception e) {
-            StringWriter error = new StringWriter();
-            e.printStackTrace(new PrintWriter(error));
-            try{
-                Log.add(error.toString());
-            }catch (Exception e1) {
-
-            }
-        }
-    }
-
-    /*
-     * Sets up physics by creating mobs and loading data
-     */
-    public Physics() {
-        /*
-         * This is the constructor for the Physics class.
-         *
-         * Currently we are using this to create enemy mobs, and the player entity. We
-         * also set the player entity to the first index of the mobs ArrayList
-         */
-
+	/*
+	 * Starts physics
+	 */
+	public void start() {
+		if (!running) {
+			mobs = new ArrayList<>();
+			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
+			player = mobs.get(0);
+			Load();
+			running = true;			
+			new Thread(this).start();
+		}
+	}
 
     }
 
@@ -708,9 +725,12 @@ public class Physics implements Runnable {
 
             running = true;
 
-            for (int x = 1; x < 5; x++) {
-                mobs.add(new Mob( 100 * x, 0, 50,50));
+            for (int x = 1; x < 150; x++) {
+                //for (int y = 1; y < 10; y++)
+                    //mobs.add(new Mob(100*x, 10*y, 50, 50));
+                mobs.add(new Mob( 500 * x, 0, 50,50));
             }
+
 
             ai.setMobAIList(mobs);
 

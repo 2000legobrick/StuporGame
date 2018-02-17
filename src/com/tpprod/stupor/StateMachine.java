@@ -32,13 +32,13 @@ import javax.swing.event.MouseInputListener;
 
 public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener {
 
-	private static final int GameState    = 0;
-	private static final int MenuState    = 1;
-	private static final int PauseState   = 2;
-	private static final int UpgradeState = 3;
-	private static final int DeadState    = 4;
-	private static final int OptionState  = 5;
-	private static final int LoadState    = 6;
+	private static final int GameState     = 0;
+	private static final int MenuState     = 1;
+	private static final int PauseState    = 2;
+	private static final int UpgradeState  = 3;
+	private static final int DeadState     = 4;
+	private static final int OptionState   = 5;
+	private static final int TutorialState = 6;
 
 	private static int CurrentState = MenuState;
 
@@ -99,7 +99,15 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 			}
 		}
-
+		/*
+		try {
+			render.RenderSplashScreen(1);
+			Thread.sleep(2000);
+			render.RenderSplashScreen(2);
+			Thread.sleep(2000);
+		} catch (InterruptedException e2) {
+		}*/
+		
 		try {
 			settingsData = (SettingsSaveData) ResourceManager.Load("SettingsSaveData");
 			render.setVolume(settingsData.getRenderVolume());
@@ -147,10 +155,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					// the key that is referenced is found in-line with
 					// the if statement.
 
-					if (currentKeys.indexOf(17) != -1) { // Ctrl key
-						physics.getPlayer().ResetMana();
-						physics.getPlayer().ResetHealth();
-					}
 					if (currentKeys.indexOf(27) != -1) { // Escape Key
 						physics.stop();
 						NextState = PauseState;
@@ -159,7 +163,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (currentKeys.indexOf(87) != -1) { // W Key or Space Bar
 						physics.getPlayer().Jump();
 					}
-					if (currentKeys.indexOf(16) != -1) {
+					if (currentKeys.indexOf(16) != -1) { // Shift Key
 						if (currentKeys.indexOf(65) != -1) { // A Key
 							physics.mobMove(physics.getPlayer(), 3, physics.getPlayer().getSpeed());
 							physics.getPlayer().FaceLeft();
@@ -179,11 +183,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 					}
 
-					if (currentKeys.indexOf(90) != -1) { // Z Key
+					if (currentKeys.indexOf(70) != -1) { // F Key
 						physics.pickUpItem(physics.getPlayer());
-					}
-					if (currentKeys.indexOf(88) != -1) { // X key
-						physics.getPlayer().HurtMob(1);
 					}
 					if (currentKeys.indexOf(49) != -1) { // 1 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
@@ -200,8 +201,6 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (currentKeys.indexOf(52) != -1) { // 4 key
 						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
 							physics.useItem(3, soundEffect.getSoundEffect());
-					}
-					if (currentKeys.indexOf(83) != -1) { // S Key
 					}
 					if (currentKeys.indexOf(192) != -1) { // Tilde Key
 						physics.stop();
@@ -370,7 +369,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		// of the current frame to help with shuttering issues
 		BufferStrategy bs = getBufferStrategy();
 		if (bs == null) {
-			// If no BufferStrategy is found, create another one that buffers 2 frames ahead
+			// If no BufferStrategy is found, create another one that buffers 3 frames ahead
 			createBufferStrategy(3);
 			requestFocus();
 			return;
@@ -596,9 +595,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				}
 			}
 			if (render.getCurrentMenuPos() == 1) {
-				if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
+				if (physics.getPlayer().getEXP() >= 5) {
 					physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-					physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() - 5);
+					physics.getPlayer().setMana(physics.getPlayer().getMana() - 5);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -608,7 +607,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			if (render.getCurrentMenuPos() == 2) {
 				if (physics.getPlayer().getEXP() >= 5) {
 					physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-					physics.getPlayer().setMaxHealth(physics.getPlayer().getMaxHealth() + 1);
+					physics.getPlayer().setMaxHealth(physics.getPlayer().getMaxHealth() + 5);
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -727,6 +726,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	public final static int getDeadstate() {
 		return DeadState;
+	}
+
+	public final static int getTutorialstate() {
+		return TutorialState;
 	}
 
 	public static int getCurrentState() {

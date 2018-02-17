@@ -100,7 +100,7 @@ public class AI{
 	
 	public boolean PointIntersection (Point point, World world) {
 		try {
-			if (world.getWorldGrid().get(point.y / StateMachine.getTileSize()).get(point.x / StateMachine.getTileSize()).getType() != 0) {
+			if (world.getWorldGrid().get(point.y / StateMachine.getTileSize()).get(point.x / StateMachine.getTileSize()).getType() == 1) {
 				return true;
 			}
 		} catch (Exception e) {}
