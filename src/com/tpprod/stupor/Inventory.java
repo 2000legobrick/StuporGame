@@ -125,12 +125,11 @@ public class Inventory {
 	 * Getters for objects in Inventory that are needed elsewhere
 	 */
 	public ArrayList<Item> getCurrentItems() {
+
 		return currentItems;
 	}
 
-	public void setCurrentItems(ArrayList<Item> currentItems) {
-		this.currentItems = new ArrayList<Item>();
-		this.currentItems = currentItems;}
+	public void setCurrentItems(ArrayList<Item> currentItems) { this.currentItems = currentItems;}
 	
 	public Item[] getCurrentMobItems() {
 		return currentMobItems;

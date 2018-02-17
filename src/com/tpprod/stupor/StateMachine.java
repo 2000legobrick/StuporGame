@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -20,13 +21,13 @@ import javax.swing.event.MouseInputListener;
 
 /*
  * The StateMachine Class does all the heavy lifting, controlling all the logic for each state of the game.
- * 
+ *
  * 	Possible States:
  * 		GameState      - Actual game is ran in this state
  * 		MenuState      - The main menu is displayed (typically at start of game)
  * 		PauseState     - The game does not update but instead stops updating until state is changed
- * 		InventoryState - Displays the current inventory, game functions are suspended here like PuaseState 
- * 		DeadState      - Informs the player on their death and resets state to the MenuState 
+ * 		InventoryState - Displays the current inventory, game functions are suspended here like PuaseState
+ * 		DeadState      - Informs the player on their death and resets state to the MenuState
  */
 
 public class StateMachine extends Canvas implements Runnable, KeyListener, MouseInputListener {
@@ -50,7 +51,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			HEIGHT = Toolkit.getDefaultToolkit().getScreenSize().height;
 	private static int tileSize = 150;
 	private static final int tickPerSec = 60; // Limits the amount of ticks per second, serves to limit the all powerful
-												// ticks
+	// ticks
 	private static final String NAME = "Stupor";
 
 	private static final long serialVersionUID = 1L;
@@ -72,14 +73,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		/*
 		 * The run method is called at the launch of the program, allowing us to
 		 * effectively package our game into a .jar file type.
-		 * 
+		 *
 		 * We use this method to show and run the current state that the game is in.
-		 * 
+		 *
 		 * Possible States: GameState - Actual game is ran in this state MenuState - The
 		 * main menu is displayed (typically at start of game) PauseState - The game
-		 * does not update but instead stops updating until state is changed
-		 * DeadState - Informs the player on their death and resets
-		 * state to the MenuState
+		 * does not update but instead stops updating until state is changed DeadState -
+		 * Informs the player on their death and resets state to the MenuState
 		 */
 
 		// Since the World file might be lost we surrounded it with a try-catch
@@ -187,20 +187,20 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						physics.pickUpItem(physics.getPlayer());
 					}
 					if (currentKeys.indexOf(49) != -1) { // 1 key
-						if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                            physics.useItem(0, soundEffect.getSoundEffect());
+						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
+							physics.useItem(0, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(50) != -1) { // 2 key
-						if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                            physics.useItem(1, soundEffect.getSoundEffect());
+						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
+							physics.useItem(1, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(51) != -1) { // 3 key
-						if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                            physics.useItem(2, soundEffect.getSoundEffect());
+						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
+							physics.useItem(2, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(52) != -1) { // 4 key
-						if(physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
-                            physics.useItem(3, soundEffect.getSoundEffect());
+						if (physics.getPlayer().getInventory().getCurrentMobItems().length != 0)
+							physics.useItem(3, soundEffect.getSoundEffect());
 					}
 					if (currentKeys.indexOf(192) != -1) { // Tilde Key
 						physics.stop();
@@ -209,21 +209,21 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
 						for (Mob entity : physics.getMobs()) {
 							physics.Dampening(entity);
-						if (currentKeys.indexOf(70) != -1) { // F Key
-                            physics.pickUpItem(physics.getPlayer());
+							if (currentKeys.indexOf(70) != -1) { // F Key
+								physics.pickUpItem(physics.getPlayer());
+							}
+						}
+						if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
+							if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
+								physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
+						}
+						if (tick % 5 == 0) {
+							animate.Animate(physics.getMobs());
 						}
 					}
-					if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
-						if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
-							physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
-					}
-					if (tick % 5 == 0) {
-						animate.Animate(physics.getMobs());
-					}
-					}
-					
+
 					break;
-					
+
 				case MenuState:
 					if (currentKeys.indexOf(87) != -1) { // W Key
 						render.setCurrentMenuPos(render.getCurrentMenuPos() - 1);
@@ -261,49 +261,52 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 									Thread.sleep(100);
 								} catch (InterruptedException e) {
 								}
-						
-						if (currentKeys.indexOf(83) != -1) { // S Key
-						}
-						if (currentKeys.indexOf(192) != -1) { // Tilde Key
-							physics.stop();
-							NextState = UpgradeState;
-						}
-                        if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
-							for (Mob entity : physics.getMobs()) {
-								physics.Dampening(entity);
-							}
-						}
-						if (render.getCurrentMenuPos() == 2) {
-							if (physics.getPlayer().getEXP() >= 5 && physics.getPlayer().getManaRefreshTimer() > 5) {
-								physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-								physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() - 5);
-								currentKeys.remove(currentKeys.indexOf(10));
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e) {
+
+								if (currentKeys.indexOf(83) != -1) { // S Key
+								}
+								if (currentKeys.indexOf(192) != -1) { // Tilde Key
+									physics.stop();
+									NextState = UpgradeState;
+								}
+								if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
+									for (Mob entity : physics.getMobs()) {
+										physics.Dampening(entity);
+									}
+								}
+								if (render.getCurrentMenuPos() == 2) {
+									if (physics.getPlayer().getEXP() >= 5
+											&& physics.getPlayer().getManaRefreshTimer() > 5) {
+										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+										physics.getPlayer()
+												.setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() - 5);
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {
+										}
+									}
+								}
+								if (render.getCurrentMenuPos() == 3) {
+									if (physics.getPlayer().getEXP() >= 5) {
+										physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
+										physics.getPlayer()
+												.setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() + 1);
+										currentKeys.remove(currentKeys.indexOf(10));
+										try {
+											Thread.sleep(100);
+										} catch (InterruptedException e) {
+										}
+									}
 								}
 							}
-						}
-						if (render.getCurrentMenuPos() == 3) {
-							if (physics.getPlayer().getEXP() >= 5) {
-								physics.getPlayer().setEXP(physics.getPlayer().getEXP() - 5);
-								physics.getPlayer().setManaRefreshTimer(physics.getPlayer().getManaRefreshTimer() + 1);
-								currentKeys.remove(currentKeys.indexOf(10));
-								try {
-									Thread.sleep(100);
-								} catch (InterruptedException e) {
-								}
+							if (currentKeys.indexOf(27) != -1) { // Escape Key
+								NextState = PauseState;
+								CurrentState = PauseState;
 							}
 						}
 					}
-					if (currentKeys.indexOf(27) != -1) { // Escape Key
-						NextState = PauseState;
-						CurrentState = PauseState;
-					}
-				}
-			}
 					break;
-					
+
 				case PauseState:
 					if (currentKeys.indexOf(10) != -1) { // EnterKey
 						if (render.getCurrentMenuPos() == 0) {
@@ -318,13 +321,26 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						}
 					}
 					break;
+
+				case DeadState:
+
+					if (currentKeys.indexOf(10) != -1) { // EnterKey
+						if (render.getCurrentMenuPos() == 0) {
+							physics.Load();
+							CurrentState = GameState;
+							NextState = GameState;
+							physics.start();
+						}
+					}
+					break;
+
 				}
 
 				// Beautiful ticks are ticking!!!
 				tick++;
 				tick();
 				--unprocessed;
-				//draws current frame
+				// draws current frame
 				render();
 			}
 			try {
@@ -343,7 +359,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	private void render() {
 		/*
 		 * The render method tells the render class to draw to the canvas.
-		 * 
+		 *
 		 * We use this class to create a buffer strategy and call the render class'
 		 * methods that draw the background and foreground to the canvas and then update
 		 * the canvas that is shown.
@@ -367,7 +383,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			if (!render.isLoading()) {
 				CurrentState = NextState;
 			}
-			
+
 			// Done with rendering, Moving to situating the canvas and displaying it
 			g.dispose();
 			bs.show();
@@ -443,7 +459,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		}
 
 		try {
-			//Log.add("Game End");
+			// Log.add("Game End");
 			Log.close();
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
@@ -455,7 +471,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			}
 		}
 
-		//new Crash().run();
+		// new Crash().run();
 		frame.setVisible(false);
 		frame.dispose();
 		physics.stop();
@@ -468,9 +484,9 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		/*
 		 * The method keyTyped is required by the KeyListener class and is an event that
 		 * is called every time a Char is pressed.
-		 * 
+		 *
 		 * Example of Keys that this event registers: A, S, D, F, etc.
-		 * 
+		 *
 		 * Keys NOT registered: F5, F11, Enter, Ctrl
 		 */
 
@@ -479,7 +495,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public void keyReleased(KeyEvent e) {
 		/*
 		 * keyReleased is called when ANY key is released from a "Pressed" state.
-		 * 
+		 *
 		 * We use it to remove a key from an ArrayList of all Keys currently "Pressed"
 		 */
 
@@ -491,7 +507,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 	public void keyPressed(KeyEvent e) {
 		/*
 		 * keyPressed is called every time a Key registers as "Pressed"
-		 * 
+		 *
 		 * This means that Every time a key is held down, this event is continuously
 		 * called. To avoid the issue of repeat KeyCodes being added to "currentKeys" (a
 		 * list of every Key that is currently "Pressed"), we are iterating through
@@ -530,31 +546,35 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		if (render.getCurrentMenuPos() == 0 && CurrentState == MenuState && arg0.getButton() == MouseEvent.BUTTON1) {
 			try {
 				ResourceManager.deleteSave("SaveData");
 				ResourceManager.deleteSave("CurrentWorldFile");
 				ResourceManager.deleteSave("SaveWorldData");
 				physics.getWorld().createCurrentWorldFile();
-			} catch(Exception e){
+			} catch (Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
-				try{
+				try {
 					Log.add(error.toString());
-				}catch (Exception e1) {}
+				} catch (Exception e1) {
+				}
 			}
 			NextState = GameState;
 			physics.start();
-		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState
+				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			if (ResourceManager.hasData("SaveData")) {
 				NextState = GameState;
 				physics.Load();
 				physics.start();
 
 			}
-		} else if (render.getCurrentMenuPos() == 2 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.getCurrentMenuPos() == 2 && CurrentState == MenuState
+				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = OptionState;
-		} else if(render.getCurrentMenuPos() == 3 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
+		} else if (render.getCurrentMenuPos() == 3 && CurrentState == MenuState
+				&& arg0.getButton() == MouseEvent.BUTTON1) {
 			render.stopBackgroundMusic();
 			stop();
 		}
@@ -620,6 +640,39 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			} else if (render.getCurrentMenuPos() == 2) {
 				NextState = MenuState;
 				physics.stop();
+			}
+		}
+		if (CurrentState == DeadState && arg0.getButton() == MouseEvent.BUTTON1) {
+			if (physics.getData().getPlayerLives() > 0) {
+				if (render.getCurrentMenuPos() == 0) {
+					if (ResourceManager.hasData("SaveData")) {
+						physics.Load();
+						CurrentState = GameState;
+						NextState = GameState;
+						physics.start();
+						}else{
+						try {
+							physics.getWorld().Initialize();
+						} catch (IOException e) {
+							StringWriter error = new StringWriter();
+							e.printStackTrace(new PrintWriter(error));
+							try {
+								Log.add(error.toString());
+							} catch (Exception e1) {
+								
+							}
+						}
+						physics.Load();
+						CurrentState = GameState;
+						NextState = GameState;
+						physics.start();
+					}
+				}
+			} else {
+				if (render.getCurrentMenuPos() == 0) {
+					CurrentState = MenuState;
+					NextState = MenuState;
+				}
 			}
 		}
 	}
@@ -697,6 +750,10 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 
 	public static SettingsSaveData getSettingsData() {
 		return settingsData;
+	}
+
+	public static void setNextState(int nextState) {
+		NextState = nextState;
 	}
 
 }

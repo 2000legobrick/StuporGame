@@ -24,6 +24,8 @@ public class Physics implements Runnable {
 	private int physicsFogOfWar = 2;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
+	private SaveData data = new SaveData();
+	 
 
 	/*
 	 * Adds gravity to all mobs and projectile
@@ -61,7 +63,15 @@ public class Physics implements Runnable {
 		ArrayList<Integer> removeList = new ArrayList<Integer>();
 		for (Mob entity : mobs) {
 			if (entity.getHealth() <= 0) {
-				removeList.add(mobs.indexOf(entity));
+		        if(entity.equals(player)) {	        	 
+		            data.setPlayerLives(data.getPlayerLives() - 1);	   
+		            StateMachine.setNextState(StateMachine.getDeadstate());	   
+		            stopWithoutSave();
+		   
+		          }else{	   
+		            removeList.add(mobs.indexOf(entity));
+		          }
+		   
 			}
 		}
 		for (Integer i : removeList) {
@@ -221,249 +231,249 @@ public class Physics implements Runnable {
 	/*
 	 * Removes an item from the world and gives it to a mob
 	 */
-	public void pickUpItem(Mob entity) {
-		Item closestItem = null;
-		double closestDistance = 100;
-		double tempDistance;
-		for (Item i : world.getWorldInventory().getCurrentItems()) {
-			tempDistance = getDistanceTo(new Point(entity.getCurrentX(), entity.getCurrentY()),
-					new Point(i.itemX, i.itemY));
-			if (tempDistance < closestDistance) {
-				closestDistance = tempDistance;
-				closestItem = i;
-			}
-		}
-		if (closestItem != null) {
-			try {
-				int nullCount = 0;
-				for (Item i : entity.getInventory().getCurrentMobItems()) {
-					if (i == null)
-						nullCount++;
-				}
-				if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
-					entity.addItem(closestItem);
-					world.getWorldInventory().removeWorldInventoryItem(closestItem);
-				} 
-			} catch(Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try {
-					Log.add(error.toString());
-				} catch (Exception e1) {
-				}
-			}
-		}
-	}
+    public void pickUpItem(Mob entity) {
+        Item closestItem = null;
+        double closestDistance = 100;
+        double tempDistance;
+        for (Item i : world.getWorldInventory().getCurrentItems()) {
+            tempDistance = getDistanceTo(new Point(entity.getCurrentX(), entity.getCurrentY()),
+                    new Point(i.itemX, i.itemY));
+            if (tempDistance < closestDistance) {
+                closestDistance = tempDistance;
+                closestItem = i;
+            }
+        }
+        if (closestItem != null) {
+            try {
+                int nullCount = 0;
+                for (Item i : entity.getInventory().getCurrentMobItems()) {
+                    if (i == null)
+                        nullCount++;
+                }
+                if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
+                    entity.addItem(closestItem);
+                    world.getWorldInventory().removeWorldInventoryItem(closestItem);
+                }
+            } catch(Exception e) {
+                StringWriter error = new StringWriter();
+                e.printStackTrace(new PrintWriter(error));
+                try {
+                    Log.add(error.toString());
+                } catch (Exception e1) {
+                }
+            }
+        }
+    }
 
-	/*
-	 * Using the pythagorean theorem to determine the distance between two points,
-	 * and returns it as an int
-	 */
-	public int getDistance(Point p1, Point p2) {
-		return (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
-	}
+    /*
+     * Using the pythagorean theorem to determine the distance between two points,
+     * and returns it as an int
+     */
+    public int getDistance(Point p1, Point p2) {
+        return (int) Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
+    }
 
-	/*
-	 * The mobMove method sets the velocity of a certain mob to a specified
-	 * magnitude in the direction specified.
-	 */
-	public void mobMove(Mob entity, int direction, int magnitude) {
+    /*
+     * The mobMove method sets the velocity of a certain mob to a specified
+     * magnitude in the direction specified.
+     */
+    public void mobMove(Mob entity, int direction, int magnitude) {
 
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
+        // 1: North
+        // 2: South
+        // 3: West
+        // 4: East
 
-		if (direction == 1) {
-			entity.setVelocityY(-magnitude);
-		} else if (direction == 2) {
-			entity.setVelocityY(magnitude);
-		} else if (direction == 3) {
-			entity.setVelocityX(-magnitude);
-		} else if (direction == 4) {
-			entity.setVelocityX(magnitude);
-		}
+        if (direction == 1) {
+            entity.setVelocityY(-magnitude);
+        } else if (direction == 2) {
+            entity.setVelocityY(magnitude);
+        } else if (direction == 3) {
+            entity.setVelocityX(-magnitude);
+        } else if (direction == 4) {
+            entity.setVelocityX(magnitude);
+        }
 
-	}
+    }
 
-	/*
-	 * The MoveToWall method is used to take a specific mob and move it in the
-	 * specified direction until it hits a wall.
-	 */
-	public void MoveToWall(Mob entity, int direction) {
+    /*
+     * The MoveToWall method is used to take a specific mob and move it in the
+     * specified direction until it hits a wall.
+     */
+    public void MoveToWall(Mob entity, int direction) {
 
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
+        // 1: North
+        // 2: South
+        // 3: West
+        // 4: East
 
-		if (direction == 1) {
-			while (Intersection(entity, direction, 1, world) == 1) {
-				entity.setCurrentY(entity.getCurrentY() - 1);
-			}
-		} else if (direction == 2) {
-			while (Intersection(entity, direction, 1, world) == 2) {
-				entity.setCurrentY(entity.getCurrentY() + 1);
-			}
-		} else if (direction == 3) {
-			while (Intersection(entity, direction, 1, world) == 3) {
-				entity.setCurrentX(entity.getCurrentX() - 1);
-			}
-		} else if (direction == 4) {
-			while (Intersection(entity, direction, 1, world) == 4) {
-				entity.setCurrentX(entity.getCurrentX() + 1);
-			}
-		}
-	}
+        if (direction == 1) {
+            while (Intersection(entity, direction, 1, world) == 1) {
+                entity.setCurrentY(entity.getCurrentY() - 1);
+            }
+        } else if (direction == 2) {
+            while (Intersection(entity, direction, 1, world) == 2) {
+                entity.setCurrentY(entity.getCurrentY() + 1);
+            }
+        } else if (direction == 3) {
+            while (Intersection(entity, direction, 1, world) == 3) {
+                entity.setCurrentX(entity.getCurrentX() - 1);
+            }
+        } else if (direction == 4) {
+            while (Intersection(entity, direction, 1, world) == 4) {
+                entity.setCurrentX(entity.getCurrentX() + 1);
+            }
+        }
+    }
 
-	/*
-	 * The Dampening method is used to bring the specified mob's horizontal velocity
-	 * back to zero.
-	 */
-	public void Dampening(Mob entity) {
+    /*
+     * The Dampening method is used to bring the specified mob's horizontal velocity
+     * back to zero.
+     */
+    public void Dampening(Mob entity) {
 
-		if (entity.getVelocityX() < 0) {
-			entity.setVelocityX(entity.getVelocityX() + entity.getDampening());
-			if (entity.getVelocityX() > 0) {
-				entity.setVelocityX(0);
-			}
-		} else if (entity.getVelocityX() > 0) {
-			entity.setVelocityX(entity.getVelocityX() - entity.getDampening());
-			if (entity.getVelocityX() < 0) {
-				entity.setVelocityX(0);
-			}
-		}
-	}
+        if (entity.getVelocityX() < 0) {
+            entity.setVelocityX(entity.getVelocityX() + entity.getDampening());
+            if (entity.getVelocityX() > 0) {
+                entity.setVelocityX(0);
+            }
+        } else if (entity.getVelocityX() > 0) {
+            entity.setVelocityX(entity.getVelocityX() - entity.getDampening());
+            if (entity.getVelocityX() < 0) {
+                entity.setVelocityX(0);
+            }
+        }
+    }
 
-	/*
-	 * The Intersection method checks if in the next movement of the entity will be
-	 * intersecting with another block. If it does intersect the speed and
-	 * acceleration are set to 0.
-	 */
-	public int Intersection(Mob entity, int direction, int magnitude, World world) {
+    /*
+     * The Intersection method checks if in the next movement of the entity will be
+     * intersecting with another block. If it does intersect the speed and
+     * acceleration are set to 0.
+     */
+    public int Intersection(Mob entity, int direction, int magnitude, World world) {
 
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
+        // 1: North
+        // 2: South
+        // 3: West
+        // 4: East
 
-		// Iterates through the world surrounding the block (checks a 2 block square
-		// radius around the entity)
-		// and adds the blocks that impede movement
-		wallObjects = new ArrayList<NewRectangle>();
-		for (int y = (int) (entity.getCurrentY() / StateMachine.getTileSize())
-				- physicsFogOfWar; y <= (int) (entity.getCurrentY() / StateMachine.getTileSize())
-						+ physicsFogOfWar; y++) {
-			for (int x = (int) (entity.getCurrentX() / StateMachine.getTileSize())
-					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize())
-							+ physicsFogOfWar; x++) {
-				try {
-					if (x >= 0 && y >= 0) {
-						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
-							wallObjects.add(world.getWorldGrid().get(y).get(x));
-						}
-					}
-				} catch (Exception e) {
-					// NON FATAL ERROR, do not report
-				}
-			}
-		}
+        // Iterates through the world surrounding the block (checks a 2 block square
+        // radius around the entity)
+        // and adds the blocks that impede movement
+        wallObjects = new ArrayList<NewRectangle>();
+        for (int y = (int) (entity.getCurrentY() / StateMachine.getTileSize())
+                - physicsFogOfWar; y <= (int) (entity.getCurrentY() / StateMachine.getTileSize())
+                + physicsFogOfWar; y++) {
+            for (int x = (int) (entity.getCurrentX() / StateMachine.getTileSize())
+                    - physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize())
+                    + physicsFogOfWar; x++) {
+                try {
+                    if (x >= 0 && y >= 0) {
+                        if (world.getWorldGrid().get(y).get(x).getType() == 1) {
+                            wallObjects.add(world.getWorldGrid().get(y).get(x));
+                        }
+                    }
+                } catch (Exception e) {
+                    // NON FATAL ERROR, do not report
+                }
+            }
+        }
 
-		// Iterates through the ArrayList wallObjects and checks if the next players
-		// movement will intersect with
-		// any of the NewRectangles
-		for (NewRectangle rect : wallObjects) {
-			if (direction == 1) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() - magnitude,
-						entity.getWidth(), entity.getHeight());
-				if (tempRect.intersects(rect.getRect())) {
-					entity.setAccelerationY(0);
-					entity.setVelocityY(0);
-					return 0;
-				}
-			} else if (direction == 2) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() + magnitude,
-						entity.getWidth(), entity.getHeight());
-				if (tempRect.intersects(rect.getRect())) {
-					entity.setAccelerationY(0);
-					entity.setVelocityY(0);
-					entity.setJump(entity.getJumpAmount());
-					return 0;
-				}
-			} else if (direction == 3) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX() - magnitude, entity.getCurrentY(),
-						entity.getWidth(), entity.getHeight());
-				if (tempRect.intersects(rect.getRect())) {
-					entity.setAccelerationX(0);
-					entity.setVelocityX(0);
-					return 0;
-				}
-			} else if (direction == 4) {
-				Rectangle tempRect = new Rectangle(entity.getCurrentX() + magnitude, entity.getCurrentY(),
-						entity.getWidth(), entity.getHeight());
-				if (tempRect.intersects(rect.getRect())) {
-					entity.setAccelerationX(0);
-					entity.setVelocityX(0);
-					return 0;
-				}
-			}
-		}
-		return direction;
-	}
+        // Iterates through the ArrayList wallObjects and checks if the next players
+        // movement will intersect with
+        // any of the NewRectangles
+        for (NewRectangle rect : wallObjects) {
+            if (direction == 1) {
+                Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() - magnitude,
+                        entity.getWidth(), entity.getHeight());
+                if (tempRect.intersects(rect.getRect())) {
+                    entity.setAccelerationY(0);
+                    entity.setVelocityY(0);
+                    return 0;
+                }
+            } else if (direction == 2) {
+                Rectangle tempRect = new Rectangle(entity.getCurrentX(), entity.getCurrentY() + magnitude,
+                        entity.getWidth(), entity.getHeight());
+                if (tempRect.intersects(rect.getRect())) {
+                    entity.setAccelerationY(0);
+                    entity.setVelocityY(0);
+                    entity.setJump(entity.getJumpAmount());
+                    return 0;
+                }
+            } else if (direction == 3) {
+                Rectangle tempRect = new Rectangle(entity.getCurrentX() - magnitude, entity.getCurrentY(),
+                        entity.getWidth(), entity.getHeight());
+                if (tempRect.intersects(rect.getRect())) {
+                    entity.setAccelerationX(0);
+                    entity.setVelocityX(0);
+                    return 0;
+                }
+            } else if (direction == 4) {
+                Rectangle tempRect = new Rectangle(entity.getCurrentX() + magnitude, entity.getCurrentY(),
+                        entity.getWidth(), entity.getHeight());
+                if (tempRect.intersects(rect.getRect())) {
+                    entity.setAccelerationX(0);
+                    entity.setVelocityX(0);
+                    return 0;
+                }
+            }
+        }
+        return direction;
+    }
 
-	/*
-	 * The Intersection method checks if in the next movement of the proj will be
-	 * intersecting with another block. If it does intersect the speed and
-	 * acceleration are set to 0.
-	 */
-	public boolean ProjectileIntersection(Projectile proj) {
+    /*
+     * The Intersection method checks if in the next movement of the proj will be
+     * intersecting with another block. If it does intersect the speed and
+     * acceleration are set to 0.
+     */
+    public boolean ProjectileIntersection(Projectile proj) {
 
-		// 1: North
-		// 2: South
-		// 3: West
-		// 4: East
+        // 1: North
+        // 2: South
+        // 3: West
+        // 4: East
 
-		// Iterates through the world surrounding the block (checks a 2 block square
-		// radius around the proj)
-		// and adds the blocks that impede movement
-		wallObjects = new ArrayList<NewRectangle>();
-		for (int y = (int) (proj.getCurrentY() / StateMachine.getTileSize())
-				- physicsFogOfWar; y <= (int) (proj.getCurrentY() / StateMachine.getTileSize())
-						+ physicsFogOfWar; y++) {
-			for (int x = (int) (proj.getCurrentX() / StateMachine.getTileSize())
-					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize())
-							+ physicsFogOfWar; x++) {
-				try {
-					if (x >= 0 && y >= 0) {
-						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
-							wallObjects.add(world.getWorldGrid().get(y).get(x));
-						}
-					}
-				} catch (Exception e) {
-					StringWriter error = new StringWriter();
-					e.printStackTrace(new PrintWriter(error));
-					try {
-						Log.add(error.toString());
-					} catch (Exception e1) {
+        // Iterates through the world surrounding the block (checks a 2 block square
+        // radius around the proj)
+        // and adds the blocks that impede movement
+        wallObjects = new ArrayList<NewRectangle>();
+        for (int y = (int) (proj.getCurrentY() / StateMachine.getTileSize())
+                - physicsFogOfWar; y <= (int) (proj.getCurrentY() / StateMachine.getTileSize())
+                + physicsFogOfWar; y++) {
+            for (int x = (int) (proj.getCurrentX() / StateMachine.getTileSize())
+                    - physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize())
+                    + physicsFogOfWar; x++) {
+                try {
+                    if (x >= 0 && y >= 0) {
+                        if (world.getWorldGrid().get(y).get(x).getType() == 1) {
+                            wallObjects.add(world.getWorldGrid().get(y).get(x));
+                        }
+                    }
+                } catch (Exception e) {
+                    StringWriter error = new StringWriter();
+                    e.printStackTrace(new PrintWriter(error));
+                    try {
+                        Log.add(error.toString());
+                    } catch (Exception e1) {
 
-					}
-				}
-			}
-		}
+                    }
+                }
+            }
+        }
 
-		Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(),
-				proj.getCurrentY());
+        Line2D projectedLine = new Line2D.Float(proj.getPreviousX(), proj.getPreviousY(), proj.getCurrentX(),
+                proj.getCurrentY());
 
-		// Iterates through the ArrayList wallObjects and checks if the next players
-		// movement will intersect with
-		// any of the NewRectangles
-		for (NewRectangle rect : wallObjects) {
-			if (projectedLine.intersects(rect.getRect())) {
-				return true;
-			}
-		}
-		return false;
-	}
+        // Iterates through the ArrayList wallObjects and checks if the next players
+        // movement will intersect with
+        // any of the NewRectangles
+        for (NewRectangle rect : wallObjects) {
+            if (projectedLine.intersects(rect.getRect())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	/*
 	 * Checks if a projectile intersects a mob
@@ -531,37 +541,6 @@ public class Physics implements Runnable {
 	}
 	
 
-	/*
-	 * Saves all relevant data to physics
-	 */
-	public void Save() {
-		SaveData data = new SaveData();
-		SaveWorldData worldData = new SaveWorldData();
-		
-		try {
-			data.setPlayerCurrentX(player.getCurrentX());
-			data.setPlayerCurrentY(player.getCurrentY());
-			data.setPlayerHealth(player.getHealth());
-			data.setPlayerMana(player.getMana());
-			data.setPlayerEXP(player.getEXP());
-			savePlayerInv(data);
-			worldData.setWorldInv(world.getWorldInventory().getCurrentItems());
-		} catch(Exception e) {}
-		try {
-			ResourceManager.Save(data, "SaveData");
-			world.saveWorldData(worldData);
-			ResourceManager.Save(worldData, "SaveWorldData");
-		} catch (Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {
-				
-			}
-		}
-	}
-	
 	public void savePlayerInv(SaveData data) {
 		Item i = null;
 		if (player.getInventory().getCurrentMobItems().length >= 1) {
@@ -594,98 +573,77 @@ public class Physics implements Runnable {
 		}
 	}
 
-	public void loadPlayerInv(SaveData data) {
-		player.resetInventory();
-		player.getInventory().addMobInventoryItem(data.getItem1());
-		player.getInventory().addMobInventoryItem(data.getItem2());
-		player.getInventory().addMobInventoryItem(data.getItem3());
-		player.getInventory().addMobInventoryItem(data.getItem4());
-	}
-	
+    /*
+     * Saves all relevant data to physics
+     */
+    public void Save() {
+        SaveData data = new SaveData();
+        SaveWorldData worldData = new SaveWorldData();
 
-	/*
-	 * Loads all relevant data to physics
-	 */
-	public void Load() {
-		try {
-			SaveData data = (SaveData) ResourceManager.Load("SaveData");
-			player.setCurrentX(data.getPlayerCurrentX());
-			player.setCurrentY(data.getPlayerCurrentY());
-			player.setHealth(data.getPlayerHealth());
-			player.setMana(data.getPlayerMana());
-			player.setEXP(data.getPlayerEXP());
-			loadPlayerInv(data);
-			if(ResourceManager.hasData("SaveWorldData")) {
-				SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
-				world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
-				world.loadWorldData(worldData);
-			}
-		} catch (Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {
-				
-			}
-		}
-	}
+        data.setPlayerCurrentX(player.getCurrentX());
+        data.setPlayerCurrentY(player.getCurrentY());
+        data.setPlayerHealth(player.getHealth());
+        data.setPlayerMana(player.getMana());
+        data.setPlayerEXP(player.getEXP());
+        savePlayerInv(data);
+        worldData.setWorldInv(world.getWorldInventory().getCurrentItems());
 
-	/*
-	 * Sets up physics by creating mobs and loading data
-	 */
-	public Physics() {
-		/*
-		 * This is the constructor for the Physics class.
-		 * 
-		 * Currently we are using this to create enemy mobs, and the player entity. We
-		 * also set the player entity to the first index of the mobs ArrayList
-		 */
-		
-		
-	}
+        try {
+            ResourceManager.Save(data, "SaveData");
+            world.saveWorldData(worldData);
+            ResourceManager.Save(worldData, "SaveWorldData");
+        } catch (Exception e) {
+            StringWriter error = new StringWriter();
+            e.printStackTrace(new PrintWriter(error));
+            try{
+                Log.add(error.toString());
+            }catch (Exception e1) {
 
-	/*
-	 * makes physics multithreaded
-	 */
-	@Override
-	public void run() {
+            }
+        }
+    }
 
-		// These variables are specific only to the run method
-		int tick = 0;
-		double timer = System.currentTimeMillis();
-		
-		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
-		double previous = System.nanoTime();
-		double unprocessed = 0;
+    public void savePlayerInv(SaveData data) {
+        Item i = null;
+        if (player.getInventory().getCurrentMobItems().length >= 1) {
+            Item item1 = player.getInventory().getCurrentMobItems()[0];
+            if (item1 != null)
+                data.setItem1(item1.getItemX(),item1.getItemY(),item1.getItemColor(),item1.getItemSize(),item1.getName());
+            else if (item1 == null)
+                data.setItem1(i);
+        }
+        if (player.getInventory().getCurrentMobItems().length >= 2) {
+            Item item2 = player.getInventory().getCurrentMobItems()[1];
+            if (item2 != null)
+                data.setItem2(item2.getItemX(),item2.getItemY(),item2.getItemColor(),item2.getItemSize(),item2.getName());
+            else if (item2 == null)
+                data.setItem2(i);
+        }
+        if (player.getInventory().getCurrentMobItems().length >= 3) {
+            Item item3 = player.getInventory().getCurrentMobItems()[2];
+            if (item3 != null)
+                data.setItem3(item3.getItemX(),item3.getItemY(),item3.getItemColor(),item3.getItemSize(),item3.getName());
+            else if (item3 == null)
+                data.setItem3(i);
+        }
+        if (player.getInventory().getCurrentMobItems().length >= 4) {
+            Item item4 = player.getInventory().getCurrentMobItems()[3];
+            if (item4 != null)
+                data.setItem4(item4.getItemX(),item4.getItemY(),item4.getItemColor(),item4.getItemSize(),item4.getName());
+            else if (item4 == null)
+                data.setItem4(i);
+        }
+    }
 
-		while (running) {
-			double current = System.nanoTime();
-			unprocessed += (current - previous) / nsPerTick;
-			previous = current;
-			while (unprocessed >= 1) {
-				// Updates game objects
-				ai.setMobAIList(mobs);
-				ai.Move(world, player);
-				Gravity();
-				Movement();
+    public void loadPlayerInv(SaveData data) {
+        player.resetInventory();
+        player.getInventory().addMobInventoryItem(data.getItem1());
+        player.getInventory().addMobInventoryItem(data.getItem2());
+        player.getInventory().addMobInventoryItem(data.getItem3());
+        player.getInventory().addMobInventoryItem(data.getItem4());
+    }
 
-				if (tick % 20 == 0) {
-					for (Mob mob:mobs) {
-						mob.setMana(mob.getMana() + 1);
-						mob.subtractFromWantsToShoot();
-					}
-				}
-				--unprocessed;
-				tick++;
-			}
 			
-			if (System.currentTimeMillis() - timer > 1000) {
-				tick = 0;
-				timer += 1000;
-			}
-		}
-	}
 
 	/*
 	 * Starts physics
@@ -701,31 +659,117 @@ public class Physics implements Runnable {
 		}
 	}
 
-	/*
-	 * Stops physics
-	 */
-	public void stop() {
-		Save();
-		running = false;
-	}
+    }
 
-	/*
-	 * Getters and setters for objects in physics
-	 */
-	public Mob getPlayer() {
-		return player;
-	}
+    /*
+     * makes physics multithreaded
+     */
+    @Override
+    public void run() {
 
-	public static ArrayList<Mob> getMobs() {
-		return mobs;
-	}
+        // These variables are specific only to the run method
+        int tick = 0;
+        double timer = System.currentTimeMillis();
 
-	public World getWorld() {
-		return world;
-	}
+        double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
+        double previous = System.nanoTime();
+        double unprocessed = 0;
 
-	public void setWorld(World world) {
-		this.world = world;
-	}
+        while (running) {
+            double current = System.nanoTime();
+            unprocessed += (current - previous) / nsPerTick;
+            previous = current;
+            while (unprocessed >= 1) {
+                // Updates game objects
+                ai.setMobAIList(mobs);
+                ai.Move(world, player);
+                Gravity();
+                Movement();
+
+                if (tick % 20 == 0) {
+                    for (Mob mob:mobs) {
+                        mob.setMana(mob.getMana() + 1);
+                        mob.subtractFromWantsToShoot();
+                    }
+                }
+                --unprocessed;
+                tick++;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                StringWriter error = new StringWriter();
+                e.printStackTrace(new PrintWriter(error));
+                try {
+                    Log.add(error.toString());
+                } catch (Exception e1) {
+
+                }
+            }
+            if (System.currentTimeMillis() - timer > 1000) {
+                tick = 0;
+                timer += 1000;
+            }
+        }
+    }
+
+    /*
+     * Starts physics
+     */
+    public void start() {
+        mobs = new ArrayList<>();
+        mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
+        player = mobs.get(0);
+        Load();
+        if (!running) {
+
+            running = true;
+
+            for (int x = 1; x < 150; x++) {
+                //for (int y = 1; y < 10; y++)
+                    //mobs.add(new Mob(100*x, 10*y, 50, 50));
+                mobs.add(new Mob( 500 * x, 0, 50,50));
+            }
+
+
+            ai.setMobAIList(mobs);
+
+            new Thread(this).start();
+        }
+    }
+
+    /*
+     * Stops physics
+     */
+    public void stop() {
+        Save();
+        running = false;
+    }
+    
+    public void stopWithoutSave() {
+        running = false;     
+    }
+    
+    /*
+     * Getters and setters for objects in physics
+     */
+    public SaveData getData() {	 
+        return data;
+    }
+      
+    public Mob getPlayer() {
+        return player;
+    }
+
+    public static ArrayList<Mob> getMobs() {
+        return mobs;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public void setWorld(World world) {
+        this.world = world;
+    }
 }
-
