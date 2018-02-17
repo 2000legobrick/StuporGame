@@ -251,6 +251,11 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 					}
 					break;
 				case UpgradeState:
+					if (currentKeys.indexOf(27) != -1) { // Escape Key
+						physics.stop();
+						NextState = PauseState;
+						CurrentState = PauseState;
+					}
 					if (currentKeys.indexOf(10) != -1) { // EnterKey
 						if (render.getCurrentMenuPos() == 1) {
 							if (physics.getPlayer().getEXP() >= 5) {
@@ -268,6 +273,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 									physics.stop();
 									NextState = UpgradeState;
 								}
+
 								if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
 									for (Mob entity : physics.getMobs()) {
 										physics.Dampening(entity);
