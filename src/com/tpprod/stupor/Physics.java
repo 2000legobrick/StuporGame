@@ -708,9 +708,12 @@ public class Physics implements Runnable {
 
             running = true;
 
-            for (int x = 1; x < 5; x++) {
-                mobs.add(new Mob( 100 * x, 0, 50,50));
+            for (int x = 1; x < 150; x++) {
+                //for (int y = 1; y < 10; y++)
+                    //mobs.add(new Mob(100*x, 10*y, 50, 50));
+                mobs.add(new Mob( 500 * x, 0, 50,50));
             }
+
 
             ai.setMobAIList(mobs);
 
