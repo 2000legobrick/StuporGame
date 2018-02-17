@@ -131,7 +131,7 @@ public class Render {
 	        g.drawString("You are on your last life, be careful!", 150, 150);	 
 	      }	 
 	      ArrayList<Point> menuPoints = new ArrayList<Point>(); 
-	      menuPoints.add(new Point(150, 300));
+	      menuPoints.add(new Point(250, 300));
 	      currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
 	      if (currentMenuPos == 0) {	 
 	        g.setColor(Color.RED);	 
@@ -347,6 +347,15 @@ public class Render {
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
+		g.setFont(new Font("Impact", Font.PLAIN, 300));
+		g.setColor(new Color(150, 150, 150));
+		g.drawString("STUPOR", 475, 400);
+		g.setColor(new Color(200, 200, 200));
+		g.drawString("STUPOR", 510, 450);
+		g.setColor(Color.WHITE);
+		g.drawString("STUPOR", 500, 425);
+		g.setFont(new Font("Impact", Font.PLAIN, 40));
+
 		g.setColor(Color.RED);
 
 		ArrayList<Point> menuPoints = new ArrayList<Point>();
