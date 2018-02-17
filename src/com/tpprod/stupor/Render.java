@@ -66,7 +66,7 @@ public class Render {
 		 * The InitializeWorld method gets the most current version of the world to
 		 * reference.
 		 */
-		world.Initialize(StateMachine.getPhysics());
+		world.Initialize();
 	}
 
 	/*
@@ -228,7 +228,7 @@ public class Render {
 		/*
 		 * The method RenderMenu renders out the menu for the game.
 		 */
-		bgMusic.start();
+
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
@@ -317,14 +317,6 @@ public class Render {
 		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
 		
-		if (currentMenuPos == 2) {
-			g.setColor(Color.RED);
-			g.drawString("Exit", 100, 225);
-		} else {
-			g.setColor(Color.WHITE);
-			g.drawString("Exit", 100, 225);
-		}
-		
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 
 		if (currentMenuPos == 0) {
@@ -363,7 +355,11 @@ public class Render {
 		 * The RenderForeground method takes the blocks on screen and actually prints
 		 * them to the canvas, allowing the player to see the world.
 		 */
-
+		try {
+			InitializeWorld();
+		} catch(Exception e) {
+			//NON FATAL ERROR
+		}
 		DisplayedObjects = new ArrayList<NewRectangle>();
 		DisplayedMobs = new ArrayList<NewRectangle>();
 		DisplayedItems = new ArrayList<NewRectangle>();
@@ -414,10 +410,6 @@ public class Render {
 		// the players current position
 		// which is located at the center of the screen
 		for (NewRectangle rect : DisplayedMobs) {
-			// g.setColor(rect.color);
-			// g.fillRect(rect.rect.x - player.currentX - player.width/2 + width / 2,
-			// rect.rect.y - player.currentY - player.height/2 + height/2, rect.rect.width,
-			// rect.rect.height);
 			if (rect.getImage() != null) {
 				g.drawImage(rect.getImage(),
 						rect.getRect().x - player.getCurrentX() - player.getWidth() / 2 + width / 2,

@@ -99,26 +99,26 @@ public class Inventory {
 	}
 
 	public void removeWorldInventoryItem(Item item) {
+		currentItems.remove(item);
 		ArrayList<ArrayList<NewRectangle>> tempWorld = StateMachine.getPhysics().getWorld().getWorldGrid();
-		boolean foundItem = false;
-		int index1=0,index2=0;
-
+		int row = 0,col = 0;
 		for(ArrayList<NewRectangle> rList : tempWorld) {
 			for (NewRectangle r : rList) {
-				int x = (int) r.getRect().getX();
-				int y = (int) r.getRect().getY();
+				int x = (int) r.getRect().getX() + StateMachine.getTileSize()/4;
+				int y = (int) r.getRect().getY() + StateMachine.getTileSize()/4;
 				if (item.getItemX() == x && item.getItemY() == y) {
-					foundItem = true;
-					index2 = rList.indexOf(r);
+					col = (int) (r.getRect().getX() - StateMachine.getTileSize()/4) / StateMachine.getTileSize();
+					row = (int) (r.getRect().getY() - StateMachine.getTileSize()/4) / StateMachine.getTileSize();
 					r.setType(0);
+					break;
 				}
+				
 			}
-			if (foundItem)
-				index1 = tempWorld.indexOf(rList);
 		}
-
-		currentItems.remove(item);
-
+		StateMachine.getPhysics().getWorld().setWorldGrid(tempWorld);
+		try {
+			StateMachine.getPhysics().getWorld().setWorldData(row, col, 0);
+		} catch (Exception e) {}
 	}
 
 	/*
@@ -127,6 +127,8 @@ public class Inventory {
 	public ArrayList<Item> getCurrentItems() {
 		return currentItems;
 	}
+
+	public void setCurrentItems(ArrayList<Item> currentItems) { this.currentItems = currentItems;}
 	
 	public Item[] getCurrentMobItems() {
 		return currentMobItems;

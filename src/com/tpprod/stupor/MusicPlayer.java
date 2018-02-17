@@ -30,7 +30,6 @@ public class MusicPlayer implements Runnable {
 	public MusicPlayer(boolean isForBackground) {
 		if (isForBackground) {
 			File[] bgFiles = new File(bgPath).listFiles();
-			// File[] seFiles = new File(sePath).listFiles();
 			setPlaylist(bgMusic, bgPath, bgFiles);
 		} else {
 			File[] seFiles = new File(sePath).listFiles();

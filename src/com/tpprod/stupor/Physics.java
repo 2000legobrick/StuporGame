@@ -222,7 +222,6 @@ public class Physics implements Runnable {
 	 * Removes an item from the world and gives it to a mob
 	 */
 	public void pickUpItem(Mob entity) {
-		System.out.println("Inventory Prior to PickUpItem: " + player.getInventory().getCurrentMobItems());
 		Item closestItem = null;
 		double closestDistance = 100;
 		double tempDistance;
@@ -499,7 +498,10 @@ public class Physics implements Runnable {
 		return false;
 	}
 	
-	public void useItem(int index) {
+	/*
+	 * Uses an item in the players Inventory
+	 */
+	public void useItem(int index,  ArrayList<AudioFile> soundEffectList) {
 		if (player.getInventory().getCurrentMobItems().length >= index) {
 			if (player.getInventory().getCurrentMobItems()[index] != null) {
 				Item[] playerInventory = player.getInventory().getCurrentMobItems();
@@ -508,9 +510,11 @@ public class Physics implements Runnable {
 				if (itemType.equals("health")) {
 					player.healthUp(1);
 					player.getInventory().removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();
 				} else if (itemType.equals("healthRegen")) {
 					player.getHealthRegen().start();
 					player.getInventory().removeMobInventoryItem(item);
+					soundEffectList.get(MusicPlayer.UseItem).play();
 				}
 			}
 		}
@@ -523,21 +527,27 @@ public class Physics implements Runnable {
 	public void Save() {
 		SaveData data = new SaveData();
 		SaveWorldData worldData = new SaveWorldData();
+		
+		data.setPlayerCurrentX(player.getCurrentX());
+		data.setPlayerCurrentY(player.getCurrentY());
+		data.setPlayerHealth(player.getHealth());
+		data.setPlayerMana(player.getMana());
+		data.setPlayerEXP(player.getEXP());
+		savePlayerInv(data);
+		worldData.setWorldInv(world.getWorldInventory().getCurrentItems());
+
 		try {
-			data.setPlayerCurrentX(player.getCurrentX());
-			data.setPlayerCurrentY(player.getCurrentY());
-			data.setPlayerHealth(player.getHealth());
-			data.setPlayerMana(player.getMana());
-			data.setPlayerEXP(player.getEXP());
-			savePlayerInv(data);
 			ResourceManager.Save(data, "SaveData");
+			world.saveWorldData(worldData);
+			ResourceManager.Save(worldData, "SaveWorldData");
+			System.out.println(worldData.getWorldSavedGrid());
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try {
+			try{
 				Log.add(error.toString());
-			} catch (Exception e1) {
-
+			}catch (Exception e1) {
+				
 			}
 		}
 	}
@@ -589,19 +599,22 @@ public class Physics implements Runnable {
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
 			loadPlayerInv(data);
+			world.loadWorldData(worldData);
+			world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
 			} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
-			try {
+			try{
 				Log.add(error.toString());
-			} catch (Exception e1) {
-
+			}catch (Exception e1) {
+				
 			}
 		}
 	}
@@ -678,11 +691,12 @@ public class Physics implements Runnable {
 	public void start() {
 		
 		if (!running) {
-			running = true;
 			mobs = new ArrayList<>();
 			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
 			player = mobs.get(0);
 			Load();
+			running = true;
+
 			for (int x = 1; x < 5; x++) {
 				mobs.add(new Mob( 100 * x, 0, 50,50));
 			}
@@ -698,7 +712,6 @@ public class Physics implements Runnable {
 	 */
 	public void stop() {
 		Save();
-		
 		running = false;
 	}
 

@@ -280,62 +280,7 @@ public class Mob {
 		}
 		inventory.setCurrentMobItems(new Item[0]);
 	}
-
-	/*
-	 * Uses an item in the mobs Inventory
-	 */
-	public void useItem(Item item) {
-		String itemType = item.name;
-		try {
-			if (Health < MaxHealth) {
-				if (itemType == "health") {
-					healthUp(1);
-					inventory.removeMobInventoryItem(item);
-				} else if (itemType == "healthRegen") {
-					healthRegen.start();
-					inventory.removeMobInventoryItem(item);
-				}
-			}
-		} catch (Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try {
-				Log.add(error.toString());
-			} catch (Exception e1) {
-			}
-		}
-	}
-
-	/*
-	 * Uses an item based on its index in the mobs inventory
-	 */
-	public void useItem(int index, ArrayList<AudioFile> soundEffectList) {
-		if (inventory.getCurrentMobItems().length >= index) {
-			try {
-				Item item = inventory.getCurrentMobItems()[index];
-				String itemType = item.name;
-				if (itemType == "health") {
-					healthUp(1);
-					inventory.removeMobInventoryItem(item);
-					soundEffectList.get(MusicPlayer.UseItem).play();
-					;
-				} else if (itemType == "healthRegen") {
-					healthRegen.start();
-					inventory.removeMobInventoryItem(item);
-					soundEffectList.get(MusicPlayer.UseItem).play();
-					;
-				}
-			} catch (Exception e) {
-				StringWriter error = new StringWriter();
-				e.printStackTrace(new PrintWriter(error));
-				try {
-					Log.add(error.toString());
-				} catch (Exception e1) {
-				}
-			}
-		}
-	}
-
+	
 	public ArrayList<Item> readItems() {
 		return inventory.getCurrentItems();
 	}
