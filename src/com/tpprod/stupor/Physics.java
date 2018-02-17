@@ -603,37 +603,7 @@ public class Physics implements Runnable {
         }
     }
 
-    public void savePlayerInv(SaveData data) {
-        Item i = null;
-        if (player.getInventory().getCurrentMobItems().length >= 1) {
-            Item item1 = player.getInventory().getCurrentMobItems()[0];
-            if (item1 != null)
-                data.setItem1(item1.getItemX(),item1.getItemY(),item1.getItemColor(),item1.getItemSize(),item1.getName());
-            else if (item1 == null)
-                data.setItem1(i);
-        }
-        if (player.getInventory().getCurrentMobItems().length >= 2) {
-            Item item2 = player.getInventory().getCurrentMobItems()[1];
-            if (item2 != null)
-                data.setItem2(item2.getItemX(),item2.getItemY(),item2.getItemColor(),item2.getItemSize(),item2.getName());
-            else if (item2 == null)
-                data.setItem2(i);
-        }
-        if (player.getInventory().getCurrentMobItems().length >= 3) {
-            Item item3 = player.getInventory().getCurrentMobItems()[2];
-            if (item3 != null)
-                data.setItem3(item3.getItemX(),item3.getItemY(),item3.getItemColor(),item3.getItemSize(),item3.getName());
-            else if (item3 == null)
-                data.setItem3(i);
-        }
-        if (player.getInventory().getCurrentMobItems().length >= 4) {
-            Item item4 = player.getInventory().getCurrentMobItems()[3];
-            if (item4 != null)
-                data.setItem4(item4.getItemX(),item4.getItemY(),item4.getItemColor(),item4.getItemSize(),item4.getName());
-            else if (item4 == null)
-                data.setItem4(i);
-        }
-    }
+
 
     public void loadPlayerInv(SaveData data) {
         player.resetInventory();
@@ -648,18 +618,7 @@ public class Physics implements Runnable {
 	/*
 	 * Starts physics
 	 */
-	public void start() {
-		if (!running) {
-			mobs = new ArrayList<>();
-			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
-			player = mobs.get(0);
-			Load();
-			running = true;			
-			new Thread(this).start();
-		}
-	}
 
-    }
 
     /*
      * makes physics multithreaded
@@ -720,12 +679,11 @@ public class Physics implements Runnable {
         mobs = new ArrayList<>();
         mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
         player = mobs.get(0);
-        Load();
         if (!running) {
 
             running = true;
 
-            for (int x = 1; x < 150; x++) {
+            for (int x = 1; x < 80; x++) {
                 //for (int y = 1; y < 10; y++)
                     //mobs.add(new Mob(100*x, 10*y, 50, 50));
                 mobs.add(new Mob( 500 * x, 0, 50,50));

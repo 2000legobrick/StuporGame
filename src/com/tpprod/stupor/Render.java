@@ -131,7 +131,7 @@ public class Render {
 	        g.drawString("You are on your last life, be careful!", 150, 150);	 
 	      }	 
 	      ArrayList<Point> menuPoints = new ArrayList<Point>(); 
-	      menuPoints.add(new Point(300, 300));	 
+	      menuPoints.add(new Point(150, 300));
 	      currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
 	      if (currentMenuPos == 0) {	 
 	        g.setColor(Color.RED);	 
@@ -143,7 +143,7 @@ public class Render {
 	    }else {	 
 	      g.drawString("They got you in a Stupor! Better luck next time!", 150, 150); 
 	      ArrayList<Point> menuPoints = new ArrayList<Point>();	 
-	      menuPoints.add(new Point(150, 200)); 
+	      menuPoints.add(new Point(165, 300));
 	      currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY)); 
 	      if (currentMenuPos == 0) {	 
 	        g.setColor(Color.RED);

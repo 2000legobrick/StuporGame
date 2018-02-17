@@ -32,12 +32,6 @@ public class World {
 	 
     private Inventory inventory = new Inventory();
 
-    private String currentWorldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/CurrentWorldFile";
-    private String defaultWorldFilePath = Paths.get(".").toAbsolutePath().normalize().toString() + "/Content/DefaultWorldFile";
-    private BufferedWriter bW = null;
-    private BufferedReader bR;
-    private ArrayList<String> line;
-    private String lineString;
 
 
     public World() {
