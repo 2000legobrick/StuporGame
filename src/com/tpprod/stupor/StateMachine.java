@@ -207,16 +207,19 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 						NextState = UpgradeState;
 					}
 					if (currentKeys.indexOf(87) == -1 && currentKeys.indexOf(87) == -1) { // A Key AND D key
+						try {
 						for (Mob entity : physics.getMobs()) {
 							physics.Dampening(entity);
 							if (currentKeys.indexOf(70) != -1) { // F Key
 								physics.pickUpItem(physics.getPlayer());
 							}
 						}
+						
 						if (tick % physics.getPlayer().getManaRefreshTimer() == 0) {
-							if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
-								physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
-						}
+								if (physics.getPlayer().getMana() < physics.getPlayer().getMaxMana())
+									physics.getPlayer().setMana(physics.getPlayer().getMana() + 1);
+							}
+						}catch(Exception e) {}
 						if (tick % 5 == 0) {
 							animate.Animate(physics.getMobs());
 						}
