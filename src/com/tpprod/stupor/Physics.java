@@ -243,7 +243,7 @@ public class Physics implements Runnable {
 				if (entity.getInventory().getCurrentMobItems().length < 4 || nullCount > 0) {
 					entity.addItem(closestItem);
 					world.getWorldInventory().removeWorldInventoryItem(closestItem);
-				}
+				} 
 			} catch(Exception e) {
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -353,10 +353,10 @@ public class Physics implements Runnable {
 		wallObjects = new ArrayList<NewRectangle>();
 		for (int y = (int) (entity.getCurrentY() / StateMachine.getTileSize())
 				- physicsFogOfWar; y <= (int) (entity.getCurrentY() / StateMachine.getTileSize())
-				+ physicsFogOfWar; y++) {
+						+ physicsFogOfWar; y++) {
 			for (int x = (int) (entity.getCurrentX() / StateMachine.getTileSize())
 					- physicsFogOfWar; x <= (int) (entity.getCurrentX() / StateMachine.getTileSize())
-					+ physicsFogOfWar; x++) {
+							+ physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
 						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
@@ -429,10 +429,10 @@ public class Physics implements Runnable {
 		wallObjects = new ArrayList<NewRectangle>();
 		for (int y = (int) (proj.getCurrentY() / StateMachine.getTileSize())
 				- physicsFogOfWar; y <= (int) (proj.getCurrentY() / StateMachine.getTileSize())
-				+ physicsFogOfWar; y++) {
+						+ physicsFogOfWar; y++) {
 			for (int x = (int) (proj.getCurrentX() / StateMachine.getTileSize())
 					- physicsFogOfWar; x <= (int) (proj.getCurrentX() / StateMachine.getTileSize())
-					+ physicsFogOfWar; x++) {
+							+ physicsFogOfWar; x++) {
 				try {
 					if (x >= 0 && y >= 0) {
 						if (world.getWorldGrid().get(y).get(x).getType() == 1) {
@@ -497,7 +497,7 @@ public class Physics implements Runnable {
 		}
 		return false;
 	}
-
+	
 	/*
 	 * Uses an item in the players Inventory
 	 */
@@ -519,7 +519,7 @@ public class Physics implements Runnable {
 			}
 		}
 	}
-
+	
 
 	/*
 	 * Saves all relevant data to physics
@@ -527,7 +527,7 @@ public class Physics implements Runnable {
 	public void Save() {
 		SaveData data = new SaveData();
 		SaveWorldData worldData = new SaveWorldData();
-
+		
 		data.setPlayerCurrentX(player.getCurrentX());
 		data.setPlayerCurrentY(player.getCurrentY());
 		data.setPlayerHealth(player.getHealth());
@@ -540,17 +540,18 @@ public class Physics implements Runnable {
 			ResourceManager.Save(data, "SaveData");
 			world.saveWorldData(worldData);
 			ResourceManager.Save(worldData, "SaveWorldData");
+			System.out.println(worldData.getWorldSavedGrid());
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
 			try{
 				Log.add(error.toString());
 			}catch (Exception e1) {
-
+				
 			}
 		}
 	}
-
+	
 	public void savePlayerInv(SaveData data) {
 		Item i = null;
 		if (player.getInventory().getCurrentMobItems().length >= 1) {
@@ -590,7 +591,7 @@ public class Physics implements Runnable {
 		player.getInventory().addMobInventoryItem(data.getItem3());
 		player.getInventory().addMobInventoryItem(data.getItem4());
 	}
-
+	
 
 	/*
 	 * Loads all relevant data to physics
@@ -598,24 +599,22 @@ public class Physics implements Runnable {
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
 			loadPlayerInv(data);
-			if(ResourceManager.hasData("SaveWorldData")) {
-				SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
-				world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
-				world.loadWorldData(worldData);
-			}
-		} catch (Exception e) {
+			world.loadWorldData(worldData);
+			world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
+			} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
 			try{
 				Log.add(error.toString());
 			}catch (Exception e1) {
-
+				
 			}
 		}
 	}
@@ -626,12 +625,12 @@ public class Physics implements Runnable {
 	public Physics() {
 		/*
 		 * This is the constructor for the Physics class.
-		 *
+		 * 
 		 * Currently we are using this to create enemy mobs, and the player entity. We
 		 * also set the player entity to the first index of the mobs ArrayList
 		 */
-
-
+		
+		
 	}
 
 	/*
@@ -643,7 +642,7 @@ public class Physics implements Runnable {
 		// These variables are specific only to the run method
 		int tick = 0;
 		double timer = System.currentTimeMillis();
-
+		
 		double nsPerTick = 1000000000.0d / StateMachine.getTickpersec();
 		double previous = System.nanoTime();
 		double unprocessed = 0;
@@ -690,20 +689,20 @@ public class Physics implements Runnable {
 	 * Starts physics
 	 */
 	public void start() {
-		mobs = new ArrayList<>();
-		mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
-		player = mobs.get(0);
-		Load();
+		
 		if (!running) {
-
+			mobs = new ArrayList<>();
+			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
+			player = mobs.get(0);
+			Load();
 			running = true;
 
 			for (int x = 1; x < 5; x++) {
 				mobs.add(new Mob( 100 * x, 0, 50,50));
 			}
-
+			
 			ai.setMobAIList(mobs);
-
+			
 			new Thread(this).start();
 		}
 	}
@@ -735,3 +734,4 @@ public class Physics implements Runnable {
 		this.world = world;
 	}
 }
+

@@ -16,19 +16,19 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 /*
- * The Render Class draws everything to the canvas that is stored in
- * 	the class StateMachine.
+ * The Render Class draws everything to the canvas that is stored in 
+ * 	the class StateMachine. 
  */
 
 public class Render {
-
+	
 	private static final int GameState    =  StateMachine.getGamestate();
 	private static final int MenuState    =  StateMachine.getMenustate();
 	private static final int PauseState   =  StateMachine.getPausestate();
 	private static final int OptionState  =  StateMachine.getOptionstate();
 	private static final int UpgradeState =  StateMachine.getUpgradestate();
 	private static final int DeadState    =  StateMachine.getDeadstate();
-
+	
 	private static volatile int CurrentState       =  StateMachine.getCurrentState();
 
 	private World world = new World();
@@ -212,14 +212,14 @@ public class Render {
 				closestIndex = pointList.indexOf(p1);
 			}
 		}
-		if (closestDistance < 100 ) {
+		if (closestDistance < 100 ) { 
 			if (currentMenuPos != closestIndex)
 				new AudioFile("Content/Audio/SoundEffects/Menu.wav").play(bgMusic.getAudioVolume()-2);
 			return closestIndex;
 		}
 		return -1;
 	}
-
+	
 
 	/*
 	 * Renders the menu screen
@@ -291,17 +291,17 @@ public class Render {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
 
-		Dimension box = new Dimension(50,50);
-		g.setColor(new Color(20,75,40)); // A Greenish Color
+        Dimension box = new Dimension(50,50);
+        g.setColor(new Color(20,75,40)); // A Greenish Color
 
-		for (int x = 1; x <= 10; x++) {
-			g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height/2), box.width, box.height);
-		}
-		Dimension box1 = new Dimension(40,40);
-		g.setColor(new Color(255,255,255)); // Pure White
-		for (int x = 1; x <= volume; x++) {
-			g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height/2), box1.width, box1.height);
-		}
+        for (int x = 1; x <= 10; x++) {
+            g.fillRect(1000 - (box.width + 10) * x, 100 - (box.height/2), box.width, box.height);
+        }
+        Dimension box1 = new Dimension(40,40);
+        g.setColor(new Color(255,255,255)); // Pure White
+        for (int x = 1; x <= volume; x++) {
+            g.fillRect(345 + (box.width + 10) * x, 100 - (box1.height/2), box1.width, box1.height);
+        }
 
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
 		g.setColor(Color.RED);
@@ -311,12 +311,12 @@ public class Render {
 		optionPoints.add(new Point(350, 115));
 		optionPoints.add(new Point(1150, 115));
 		optionPoints.add(new Point(150, 215));
-
+		
 		currentMenuPos = getClosestIndex(optionPoints, new Point(currentMouseX, currentMouseY));
 
 		g.setColor(Color.WHITE);
 		g.drawString("Volume", 100, 125);
-
+		
 		g.setFont(new Font("Impact", Font.PLAIN, 80));
 
 		if (currentMenuPos == 0) {
@@ -334,9 +334,9 @@ public class Render {
 			g.setColor(Color.WHITE);
 			g.drawString("+", 1050, 135);
 		}
-
+		
 		g.setFont(new Font("Impact", Font.PLAIN, 40));
-
+		
 		if (currentMenuPos == 2) {
 			g.setColor(Color.RED);
 			g.drawString("Main Menu", 100, 225);
@@ -350,12 +350,16 @@ public class Render {
 	 * Renders the foreground of the game
 	 */
 	public void RenderForeground(Graphics g, int width, int height, int tileSize, ArrayList<Mob> entities, Mob player,
-								 World world) {
+			World world) {
 		/*
 		 * The RenderForeground method takes the blocks on screen and actually prints
 		 * them to the canvas, allowing the player to see the world.
 		 */
-
+		try {
+			InitializeWorld();
+		} catch(Exception e) {
+			//NON FATAL ERROR
+		}
 		DisplayedObjects = new ArrayList<NewRectangle>();
 		DisplayedMobs = new ArrayList<NewRectangle>();
 		DisplayedItems = new ArrayList<NewRectangle>();
@@ -489,9 +493,9 @@ public class Render {
 
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, width, height);
-
+		
 		ArrayList<Point> upgradePoints = new ArrayList<Point> ();
-
+		
 		Dimension box = new Dimension(125,125);
 		Graphics2D g2D = (Graphics2D) g;
 		g2D.setStroke(new BasicStroke(4));
@@ -500,13 +504,13 @@ public class Render {
 			g.drawRect(middleWidth - box.width/2 - (300 * x), middleHeight - box.height/2, box.width, box.height);
 			upgradePoints.add(new Point(middleWidth - (300 * x), middleHeight));
 		}
-
+		
 		currentMenuPos = getClosestIndex(upgradePoints, new Point(currentMouseX, currentMouseY));
-
+		
 		g.setColor(Color.RED);
 		if (currentMenuPos != -1)
 			g.drawRect(middleWidth - box.width/2 - (300 * (currentMenuPos - 1)), middleHeight - box.height/2, box.width, box.height);
-
+		
 	}
 
 	/*
