@@ -92,7 +92,7 @@ public class Render {
 			} else if (CurrentState == UpgradeState) {
 				RenderUpgrade(g, width, height);
 			} else if (CurrentState == DeadState) {
-
+				RenderDead(g, width, height, StateMachine.getPhysics().getData().getPlayerLives());
 			}
 		} else {
 			loading = true;
@@ -100,6 +100,42 @@ public class Render {
 		}
 	}
 
+	public void RenderDead(Graphics g, int width, int height, int lives) {		 
+	    g.setColor(Color.BLACK);	 
+	    g.fillRect(0, 0, width, height);	 
+	    g.setFont(new Font("Impact", Font.PLAIN, 40));	 
+	    g.setColor(Color.WHITE);	 
+	    if(lives > 0) {	 
+	      if(lives > 1) {	 
+	        g.drawString("They got you! you have to be careful out there, lucky for you you have this life and " + (lives - 1) + " remaning.", 150, 150);	 
+	      } else {	 
+	        g.drawString("You are on your last life, be careful!", 150, 150);	 
+	      }	 
+	      ArrayList<Point> menuPoints = new ArrayList<Point>(); 
+	      menuPoints.add(new Point(300, 300));	 
+	      currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY));
+	      if (currentMenuPos == 0) {	 
+	        g.setColor(Color.RED);	 
+	        g.drawString("Resume From Last Save", 150, 300);	 
+	      } else {	 
+	        g.setColor(Color.WHITE);	 
+	        g.drawString("Resume From Last Save", 150, 300);
+	      }	 
+	    }else {	 
+	      g.drawString("They got you in a Stupor! Better luck next time!", 150, 150); 
+	      ArrayList<Point> menuPoints = new ArrayList<Point>();	 
+	      menuPoints.add(new Point(150, 200)); 
+	      currentMenuPos = getClosestIndex(menuPoints, new Point(currentMouseX, currentMouseY)); 
+	      if (currentMenuPos == 0) {	 
+	        g.setColor(Color.RED);
+	        g.drawString("Return To Menu", 150, 300);	 
+	      } else {	 
+	        g.setColor(Color.WHITE);
+	        g.drawString("Return To Menu", 150, 300);	 
+	      }	 
+	    }	 
+	  }
+	 
 	/*
 	 * Renders the loading screen
 	 */

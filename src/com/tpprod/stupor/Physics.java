@@ -24,6 +24,8 @@ public class Physics implements Runnable {
 	private int physicsFogOfWar = 2;
 	private ArrayList<NewRectangle> wallObjects = new ArrayList<NewRectangle>();
 	private boolean running = false;
+	private SaveData data = new SaveData();
+	 
 
 	/*
 	 * Adds gravity to all mobs and projectile
@@ -61,7 +63,15 @@ public class Physics implements Runnable {
 		ArrayList<Integer> removeList = new ArrayList<Integer>();
 		for (Mob entity : mobs) {
 			if (entity.getHealth() <= 0) {
-				removeList.add(mobs.indexOf(entity));
+		        if(entity.equals(player)) {	        	 
+		            data.setPlayerLives(data.getPlayerLives() - 1);	   
+		            StateMachine.setNextState(StateMachine.getDeadstate());	   
+		            stopWithoutSave();
+		   
+		          }else{	   
+		            removeList.add(mobs.indexOf(entity));
+		          }
+		   
 			}
 		}
 		for (Integer i : removeList) {
@@ -715,10 +725,18 @@ public class Physics implements Runnable {
         Save();
         running = false;
     }
-
+    
+    public void stopWithoutSave() {
+        running = false;     
+    }
+    
     /*
      * Getters and setters for objects in physics
      */
+    public SaveData getData() {	 
+        return data;
+    }
+      
     public Mob getPlayer() {
         return player;
     }
