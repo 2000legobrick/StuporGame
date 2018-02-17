@@ -43,8 +43,14 @@ public class World {
 		 * file.
 		 */
 		
-		bR = new BufferedReader(new FileReader(currentWorldFilePath));
-		ArrayList<Item> worldItems = new ArrayList<Item>();
+		if (!ResourceManager.hasData("CurrentWorldFile")) {
+			try {
+				createCurrentWorldFile();
+			} catch (Exception e) {
+			}
+		} else {
+			bR = new BufferedReader(new FileReader(currentWorldFilePath));
+		}
 		int accY = 0;
 		try {
 			// While the file being read still has new lines to read iterate through the
@@ -57,14 +63,18 @@ public class World {
 				int accX = 0;
 				for (String item : line) {
 					if (Integer.parseInt(item) == 4) {
-						worldItems.add(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.MAGENTA, StateMachine.getTileSize()/2, "healthRegen"));
+						inventory.addInventoryItem(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.MAGENTA, StateMachine.getTileSize()/2, "healthRegen"));
 					} else if (Integer.parseInt(item) == 5) {
-						worldItems.add(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.ORANGE, StateMachine.getTileSize()/2, "health"));
+						inventory.addInventoryItem(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.ORANGE, StateMachine.getTileSize()/2, "health"));
 					}
 					worldGrid.get(accY)
 							.add(new NewRectangle(Integer.parseInt(item), new Rectangle(accX * StateMachine.getTileSize(),
 									accY * StateMachine.getTileSize(), StateMachine.getTileSize(), StateMachine.getTileSize())));
 					accX++;
+				}
+				if (bW != null) {
+					bW.write(lineString);
+					bW.write("\n");
 				}
 				accY++;
 
@@ -75,11 +85,13 @@ public class World {
 			try{
 				Log.add(error.toString());
 			}catch (Exception e1) {
-
+				
 			}
+
 		}
+		if (bW != null)
+			bW.close();
 		bR.close();
-		inventory.setCurrentItems(worldItems);
 	}
 
 	/*
@@ -88,48 +100,6 @@ public class World {
 	
 	public Inventory getWorldInventory() {
 		return inventory;
-	}
-
-	public void resetWorldInventory() {
-		try {
-			// While the file being read still has new lines to read iterate through the
-			// split lines and add a NewRectangle to the 2d ArrayList worldGrid
-			bR = new BufferedReader(new FileReader(defaultWorldFilePath));
-			ArrayList<Item> worldDefaultItems = new ArrayList<Item>();
-			ArrayList<ArrayList<NewRectangle>> worldDefaultGrid = new ArrayList<ArrayList<NewRectangle>>();
-			int accY = 0;
-			while ((lineString = bR.readLine()) != null) {
-				line = new ArrayList<String>(Arrays.asList(lineString.split(" ")));
-
-				worldDefaultGrid.add(new ArrayList<NewRectangle>());
-				int accX = 0;
-				for (String item : line) {
-					if (Integer.parseInt(item) == 4) {
-						worldDefaultItems.add(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.MAGENTA, StateMachine.getTileSize()/2, "healthRegen"));
-					} else if (Integer.parseInt(item) == 5) {
-						worldDefaultItems.add(new Item(accX * StateMachine.getTileSize() + StateMachine.getTileSize()/4, accY * StateMachine.getTileSize() + StateMachine.getTileSize()/4, Color.ORANGE, StateMachine.getTileSize()/2, "health"));
-					}
-					worldDefaultGrid.get(accY)
-							.add(new NewRectangle(Integer.parseInt(item), new Rectangle(accX * StateMachine.getTileSize(),
-									accY * StateMachine.getTileSize(), StateMachine.getTileSize(), StateMachine.getTileSize())));
-					accX++;
-				}
-				accY++;
-
-			}
-			bR.close();
-			setWorldGrid(worldDefaultGrid);
-			inventory.setCurrentItems(worldDefaultItems);
-		} catch (Exception e) {
-			StringWriter error = new StringWriter();
-			e.printStackTrace(new PrintWriter(error));
-			try{
-				Log.add(error.toString());
-			}catch (Exception e1) {
-
-			}
-		}
-
 	}
 
 	public void saveWorldData(SaveWorldData worldData){
@@ -162,38 +132,33 @@ public class World {
 	}
 	
 	public void loadWorldData(SaveWorldData worldData) throws Exception {
-		bW = new BufferedWriter(new FileWriter(new File(currentWorldFilePath)));
-		ArrayList<ArrayList<String>> savedWorldGrid = worldData.getWorldSavedGrid();
-		for (ArrayList<String> row : savedWorldGrid) {
-			for (String col : row) {
-				bW.write(col + " ");
+		if (ResourceManager.hasData("CurrentWorldFile")) {
+			bW = new BufferedWriter(new FileWriter(new File(currentWorldFilePath)));
+			ArrayList<ArrayList<String>> savedWorldGrid = worldData.getWorldSavedGrid();
+			for (ArrayList<String> row : savedWorldGrid) {
+				for (String col : row) {
+					bW.write(col);
+				}
+				bW.write("\n");
 			}
-			bW.write("\n");
-
 		}
-		bW.close();
 	}
 
 	public void createCurrentWorldFile() throws Exception{
-		resetWorldInventory();
 		bR = new BufferedReader(new FileReader(defaultWorldFilePath));
 		bW = new BufferedWriter(new FileWriter(new File(currentWorldFilePath)));
 		while((lineString = bR.readLine()) != null) {
-			line = new ArrayList<String>(Arrays.asList(lineString.split(" ")));
-			for(String item : line) {
-				bW.write(item + " ");
-			}
+			bW.write(lineString);
 			bW.write("\n");
 		}
 		bW.close();
 		bR.close();
-		//Initialize();
 	}
 
 	public void setWorldData(int row, int col, int itemType) throws Exception {
 		ArrayList<ArrayList<String>> tempWorldGrid = new ArrayList<ArrayList<String>>();
 		if (ResourceManager.hasData("CurrentWorldFile")) {
-			bR = new BufferedReader(new FileReader(new File(currentWorldFilePath)));
+			bR = new BufferedReader(new FileReader(currentWorldFilePath));
 			int acc = 0;
 			while ((lineString = bR.readLine()) != null) {
 				line = new ArrayList<String>(Arrays.asList(lineString.split(" ")));
@@ -209,10 +174,11 @@ public class World {
 					bW.write(tempCol);
 				bW.write('\n');
 			}
-			//bW.write("0", row * 960 + col, row * 960 + col + 1);
+			//bW.write("0", col * 960 + row, col * 960 + row + 1);
 			bW.close();
 			bR.close();
 		}
+		
 	}
 	
 	public ArrayList<ArrayList<NewRectangle>> getWorldGrid() {

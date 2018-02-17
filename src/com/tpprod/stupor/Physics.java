@@ -540,6 +540,7 @@ public class Physics implements Runnable {
 			ResourceManager.Save(data, "SaveData");
 			world.saveWorldData(worldData);
 			ResourceManager.Save(worldData, "SaveWorldData");
+			System.out.println(worldData.getWorldSavedGrid());
 		} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
@@ -598,18 +599,16 @@ public class Physics implements Runnable {
 	public void Load() {
 		try {
 			SaveData data = (SaveData) ResourceManager.Load("SaveData");
+			SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
 			player.setCurrentX(data.getPlayerCurrentX());
 			player.setCurrentY(data.getPlayerCurrentY());
 			player.setHealth(data.getPlayerHealth());
 			player.setMana(data.getPlayerMana());
 			player.setEXP(data.getPlayerEXP());
 			loadPlayerInv(data);
-			if(ResourceManager.hasData("SaveWorldData")) {
-				SaveWorldData worldData = (SaveWorldData) ResourceManager.Load("SaveWorldData");
-				world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
-				world.loadWorldData(worldData);
-			}
-		} catch (Exception e) {
+			world.loadWorldData(worldData);
+			world.getWorldInventory().setCurrentItems(worldData.getWorldInv());
+			} catch (Exception e) {
 			StringWriter error = new StringWriter();
 			e.printStackTrace(new PrintWriter(error));
 			try {
@@ -689,12 +688,12 @@ public class Physics implements Runnable {
 	 * Starts physics
 	 */
 	public void start() {
-		mobs = new ArrayList<>();
-		mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
-		player = mobs.get(0);
-		Load();
+		
 		if (!running) {
-
+			mobs = new ArrayList<>();
+			mobs.add(new Mob(StateMachine.getTileSize()*3, 0, 100,50));
+			player = mobs.get(0);
+			Load();
 			running = true;
 
 			for (int x = 1; x < 5; x++) {

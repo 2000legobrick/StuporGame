@@ -404,7 +404,11 @@ public class Render {
 		 * The RenderForeground method takes the blocks on screen and actually prints
 		 * them to the canvas, allowing the player to see the world.
 		 */
-
+		try {
+			InitializeWorld();
+		} catch(Exception e) {
+			//NON FATAL ERROR
+		}
 		DisplayedObjects = new ArrayList<NewRectangle>();
 		DisplayedMobs = new ArrayList<NewRectangle>();
 		DisplayedItems = new ArrayList<NewRectangle>();
