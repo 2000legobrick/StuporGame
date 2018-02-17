@@ -563,6 +563,8 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 			try {
 				ResourceManager.deleteSave("SaveData");
 				ResourceManager.deleteSave("CurrentWorldFile");
+				ResourceManager.deleteSave("SaveWorldData");
+				physics.getWorld().createCurrentWorldFile();
 			} catch(Exception e){
 				StringWriter error = new StringWriter();
 				e.printStackTrace(new PrintWriter(error));
@@ -571,11 +573,13 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 				}catch (Exception e1) {}
 			}
 			NextState = GameState;
-			physics.start();						
+			physics.start();
 		} else if (render.getCurrentMenuPos() == 1 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			if (ResourceManager.hasData("SaveData")) {
 				NextState = GameState;
+				physics.Load();
 				physics.start();
+
 			}
 		} else if (render.getCurrentMenuPos() == 2 && CurrentState == MenuState  && arg0.getButton() == MouseEvent.BUTTON1) {
 			NextState = OptionState;
@@ -622,6 +626,7 @@ public class StateMachine extends Canvas implements Runnable, KeyListener, Mouse
 		}
 		if (CurrentState == PauseState && arg0.getButton() == MouseEvent.BUTTON1) {
 			if (render.getCurrentMenuPos() == 0) {
+				physics.Load();
 				physics.start();
 				CurrentState = GameState;
 				NextState = GameState;
